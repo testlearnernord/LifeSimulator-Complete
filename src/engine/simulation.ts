@@ -1,6 +1,7 @@
 import {CAREERS,COUNTRIES,ITEMS,LAST_NAMES,NAMES} from './catalog.js';
 import type {Action,Entry,NewLife,Pending,Person,Relationship,SaveGame,Stat} from './types.js';
 import {advanceExpansions,businessAction,rentalAction,socialAction,validExtensions} from './expansions.js';
+import {advanceInvestments,investAction,portfolioValue,validInvestments} from './investments.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -50,6 +51,7 @@ function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=sc
  const assetExpense=p.assets.reduce((a,b)=>a+b.annualCost,0);
  p.cash-=expense+assetExpense;
  advanceExpansions(s,expansionHooks(s));
+ advanceInvestments(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
  if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
@@ -196,6 +198,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
+ case 'INVEST':investAction(s,action.key,action.assetId,action.quantity,expansionHooks(s));break;
  case 'SOCIAL':socialAction(s,action.key,action.platform,expansionHooks(s));break;
   case 'BUSINESS':businessAction(s,action.key,action.sector,expansionHooks(s));break;
   case 'RENTAL':rentalAction(s,action.key,action.id,expansionHooks(s));break;
@@ -225,7 +228,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p))return false;
+ if(!validExtensions(p)||!validInvestments(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
@@ -244,4 +247,4 @@ export function isSaveGame(value:unknown):value is SaveGame{
  return true;
 }
 export function careerName(p:Person){return CAREERS.find(c=>c.id===p.jobId)?.title||'Keine Anstellung';}
-export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0);}
+export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0)+portfolioValue(p);}
