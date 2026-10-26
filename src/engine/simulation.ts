@@ -63,7 +63,7 @@ function activity(s:SaveGame,key:string){const p=s.person;
  case 'doctor':useAnnual(p,'doctor',2);if(p.cash<150)throw Error('Für den Arztbesuch fehlen 150 €.');p.cash-=150;stat(p,'health',12+Math.floor(rng(s)*12));log(s,'Du bist beim Arzt gewesen.','good');break;
  case 'meditate':useAnnual(p,'meditate',2);stat(p,'happiness',7);stat(p,'health',2);log(s,'Du hast meditiert und dich erholt.','good');break;
  case 'study':useAnnual(p,'study');if(p.age<6||p.age>24||p.school==='Abgeschlossen')throw Error('Du bist derzeit nicht in der Schule.');stat(p,'smarts',5);stat(p,'happiness',-1);log(s,'Du hast fleißig gelernt.','good');break;
- case 'date':useAnnual(p,'date');if(p.age<16throw Error('Dating ist erst ab 16 möglich.');if(p.relationships.some(r=>r.kind==='Partner'&&r.alive))throw Error('Du bist bereits in einer Beziehung.');{const r=relation(s,'Partner',Math.max(16,p.age+Math.floor(rng(s)*7)-3));p.relationships.push(r);log(s,`Du bist jetzt mit ${r.name} zusammen.`,'good');}break;
+ case 'date':useAnnual(p,'date');if(p.age<16)throw Error('Dating ist erst ab 16 möglich.');if(p.relationships.some(r=>r.kind==='Partner'&&r.alive))throw Error('Du bist bereits in einer Beziehung.');{const r=relation(s,'Partner',Math.max(16,p.age+Math.floor(rng(s)*7)-3));p.relationships.push(r);log(s,`Du bist jetzt mit ${r.name} zusammen.`,'good');}break;
  case 'crime':
  case 'crime:pickpocket':
  case 'crime:shoplift':
