@@ -2,12 +2,13 @@ import {applyAction,careerName,createLife,money,netWorth} from './engine/simulat
 import {isMuted,playSound,toggleSound} from './audio.js';
 import {CAREERS,COUNTRIES,ITEMS} from './engine/catalog.js';
 import {BUSINESS_SECTORS,SOCIAL_PLATFORMS} from './engine/expansions.js';
+import {PREMIUM_CATALOG,PREMIUM_GROUPS} from './engine/premium-catalog.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
 type Tab='life'|'career'|'people'|'assets'|'activities'|'menu';
 const root=document.querySelector<HTMLDivElement>('#app')!;
-let current:SaveGame|null=null;let games:SaveGame[]=[];let tab:Tab='life';let modal:'new'|'edit'|'saves'|'delete'|null=null;let deleteTarget:string|null=null;let toastMessage='';let toastPositive=false;let updateReady=false;let activitySection:string|null=null;let relationFocus:string|null=null;let historyExpanded=false;
+let current:SaveGame|null=null;let games:SaveGame[]=[];let tab:Tab='life';let modal:'new'|'edit'|'saves'|'delete'|null=null;let deleteTarget:string|null=null;let toastMessage='';let toastPositive=false;let updateReady=false;let activitySection:string|null=null;let relationFocus:string|null=null;let historyExpanded=false;let premiumOpen=false;
 const html=(str:unknown):string=>String(str).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
 const opt=(items:string[],selected:string)=>items.map(i=>`<option value="${html(i)}" ${i===selected?'selected':''}>${html(i)}</option>`).join('');
 const button=(text:string,action:string,id='',extra='secondary',disabled=false)=>`<button class="button ${extra}" data-action="${html(action)}" data-id="${html(id)}" ${disabled?'disabled':''}>${text}</button>`;
@@ -103,7 +104,26 @@ function renderActivities(p:Person){
  if(activitySection==='leisure')return `${back}${heading('Freizeit')}<div class='stack'>${card('🚶','Spazieren gehen','Mehr Gesundheit und Zufriedenheit','activity','walk','Gehen')}${card('🤝','Freiwilligenarbeit','Ruf und Wohlbefinden verbessern, ab 14','activity','volunteer','Helfen',p.age<14)}${card('🎟️','Lotterielos','20 € je Los · seltene hohe Gewinne','activity','lottery','Spielen',p.age<18||p.cash<20)}</div>`;
  return back;
 }
-function renderMenu(){return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.4.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderPremium(){
+ const p=current?.person;
+ const playable=['time-machine','jail-card','golden-pacifier','golden-diploma','hollywood-star'];
+ const availableYears=[1,2,3,4,5].filter(y=>(current?.checkpoints||[]).some(c=>c.age===(p?.age||0)-y));
+ return `<button class='screen-back' data-action='premiumback'>‹ Hauptmenü</button><div class='panel-intro'><span class='panel-emoji'>🎁</span><div><h2>Zusatzinhalte</h2><span>Alle implementierten Inhalte sind kostenlos</span></div></div>
+ <div class='well'>Dieser Katalog dokumentiert nachgewiesene BitLife-Kaufangebote, mit ihrem tatsächlichen Entwicklungsstand in Lebenslinien. Offene Pakete sind ausdrücklich nicht spielbar.</div>
+ ${heading('Nutzbare Sonderfunktionen')}
+ <div class='stack'>
+ ${card('⏳','Time Machine','Zurück zu einem früheren Lebensjahr, auch nach dem Tod','premiumrewind','1','Zurückspulen',!availableYears.length)}
+ ${availableYears.length?`<div class='info-card'><label class='field'>Zeitreise<select id='rewind-years'>${availableYears.map(y=>`<option value='${y}'>${y} ${y===1?'Jahr':'Jahre'}</option>`).join('')}</select></label>${button('Jahre zurückspulen','premiumrewind','selected','button-wide')}</div>`:''}
+ ${card('👶','Golden Pacifier','Bis zu drei Kinder mit selbst gewähltem Geschlecht und Talent','open','baby','Planen',!p||!p.alive||p.age<18||p.prisonYears>0||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}
+ ${card('🎓','Golden Diploma',`Sofortabschlüsse: ${p?.degrees?.length||0}/2`,'open','diploma','Abschluss',!p||!p.alive||p.age<18||p.prisonYears>0||p.universityYears>0||(p.degrees?.length||0)>=2)}
+ ${card('🚔','Get Out of Jail Free Card','Haftentlassung mit Löschung der Vorstrafe','premiumitem','jail-card','Nutzen',!p||!p.alive||p.prisonYears===0)}
+ ${card('🌟','Hollywood Star','Sofortige Bekanntheit in bestimmten Berufen','premiumitem','hollywood-star','Aktivieren',!p||!p.alive||p.prisonYears>0||!(['writer','chef','reporter','app-developer'].includes(p.jobId||'')||p.business))}
+ </div>
+ ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
+ <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
+}
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.5.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+ ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
  ${heading('Audio')}<div class="info-card"><div class="row"><span class="subtle">Synthetische, lokal erzeugte UI-Töne.</span>${button(isMuted()?'Ton einschalten':'Ton ausschalten','sound','','smallbtn')}</div></div>${heading('Installation und Datenschutz')}<div class="info-card">Im iPhone-Safari auf <b>Teilen → Zum Home-Bildschirm</b> tippen. Beim ersten Aufruf müssen die Dateien online verfügbar sein. Danach funktioniert die installierte App offline. Spielstände verbleiben im Browser (IndexedDB) und werden nicht an Server übertragen.<hr class="divider">Automatische Speicherung nach jeder Aktion. <b>Wichtig:</b> Browserdaten löschen kann Spielstände entfernen. Regelmäßig exportieren.${updateReady?`<div style="margin-top:14px">${button('Update installieren','update','','button-wide')}</div>`:''}</div>
