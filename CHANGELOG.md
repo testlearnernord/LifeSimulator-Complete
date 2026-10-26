@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.5.0 – 2026-10-26 (Premium-Inventar, fünf neue Sonderfunktionen)
+## 0.5.0 – 2026-10-26 (Premium-Inventar und spielbare Sonderfunktionen)
+
+- Investor subset: five fictional asset classes, annual prices, share purchases and sales, portfolio valuation, dividends, advisor decisions, insolvency risk through broader game economics.
 
 - 40 nachgewiesene bzw. community-recherchierte Add-on-Angebote als strukturierter Katalog mit Herkunft und ehrlichem Status (nicht unbedingt vollständig).
 - Neues Premium-Inventar mit bedienbaren Extras und kostenloser Admin-Freischaltung für alle tatsächlich programmierten Mechaniken.
