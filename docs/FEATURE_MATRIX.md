@@ -1,6 +1,8 @@
+> Die vollständige vorläufige Übersicht kaufbarer Zusatzinhalte (40 Einträge) befindet sich in [PREMIUM_INVENTORY.md](PREMIUM_INVENTORY.md) und dem Quellkatalog `src/engine/premium-catalog.ts`. Quelle, Status und Vollständigkeitsgrenzen sind dort erläutert.
+
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-25. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.25.x (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.4.0 (2026-10-26).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.5.0 (2026-10-26).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -123,3 +125,17 @@ Die offizielle Hilfe und der App Store haben höhere Aussagekraft als Community-
 
 - Eigener kostenloser Admin-Editor für die vier sichtbaren Charakterwerte bei der Geburt und während eines Lebens. Er beansprucht **keine** Funktionsgleichheit mit dem vollständigen God Mode des Originals (z. B. Aussehen, Talente, Verwandten-Editor oder Adelsstatus).
 - Offene DLC- und Spezialkarriereeinträge bleiben unverändert offen, bis tatsächlich spielbare Simulation, Tests und UI vorhanden sind.
+
+### Neuer Stand 0.5.0
+
+| Kaufoption | Status im eigenen Spiel | Tatsächlich implementiert |
+|---|---|---|
+| Time Machine | **S** | 15 lokale Jahres-Snapshots, Rücksprung 1–5 Jahre, auch nach Tod |
+| Golden Pacifier | **P** | Bis zu Drillinge mit wählbarem Geschlecht und Talent |
+| Get Out of Jail Free Card | **P** | Haftentlassung und Löschen des einfachen Strafregisters |
+| Golden Diploma | **P** | Zwei Sofortabschlüsse aus vier Studienrichtungen |
+| Hollywood Star | **P** | Bekanntheit in einigen Jobs und als Unternehmer |
+| God Mode, Bitizenship, Boss Mode | **P** | Nur vereinzelte Teilfunktionen, nicht komplette Originalpakete |
+| Investor, Cult, Black Market, Zoo, Casino, Secret Agent, Movie Director, Ultimate Fighter | **O** | Kein vollständiges spielbares Pack |
+
+**Kein 1:1-Anspruch:** Alle fünf Mechaniken sind eigene Umsetzung bekannter Grundfunktionen. Proprietäre Parameter und viele zugehörige Inhalte fehlen. Die übrigen Kaufangebote sind nicht „kostenlos freigeschaltet“, sondern noch nicht programmiert.
