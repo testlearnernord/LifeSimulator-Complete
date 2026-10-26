@@ -69,11 +69,22 @@ with sync_playwright() as playwright:
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     page.locator('[data-action="category"][data-id="social"]').click()
     expect(page.get_by_text('1 Beiträge')).to_be_visible()
+    page.get_by_role('button', name='Hauptmenü öffnen').click()
+    page.locator('[data-action="premiumopen"]').click()
+    expect(page.get_by_role('heading', name='Zusatzinhalte')).to_be_visible()
+    expect(page.locator('.premium-line')).to_have_count(40)
+    expect(page.get_by_text('Golden Pacifier', exact=True)).to_be_visible()
+    expect(page.get_by_text('Movie Director', exact=True)).to_be_visible()
+    import os
+    os.makedirs('artifacts', exist_ok=True)
+    page.screenshot(path='artifacts/premium-mobile.png', full_page=True)
+    page.locator('[data-action="premiumrewind"][data-id="selected"]').click()
     page.get_by_role('button', name='Zum Lebenslauf').click()
+    expect(page.locator('.year-group h2').last).to_contain_text('Alter: 12 Jahre')
     import os
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.4 mobile expansion UI, social persistence, stats, saves and offline: PASSED')
+    print('v0.5 mobile premium inventory, time rewind, social persistence and offline: PASSED')
     context.close()
     browser.close()
