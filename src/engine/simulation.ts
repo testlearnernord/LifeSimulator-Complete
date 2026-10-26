@@ -72,7 +72,7 @@ function activity(s:SaveGame,key:string){const p=s.person;
   useAnnual(p,'crime',2);
   const level=key==='crime:burglary'?3:key==='crime:shoplift'?1:2;
   const reward=level*120+Math.floor(rng(s)*level*900);
-  const caught=chance(s,Math.min(.83,.26+level*.085+(p.record?.1:0)));
+  const caught=chance(s,Math.min(.83,.26+level*.085+(p.record ? 0.1 : 0)));
   if(caught){p.record=true;p.prisonYears=1+Math.floor(rng(s)*level+1);p.jobId=null;p.salaryBonus=0;p.cash-=Math.min(Math.max(0,p.cash),400+level*250);stat(p,'happiness',-20);log(s,`Du wurdest gefasst und zu ${p.prisonYears} Jahren Haft verurteilt.`,'bad');}
   else{p.cash+=reward;stat(p,'happiness',2);log(s,`Der Diebstahl brachte ${money(reward)} ein.`,'good');}
   p.reputation=clamp((p.reputation??50)-level*6);break;
