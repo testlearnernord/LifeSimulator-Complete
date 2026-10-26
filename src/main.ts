@@ -1,6 +1,7 @@
 import {applyAction,careerName,createLife,money,netWorth} from './engine/simulation.js';
 import {isMuted,playSound,toggleSound} from './audio.js';
 import {CAREERS,COUNTRIES,ITEMS} from './engine/catalog.js';
+import {BUSINESS_SECTORS,SOCIAL_PLATFORMS} from './engine/expansions.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -32,6 +33,20 @@ function renderTimeline(p:Person){
 function renderLife(s:SaveGame){const p=s.person;return `<section class="life-feed"><div class="feed-label"><span>📖 Dein Lebenslauf</span><span>${p.generation}. Generation</span></div>${renderTimeline(p)}
  ${!p.alive?`<div class="end-of-life"><span class="end-symbol">🕊️</span><h2>Ein Leben geht zu Ende</h2><p>${html(p.causeOfDeath||'Deine Geschichte ist abgeschlossen.')}</p>${p.relationships.some(r=>r.kind==='Kind'&&r.alive)?'<p>Wähle ein Kind und führe die Familiengeschichte fort.</p>':'<p>Beginne eine neue Geschichte über das Menü.</p>'}</div>`:''}
  ${!p.alive&&p.relationships.some(r=>r.kind==='Kind'&&r.alive)?`${heading('Nächste Generation')}<div class="stack">${p.relationships.filter(r=>r.kind==='Kind'&&r.alive).map(r=>card('👶',html(r.name),`${r.age} Jahre alt`,'generation',r.id,'Spielen')).join('')}</div>`:''}</section>`;}
+function renderBusiness(p:Person){
+ const b=p.business;
+ if(!b)return `${heading('Eigenes Unternehmen')}<div class='well'>Gründe ein Unternehmen, entwickle Produkte, betreibe Marketing und beschäftige Mitarbeiter. Das Unternehmenskapital wird separat geführt.</div><div class='stack'>${BUSINESS_SECTORS.map(s=>card('🏢',s.name,money(s.start)+' Gründungskapital','business','open|'+s.id,'Gründen',p.age<18||p.cash<s.start||p.prisonYears>0)).join('')}</div>`;
+ return `${heading('Dein Unternehmen')}<div class='info-card'><h2>🏢 ${html(b.name)}</h2><p>Firmenkasse: <b>${money(b.cash)}</b></p><p class='small'>${b.staff} Beschäftigte · Produktqualität ${b.quality}% · Bekanntheit ${b.brand}% · ${b.age} Geschäftsjahre</p><div class='performance-meter'><div style='width:${b.quality}%'></div></div></div>
+ <div class='stack'>
+ ${card('🔬','Produkte verbessern','4.500 € Firmenkapital','business','develop','Entwickeln',b.cash<4500||p.prisonYears>0)}
+ ${card('📣','Marketing','3.000 € Firmenkapital','business','market','Werben',b.cash<3000||p.prisonYears>0)}
+ ${card('👩‍💼','Mitarbeiter einstellen','1.500 € Rekrutierungskosten','business','hire','Einstellen',b.cash<1500||p.prisonYears>0)}
+ ${card('📉','Stellen abbauen','Eine Stelle streichen','business','fire','Abbauen',b.staff<=1||p.prisonYears>0)}
+ ${card('💵','Kapital nachschießen','10.000 € Privatgeld in die Firmenkasse','business','invest','Investieren',p.cash<10000||p.prisonYears>0)}
+ ${card('💰','Gewinn entnehmen','10.000 € aus der Firmenkasse, netto 7.500 €','business','withdraw','Entnehmen',b.cash<10000||p.prisonYears>0)}
+ ${card('🏦','Unternehmen verkaufen','Verkauf zum Schätzwert','business','sell','Verkaufen',p.prisonYears>0)}
+ </div>`;
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -42,7 +57,7 @@ function renderCareer(p:Person){
  ${heading('Beruf',p.jobId?'Beschäftigt':'Arbeitssuchend')}
  <div class='info-card'><b>${html(careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr`:'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
- ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed;return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>`;
+ ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed;return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
 function renderPeople(p:Person){
  const living=p.relationships.filter(r=>r.alive);
@@ -56,7 +71,17 @@ function renderPeople(p:Person){
  ${heading('Familie, Liebe und Freundschaft')}<div class='stack'>${living.map(r=>`<button class='list-entry' data-action='relview' data-id='${html(r.id)}'><span class='list-emoji'>${r.kind==='Kind'?'🧒':r.kind==='Partner'?'❤️':r.kind==='Freund'?'🫂':'👪'}</span><span class='list-text'><b>${html(r.name)}</b><small>${r.kind} · ${r.age} Jahre · ${r.bond}%</small><span class='relationship-meter'><span style='width:${r.bond}%'></span></span></span><span class='chevron'>›</span></button>`).join('')}</div>
  ${heading('Liebe und Familie')}<div class='stack'>${card('💘','Partnersuche','Ab 16 Jahren','activity','date','Suchen',p.age<16||p.prisonYears>0||living.some(r=>r.kind==='Partner'))}${card('👶','Nachwuchs','Ein Kind bekommen','activity','child','Versuchen',p.age<18||p.age>55||p.prisonYears>0||!living.some(r=>r.kind==='Partner'))}</div>`;
 }
-function renderAssets(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>`;}
+function rentalPanel(p:Person,a:Person['assets'][number]){
+ if(a.kind!=='Haus')return '';
+ const r=a.rental;
+ const disabled=p.prisonYears>0||!p.alive;
+ return `<div class='rental-panel'><b>🏠 Vermietung</b><p class='small'>${r?(r.occupied?'Vermietet':'Leerstand')+' · Jahresmiete '+money(r.annualRent)+' · Zustand '+r.condition+'%':'Noch nicht zur Vermietung angeboten'}</p><div class='row'>
+ ${button('Mieter finden','rental',a.id+'|advertise','smallbtn',disabled||!!r?.occupied)}
+ ${button('Renovieren','rental',a.id+'|repair','smallbtn',disabled||p.cash<Math.round(a.value*.025))}
+ ${r?.occupied?button('Mietvertrag beenden','rental',a.id+'|vacate','smallbtn',disabled):''}
+ </div></div>`;
+}
+function renderAssets(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>`;}
 function renderActivities(p:Person){
  const jailed=p.prisonYears>0;
  if(jailed){return `<div class='panel-intro'><span class='panel-emoji'>🔒</span><div><h2>Gefängnis</h2><span>Reststrafe: ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'}</span></div></div><div class='prison-warning'>Arbeiten, Reisen, Einkaufen und weitere Straftaten sind während der Haft gesperrt.</div>${heading('Haftalltag')}<div class='stack'>${card('📚','Gefängnisbibliothek','Wissen aufbauen','activity','prison:library','Lesen')}${card('🏃','Hofgang','Fitness und Stimmung verbessern','activity','prison:yard','Trainieren')}${card('🧘','Meditation in der Zelle','Stress abbauen','activity','prison:meditate','Meditieren')}${card('🧹','Gefängnisarbeit','80 € für erledigte Aufgaben','activity','prison:job','Arbeiten')}</div>`;}
@@ -65,6 +90,7 @@ function renderActivities(p:Person){
  ${option('🧠','Körper & Geist','Fitnessstudio, Bibliothek, Meditation, Arzt','mind')}
  ${option('❤️','Liebe','Partner kennenlernen und Familie gründen','love')}
  ${option('⚖️','Kriminalität','Taschendiebstahl, Ladendiebstahl, Einbruch','crime')}
+ ${option('📱','Social Media','Follower, Bekanntheit und Werbepartner','social')}
  ${option('✈️','Reisen','Urlaub und Auswanderung','travel')}
  ${option('🎟️','Freizeit','Spazieren, Helfen und Lotterie','leisure')}
  </div>`;}
@@ -72,11 +98,12 @@ function renderActivities(p:Person){
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
  if(activitySection==='love')return `${back}${heading('Liebe und Familie')}<div class='stack'>${card('💕','Partnersuche','Neue Beziehung beginnen','activity','date','Suchen',p.age<16||p.relationships.some(r=>r.kind==='Partner'&&r.alive))}${card('👶','Nachwuchs','Versucht, Eltern zu werden','activity','child','Versuchen',p.age<18||p.age>55||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}</div>`;
  if(activitySection==='crime')return `${back}<div class='prison-warning'>⚠️ Straftaten können zu Geldstrafen, Vorstrafen und Gefängnis führen. Maximal zwei Versuche je Lebensjahr.</div>${heading('Straftaten')}<div class='stack'>${card('👜','Taschendiebstahl','Mittleres Risiko, kleiner Gewinn','activity','crime:pickpocket','Versuchen',p.age<12)}${card('🛍️','Ladendiebstahl','Geringeres Risiko und geringere Beute','activity','crime:shoplift','Versuchen',p.age<12)}${card('🏠','Einbruch','Hohes Risiko und höhere Beute','activity','crime:burglary','Versuchen',p.age<12)}</div>`;
+ if(activitySection==='social')return `${back}<div class='panel-intro'><span class='panel-emoji'>📱</span><div><h2>Social Media</h2><span>Berühmt werden und Werbepartner finden</span></div></div><div class='info-card'>Bekanntheit: <b>${p.fame??0}%</b> · Reichweite: <b>${Object.values(p.social||{}).reduce((sum,profile)=>sum+(profile?.followers||0),0).toLocaleString('de-DE')} Follower</b><p class='small'>Beiträge sind auf drei pro Plattform und Jahr begrenzt. Ab 10.000 Followern sind Werbedeals möglich.</p></div><div class='stack'>${SOCIAL_PLATFORMS.map(platform=>{const profile=p.social?.[platform];return `<article class='social-card'><h3>📣 ${html(platform)}</h3><p>${profile?profile.followers.toLocaleString('de-DE')+' Follower · '+profile.posts+' Beiträge':'Du hast noch kein Profil.'}</p><div class='row'>${!profile?button('Profil anlegen','social',platform+'|join','smallbtn',p.age<13):button('Beitrag veröffentlichen','social',platform+'|post','smallbtn')}${profile?button('Werbedeal','social',platform+'|sponsor','smallbtn',profile.followers<10000):''}${profile?button('Konto löschen','social',platform+'|delete','ghost smallbtn'):''}</div></article>`;}).join('')}</div>`;
  if(activitySection==='travel')return `${back}${heading('Reisen und Wohnen')}<div class='stack'>${card('🌴','Urlaub machen','2.000 € · Glück verbessern','activity','vacation','Buchen',p.age<18||p.cash<2000)}</div>${heading('Auswandern')}<div class='info-card'><label class='field'>Zielland<select id='country-select'>${opt(COUNTRIES.filter(x=>x!==p.country),COUNTRIES.find(x=>x!==p.country)||'')}</select></label><p class='small'>3.500 € für den Umzug. Bestehende Anstellung endet.</p>${button('Auswandern','emigrate','','button-wide',p.age<18||p.cash<3500)}</div>`;
  if(activitySection==='leisure')return `${back}${heading('Freizeit')}<div class='stack'>${card('🚶','Spazieren gehen','Mehr Gesundheit und Zufriedenheit','activity','walk','Gehen')}${card('🤝','Freiwilligenarbeit','Ruf und Wohlbefinden verbessern, ab 14','activity','volunteer','Helfen',p.age<14)}${card('🎟️','Lotterielos','20 € je Los · seltene hohe Gewinne','activity','lottery','Spielen',p.age<18||p.cash<20)}</div>`;
  return back;
 }
-function renderMenu(){return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.3.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.4.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
  ${heading('Audio')}<div class="info-card"><div class="row"><span class="subtle">Synthetische, lokal erzeugte UI-Töne.</span>${button(isMuted()?'Ton einschalten':'Ton ausschalten','sound','','smallbtn')}</div></div>${heading('Installation und Datenschutz')}<div class="info-card">Im iPhone-Safari auf <b>Teilen → Zum Home-Bildschirm</b> tippen. Beim ersten Aufruf müssen die Dateien online verfügbar sein. Danach funktioniert die installierte App offline. Spielstände verbleiben im Browser (IndexedDB) und werden nicht an Server übertragen.<hr class="divider">Automatische Speicherung nach jeder Aktion. <b>Wichtig:</b> Browserdaten löschen kann Spielstände entfernen. Regelmäßig exportieren.${updateReady?`<div style="margin-top:14px">${button('Update installieren','update','','button-wide')}</div>`:''}</div>
@@ -111,7 +138,10 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
  else if(kind==='activity'){playSound('tap');await action({type:'ACTIVITY',key:id});}
- else if(kind==='study')await action({type:'STUDY'});
+ else if(kind==='social'){const sep=id.lastIndexOf('|');await action({type:'SOCIAL',platform:id.slice(0,sep) as import('./engine/types.js').SocialPlatform,key:id.slice(sep+1) as 'join'|'post'|'sponsor'|'delete'});}
+  else if(kind==='business'){const sep=id.indexOf('|');await action({type:'BUSINESS',key:(sep<0?id:id.slice(0,sep)) as 'open'|'develop'|'market'|'hire'|'fire'|'sell'|'invest'|'withdraw',sector:sep<0?undefined:id.slice(sep+1) as import('./engine/types.js').BusinessSector});}
+  else if(kind==='rental'){const sep=id.lastIndexOf('|');await action({type:'RENTAL',id:id.slice(0,sep),key:id.slice(sep+1) as 'advertise'|'repair'|'vacate'});}
+  else if(kind==='study')await action({type:'STUDY'});
  else if(kind==='job')await action({type:'JOB',id});
  else if(kind==='buy')await action({type:'BUY',id});
  else if(kind==='sell')await action({type:'SELL',id});
