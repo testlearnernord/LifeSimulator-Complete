@@ -20,6 +20,7 @@ export function createLife(input:NewLife):SaveGame{
  const p:Person={id:`person-${seed.toString(16)}`,name,gender:input.gender,country:COUNTRIES.includes(input.country)?input.country:COUNTRIES[0]!,age:0,alive:true,stats:{health:85,happiness:80,smarts:50,looks:50},cash:Math.max(0,input.inheritance||0),school:'Kindergarten',degree:false,universityYears:0,jobId:null,jobYears:0,prisonYears:0,record:false,relationships:[],assets:[],history:[],pending:null,causeOfDeath:null,generation:input.generation||1};
  const s:SaveGame={schema:1,id:`life-${seed.toString(16)}-${Date.now()}`,title:name,updated:Date.now(),seed,person:p,ancestry:[],adminFullAccess:true};
  p.stats.smarts=clamp(30+rng(s)*60);p.stats.looks=clamp(30+rng(s)*60);
+ if(input.stats){for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=input.stats[key];if(value===undefined)continue;if(!Number.isFinite(value)||!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');p.stats[key]=value;}}
  p.relationships.push(relation(s,'Mutter',22+Math.floor(rng(s)*18)),relation(s,'Vater',22+Math.floor(rng(s)*18)));
  log(s,`Du wurdest in ${p.country} geboren. Deine Geschichte beginnt.`,'good');
  return s;
@@ -137,6 +138,11 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  if(!p.alive)throw Error('Dieses Leben ist bereits beendet.');
  if(p.pending&&action.type!=='EVENT')throw Error('Bitte zuerst die offene Entscheidung treffen.');
  switch(action.type){
+ case 'CUSTOMIZE':{
+  if(s.adminFullAccess!==true)throw Error('Diese Funktion ist nicht freigeschaltet.');
+  for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
+  p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
+ }
  case 'AGE':age(s);break;
  case 'ACTIVITY':activity(s,action.key);break;
  case 'RELATION':interact(s,action.id,action.key);break;
