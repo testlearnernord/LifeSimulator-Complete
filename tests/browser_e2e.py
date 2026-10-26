@@ -27,11 +27,11 @@ with sync_playwright() as playwright:
         event_buttons.first.click()
         expect(event_buttons).to_have_count(0)
 
-    page.get_by_role('button', name='Karriere', exact=True).click()
+    page.locator('nav [data-action="tab"][data-id="career"]').click()
     expect(page.get_by_text('Stellenangebote')).to_be_visible()
-    page.get_by_role('button', name='Aktivitäten', exact=True).click()
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
     expect(page.get_by_text('Fitnessstudio')).to_be_visible()
-    page.get_by_role('button', name='Menü', exact=True).click()
+    page.locator('nav [data-action="tab"][data-id="menu"]').click()
     expect(page.get_by_text('Spielstände verwalten')).to_be_visible()
     with page.expect_download() as download_info:
         page.get_by_role('button', name='Exportieren', exact=True).click()
@@ -39,7 +39,7 @@ with sync_playwright() as playwright:
 
     # Saved life persists across reloads through IndexedDB.
     page.reload(wait_until='networkidle')
-    page.get_by_role('button', name='Leben', exact=True).click()
+    page.locator('nav [data-action="tab"][data-id="life"]').click()
     expect(page.locator('h1').first).to_have_text('Testspieler')
     expect(page.locator('.age-chip')).to_contain_text('1')
     page.evaluate('navigator.serviceWorker.ready')
