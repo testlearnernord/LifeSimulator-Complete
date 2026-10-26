@@ -28,6 +28,7 @@ test('prison blocks all outside crime actions, jobs and purchases',()=>{
 });
 test('inmates have playable options and actions reset annually',()=>{
  let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
  s.person.prisonYears=3;
  s=applyAction(s,{type:'ACTIVITY',key:'prison:library'});
  s=applyAction(s,{type:'ACTIVITY',key:'prison:library'});
@@ -64,6 +65,7 @@ test('hard work affects performance, is limited per year and leads to bonuses',(
 });
 test('gifts and shared time affect social bond and money',()=>{
  let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
  const r=s.person.relationships[0];
  s.person.cash=1000;
  const balance=s.person.cash;
