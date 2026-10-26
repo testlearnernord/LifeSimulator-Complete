@@ -1,0 +1,22 @@
+{
+  "name": "lifesimulator-complete",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent, offline-first life simulation PWA - initial playable vertical slice",
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "check": "tsc --noEmit",
+    "serve": "node scripts/serve.mjs",
+    "dev": "npm run build && npm run serve"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "5.8.3"
+  }
+}

@@ -1,0 +1,14 @@
+export type Stat='health'|'happiness'|'smarts'|'looks';
+export type Stats=Record<Stat,number>;
+export type Gender='weiblich'|'männlich'|'divers';
+export type School='Kindergarten'|'Grundschule'|'Weiterführende Schule'|'Universität'|'Abgeschlossen';
+export type Relationship={id:string;name:string;kind:'Mutter'|'Vater'|'Elternteil'|'Partner'|'Kind'|'Freund';gender:Gender;age:number;bond:number;alive:boolean};
+export type Possession={id:string;name:string;kind:'Haus'|'Auto';value:number;annualCost:number};
+export type Pending={id:string;heading:string;detail:string;options:{label:string;kind:string}[]};
+export type Entry={id:string;age:number;text:string;tone:'normal'|'good'|'bad'};
+export type Career={id:string;title:string;salary:number;minAge:number;minSmarts:number;requiresDegree:boolean};
+export type Person={id:string;name:string;gender:Gender;country:string;age:number;alive:boolean;stats:Stats;cash:number;school:School;degree:boolean;universityYears:number;jobId:string|null;jobYears:number;prisonYears:number;record:boolean;relationships:Relationship[];assets:Possession[];history:Entry[];pending:Pending|null;causeOfDeath:string|null;generation:number};
+export type SaveGame={schema:1;id:string;title:string;updated:number;seed:number;person:Person;ancestry:{name:string;age:number;cause:string}[];adminFullAccess:true};
+export type NewLife={name:string;gender:Gender;country:string;seed?:number;generation?:number;inheritance?:number};
+export type Action={type:'AGE'}|{type:'ACTIVITY';key:string}|{type:'JOB';id:string}|{type:'STUDY'}|{type:'RELATION';id:string;key:string}|{type:'EVENT';kind:string}|{type:'BUY';id:string}|{type:'SELL';id:string}|{type:'EMIGRATE';country:string}|{type:'NEW_GENERATION';id:string};
+export const ADMIN_FULL_ACCESS=true;
