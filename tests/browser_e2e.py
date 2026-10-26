@@ -53,10 +53,12 @@ with sync_playwright() as playwright:
         page.locator('[data-action="event"]').first.click()
     context.set_offline(False)
     # Reach the social-media minimum age using the actual game's age/event loop.
-    for _ in range(11):
+    for expected_age in range(3,14):
         page.locator('.age-button').click()
+        expect(page.locator('.year-group h2').last).to_contain_text(f'Alter: {expected_age} Jahre')
         if page.locator('[data-action="event"]').count():
             page.locator('[data-action="event"]').first.click()
+            expect(page.locator('.overlay')).to_have_count(0)
     expect(page.locator('.year-group h2').last).to_contain_text('Alter: 13 Jahre')
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     page.locator('[data-action="category"][data-id="social"]').click()
