@@ -80,3 +80,10 @@
 .premium-status.spielbar{background:#d9f1e1;color:#116838}
 .premium-status.teilweise{background:#fff0d5;color:#895300}
 @media(max-width:380px){.premium-line{padding:10px 7px}.premium-status{font-size:9px;padding:4px 6px}}
+
+
+/* Compact investment trading controls */
+.investment-card .trade-label{display:flex;align-items:center;gap:6px;font-size:12px;color:#516c7c;min-height:36px}
+.investment-card select{min-height:35px;border:1px solid #bed0df;border-radius:6px;background:white;color:#0e638e;padding:4px 8px;font-size:13px}
+.investment-card .smallbtn{min-height:36px}
+@media(max-width:390px){.investment-card .row{justify-content:space-between}.investment-card .smallbtn{padding:8px 10px}}
