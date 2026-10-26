@@ -1,0 +1,31 @@
+name: Test & Build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - name: Install Playwright for browser tests
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Browser E2E
+        run: |
+          node scripts/serve.mjs &
+          sleep 2
+          python tests/browser_e2e.py
+      - name: Upload static PWA build
+        uses: actions/upload-artifact@v4
+        with:
+          name: lebenslinien-pwa
+          path: dist/
