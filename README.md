@@ -82,3 +82,7 @@ Unter **Hauptmenü → Premium-Inhalte** befindet sich ein recherchiertes Invent
 
 Technische Details und Quellen: [Premium-Inventar](docs/PREMIUM_INVENTORY.md). Zeitreise speichert höchstens 15 vergangene Jahresstände; bestehende Speicherstände bleiben gültig. Weil Snapshots zusätzlich Platz benötigen, regelmäßig JSON-Backups exportieren.
 
+
+### Anleger-Erweiterung (0.5.0)
+
+Das Investor-System ist nun teilweise spielbar. Unter **Besitz → Investments** stehen fünf fiktive Anlageklassen (Aktien, Anleihen, Fonds, Penny Stocks und Kryptowährungen) mit Kauf/Verkauf, Depotwert, Jahreskursen, Dividenden/Zinsen und Finanzberater zur Verfügung. Keine echten Kurse oder exakten BitLife-Formeln. Das Depot ist in die Vermögensanzeige, Speicherstände und die Zeitreise integriert.
