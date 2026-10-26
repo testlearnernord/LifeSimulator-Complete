@@ -15,3 +15,68 @@ test('country changes preserve independent game snapshots',()=>{let s=advance(bo
 test('closed event must be resolved before next year',()=>{let s=advance(born(),3);let found=false;for(let i=0;i<45;i++){if(s.person.pending){found=true;assert.throws(()=>applyAction(s,{type:'AGE'}));s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});break;}s=applyAction(s,{type:'AGE'});}assert.ok(found);assert.equal(s.person.pending,null);});
 test('family successor keeps family fortune in a new character',()=>{let s=advance(born(),18);s=applyAction(s,{type:'ACTIVITY',key:'date'});for(let i=0;i<10&&!s.person.relationships.some(r=>r.kind==='Kind');i++)s=applyAction(s,{type:'ACTIVITY',key:'child'});const child=s.person.relationships.find(r=>r.kind==='Kind');assert.ok(child);s.person.cash=100000;s.person.age=115;s.person.stats.health=1;s=applyAction(s,{type:'AGE'});assert.equal(s.person.alive,false);const next=applyAction(s,{type:'NEW_GENERATION',id:child.id});assert.equal(next.person.name,child.name);assert.equal(next.person.gender,child.gender);assert.equal(next.person.generation,2);assert.equal(next.ancestry.length,1);assert.ok(next.person.cash>50000);});
 test('deep save validator rejects fabricated relationship bond',()=>{let s=born();s.person.relationships[0].bond='80%" onfocus="alert(1)';assert.equal(isSaveGame(s),false);});
+
+
+test('prison blocks all outside crime actions, jobs and purchases',()=>{
+ let s=advance(born(),18);
+ s.person.prisonYears=3;
+ assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'crime:burglary'}),/Haft/);
+ assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'date'}),/Haft/);
+ assert.throws(()=>applyAction(s,{type:'JOB',id:'retail'}),/Haft/);
+ s.person.cash=999999;
+ assert.throws(()=>applyAction(s,{type:'BUY',id:'car-small'}),/Haft/);
+});
+test('inmates have playable options and actions reset annually',()=>{
+ let s=advance(born(),20);
+ s.person.prisonYears=3;
+ s=applyAction(s,{type:'ACTIVITY',key:'prison:library'});
+ s=applyAction(s,{type:'ACTIVITY',key:'prison:library'});
+ assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'prison:library'}),/dieses Jahr/);
+ s=applyAction(s,{type:'AGE'});
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ assert.equal(s.person.prisonYears,2);
+ s=applyAction(s,{type:'ACTIVITY',key:'prison:job'});
+ assert.ok(s.person.cash>-20000);
+ assert.ok(isSaveGame(s));
+});
+test('crime attempt limit applies across crime types and old saves remain valid',()=>{
+ let s=advance(born(),18);
+ assert.equal(isSaveGame(s),true);
+ for(const key of ['crime:shoplift','crime:pickpocket']){
+   s=applyAction(s,{type:'ACTIVITY',key});
+   s.person.prisonYears=0; // force freedom only to isolate annual quota
+ }
+ assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'crime:burglary'}),/dieses Jahr/);
+ assert.equal(s.person.yearlyActions.crime,2);
+});
+test('hard work affects performance, is limited per year and leads to bonuses',()=>{
+ let s=advance(born(),18);
+ s=applyAction(s,{type:'JOB',id:'retail'});
+ const original=s.person.careerPerformance;
+ s=applyAction(s,{type:'ACTIVITY',key:'workhard'});
+ assert.ok(s.person.careerPerformance>original);
+ assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'workhard'}),/dieses Jahr/);
+ s=advance(s,1);
+ assert.doesNotThrow(()=>applyAction(s,{type:'ACTIVITY',key:'workhard'}));
+ for(let i=0;i<2;i++){s.person.careerPerformance=98;s=advance(s,1);}
+ assert.ok(s.person.salaryBonus>=0);
+ assert.ok(isSaveGame(s));
+});
+test('gifts and shared time affect social bond and money',()=>{
+ let s=advance(born(),20);
+ const r=s.person.relationships[0];
+ const balance=s.person.cash;
+ s=applyAction(s,{type:'RELATION',id:r.id,key:'gift'});
+ assert.equal(s.person.cash,balance-100);
+ assert.ok(s.person.relationships[0].bond>=r.bond);
+ assert.throws(()=>applyAction(s,{type:'RELATION',id:r.id,key:'gift'}),/dieses Jahr/);
+ s=applyAction(s,{type:'RELATION',id:r.id,key:'time'});
+ assert.ok(isSaveGame(s));
+});
+test('optional new progress fields are validated and legacy saves work',()=>{
+ const s=born();
+ assert.ok(isSaveGame(s));
+ assert.equal(isSaveGame({...s,person:{...s.person,yearlyActions:{gym:'NAN'}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,careerPerformance:-5}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,salaryBonus:Infinity}}),false);
+});
