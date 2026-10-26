@@ -36,8 +36,9 @@ test('inmates have playable options and actions reset annually',()=>{
  s=applyAction(s,{type:'AGE'});
  if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
  assert.equal(s.person.prisonYears,2);
+ const beforeWork=s.person.cash;
  s=applyAction(s,{type:'ACTIVITY',key:'prison:job'});
- assert.ok(s.person.cash>-20000);
+ assert.equal(s.person.cash,beforeWork+80);
  assert.ok(isSaveGame(s));
 });
 test('crime attempt limit applies across crime types and old saves remain valid',()=>{
