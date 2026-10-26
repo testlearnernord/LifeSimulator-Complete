@@ -1,8 +1,16 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.1.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.2.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
+
+## Mobile-Oberfläche ab v0.2.0
+
+Die Benutzeroberfläche orientiert sich am traditionellen Layout eines mobilen Lebenssimulators, mit **chronologischem Lebenslauf**, **Charakterprofil mit Kontostand**, **dauerhaften Statusbalken** und **zentralem Alters-Button**. Beruf, Besitz, Beziehungen und Aktivitäten liegen unmittelbar in der unteren Navigation. Hauptmenü und Rückkehr zum Lebenslauf erreichst du über die Kopfzeile.
+
+Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalassets. Es ist eine visuelle Annäherung, **keine 1:1-Reproduktion**. Die Simulation ist weiterhin eine frühe Version und noch weit vom vollständigen Referenzumfang entfernt.
+
+**Live:** https://testlearnernord.github.io/LifeSimulator-Complete/
 
 ## Was jetzt spielbar ist
 
