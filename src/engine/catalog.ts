@@ -8,7 +8,11 @@ export const CAREERS:Career[]=[
  {id:'engineer',title:'Ingenieur/in',salary:75000,minAge:22,minSmarts:65,requiresDegree:true},
  {id:'teacher',title:'Lehrkraft',salary:58000,minAge:22,minSmarts:55,requiresDegree:true},
  {id:'doctor',title:'Arzt/Ärztin',salary:125000,minAge:22,minSmarts:85,requiresDegree:true},
- {id:'lawyer',title:'Rechtsanwalt/-anwältin',salary:105000,minAge:22,minSmarts:78,requiresDegree:true}
+ {id:'lawyer',title:'Rechtsanwalt/-anwältin',salary:105000,minAge:22,minSmarts:78,requiresDegree:true},
+ {id:'writer',title:'Schriftsteller/in',salary:38000,minAge:18,minSmarts:55,requiresDegree:false},
+ {id:'chef',title:'Koch/Köchin',salary:42000,minAge:18,minSmarts:15,requiresDegree:false},
+ {id:'reporter',title:'Reporter/in',salary:45000,minAge:20,minSmarts:55,requiresDegree:false},
+ {id:'app-developer',title:'App-Entwickler/in',salary:82000,minAge:22,minSmarts:70,requiresDegree:true}
 ];
 export const ITEMS=[{id:'car-small',name:'Gebrauchtwagen',kind:'Auto' as const,price:7500,annualCost:1200},{id:'car-new',name:'Neuwagen',kind:'Auto' as const,price:26000,annualCost:3000},{id:'house-small',name:'Eigentumswohnung',kind:'Haus' as const,price:130000,annualCost:3300},{id:'house-large',name:'Einfamilienhaus',kind:'Haus' as const,price:310000,annualCost:7500}];
 export const NAMES=['Alex','Robin','Kim','Sam','Mira','Jamie','Noah','Lea','Emil','Lina','Jules','Mika','Marie','Felix','Jana','Luis'];
