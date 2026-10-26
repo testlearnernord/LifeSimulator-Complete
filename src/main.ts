@@ -3,6 +3,7 @@ import {isMuted,playSound,toggleSound} from './audio.js';
 import {CAREERS,COUNTRIES,ITEMS} from './engine/catalog.js';
 import {BUSINESS_SECTORS,SOCIAL_PLATFORMS} from './engine/expansions.js';
 import {PREMIUM_CATALOG,PREMIUM_GROUPS} from './engine/premium-catalog.js';
+import {FINANCIAL_ASSETS,getMarketPrice,portfolioValue} from './engine/investments.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -82,7 +83,19 @@ function rentalPanel(p:Person,a:Person['assets'][number]){
  ${r?.occupied?button('Mietvertrag beenden','rental',a.id+'|vacate','smallbtn',disabled):''}
  </div></div>`;
 }
-function renderAssets(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>`;}
+function renderInvestments(p:Person){
+ return `${heading('Investments',money(portfolioValue(p)))}<div class='well'>Eigenständiges Marktmodell: Aktien, Anleihen, Fonds, Penny Stocks und Kryptowährungen. Kursänderungen erfolgen bei jedem Lebensjahr, nicht in Echtzeit. Handel ab 18.</div>
+ <div class='info-card'><b>Finanzberater: ${p.financialAdvisor?'Eingestellt':'Nicht eingestellt'}</b><p class='small'>Einmalig 1.000 € bei Einstellung, danach 900 € jährlich. Bei genügend Geld legt er automatisch im Fonds an.</p><div class='row'>${p.financialAdvisor?button('Berater entlassen','investment','advisor-fire','smallbtn'):button('Berater einstellen','investment','advisor-hire','smallbtn',p.age<18||p.prisonYears>0||p.cash<1000)}</div></div>
+ <div class='stack'>${FINANCIAL_ASSETS.map(a=>{
+  const price=getMarketPrice(p,a.id);
+  const shares=p.investments?.find(h=>h.assetId===a.id)?.quantity||0;
+  return `<article class='social-card investment-card'><h3>📈 ${a.name}</h3><p>${a.kind} · Kurs ${money(price)} · Bestand ${shares} · Wert ${money(shares*price)}</p>
+  <div class='row'><label class='trade-label'>Anteile <select id='investment-qty-${a.id}'>${[1,5,20,100].map(q=>`<option value='${q}'>${q}</option>`).join('')}</select></label>
+  ${button('Kaufen','investment','buy|'+a.id,'smallbtn',p.age<18||p.prisonYears>0||p.cash<price*1.005)}
+  ${button('Verkaufen','investment','sell|'+a.id,'smallbtn',p.age<18||p.prisonYears>0||shares===0)}
+  </div></article>`;}).join('')}</div>`;
+}
+function renderAssets(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>${renderInvestments(p)}`;}
 function renderActivities(p:Person){
  const jailed=p.prisonYears>0;
  if(jailed){return `<div class='panel-intro'><span class='panel-emoji'>🔒</span><div><h2>Gefängnis</h2><span>Reststrafe: ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'}</span></div></div><div class='prison-warning'>Arbeiten, Reisen, Einkaufen und weitere Straftaten sind während der Haft gesperrt.</div>${heading('Haftalltag')}<div class='stack'>${card('📚','Gefängnisbibliothek','Wissen aufbauen','activity','prison:library','Lesen')}${card('🏃','Hofgang','Fitness und Stimmung verbessern','activity','prison:yard','Trainieren')}${card('🧘','Meditation in der Zelle','Stress abbauen','activity','prison:meditate','Meditieren')}${card('🧹','Gefängnisarbeit','80 € für erledigte Aufgaben','activity','prison:job','Arbeiten')}</div>`;}
@@ -166,6 +179,10 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  else if(kind==='social'){const sep=id.lastIndexOf('|');await action({type:'SOCIAL',platform:id.slice(0,sep) as import('./engine/types.js').SocialPlatform,key:id.slice(sep+1) as 'join'|'post'|'sponsor'|'delete'});}
   else if(kind==='business'){const sep=id.indexOf('|');await action({type:'BUSINESS',key:(sep<0?id:id.slice(0,sep)) as 'open'|'develop'|'market'|'hire'|'fire'|'sell'|'invest'|'withdraw',sector:sep<0?undefined:id.slice(sep+1) as import('./engine/types.js').BusinessSector});}
   else if(kind==='rental'){const sep=id.lastIndexOf('|');await action({type:'RENTAL',id:id.slice(0,sep),key:id.slice(sep+1) as 'advertise'|'repair'|'vacate'});}
+  else if(kind==='investment'){
+   if(id==='advisor-hire'||id==='advisor-fire')await action({type:'INVEST',key:id});
+   else{const [key,assetId]=id.split('|');const quantity=Number(document.querySelector<HTMLSelectElement>('#investment-qty-'+assetId)?.value||1);await action({type:'INVEST',key:key as 'buy'|'sell',assetId,quantity});}
+  }
   else if(kind==='premiumitem'){await action({type:'PREMIUM',key:id as 'jail-card'|'golden-diploma'|'hollywood-star'});}
   else if(kind==='premiumrewind'){const y=id==='selected'?Number(document.querySelector<HTMLSelectElement>('#rewind-years')?.value||1):Number(id);await action({type:'REWIND',years:y as 1|2|3|4|5});}
   else if(kind==='study')await action({type:'STUDY'});
