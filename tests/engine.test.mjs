@@ -189,6 +189,7 @@ test('prison excludes business and social actions and new save fields are valida
 
 test('time machine rewinds complete character state and truncates future history',()=>{
  let s=advance(born(),6);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
  const before=s.person.age;
  const originalCash=s.person.cash;
  s.person.cash=9999;
