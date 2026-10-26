@@ -1,6 +1,6 @@
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-25. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.25.x (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.1.0.
+**Referenzdatum:** 2026-10-25. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.25.x (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.3.0 (2026-10-26).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -28,7 +28,7 @@
 | Familie | Kinder | A | S | Baby bei bestehender Partnerschaft |
 | Familie | Fruchtbarkeit / medizinische Betreuung | H | O | Keine differenzierten Systeme |
 | Familie | Golden Pacifier (Kinderzahl, Geschlecht, Talente) | H | O | Kaufitem nur als Referenz |
-| Beziehungen | Interaktion / Kompliment / Streit | A,H | S | Beziehungspunkte veränderbar |
+| Beziehungen | Interaktion / Kompliment / Streit | A,H | S | Beziehungspunkte, Geschenke, gemeinsame Zeit, detaillierte Personenmenüs |
 | Beziehungen | Beziehungen zu Boss/Lehrern | H | O | Noch kein NPC-Arbeits-/Schulnetz |
 | Beziehungen | Freundschaft | A | P | Ereignisbasiert und Interaktionen |
 | Schule | Schule / Schulpflicht | A | P | Altersstufen und Lernaktion |
@@ -36,7 +36,7 @@
 | Schule | Weitere Studienrichtungen / akademische Titel | H,C | O | Noch keine vollständigen Ausbildungspfade |
 | Karriere | Klassischer Vollzeitberuf | H,C | S | Acht eigene Karriereprofile |
 | Karriere | Bewerbung / Gehalt / Beschäftigung | H,C | P | Voraussetzungen und Jahresverdienst, kein Interview |
-| Karriere | Beförderung und Karriereleiter | H,C | P | Jährliche Gehaltssteigerung, keine Jobränge |
+| Karriere | Beförderung und Karriereleiter | H,C | P | Leistungswert, Gehaltsverhandlung, Bonus durch Beförderung; noch keine vollständigen Jobränge |
 | Karriere | Teilzeitjobs | W | O | Noch nicht integriert |
 | Karriere | Militär | W | O | Keine Einsätze, Laufbahnen oder Minenfelder |
 | Karriere | Fame / Berühmtheit | H | O | Kein Fame-System |
@@ -72,10 +72,15 @@
 | Gesundheit | Krankheiten / Therapien | A | O | Kein spezifischer Krankheitskatalog |
 | Gesundheit | Promiscuity Potion | H | O | Offizielles Item, STD-Schutz |
 | Delikte | Diebstahl / Risiko | A | S | Zufall: Geld oder Haft, vereinfachtes Modell |
-| Delikte | Polizeikontakt / Gefängnis | A | P | Haftjahre und Akteneintrag |
+| Delikte | Polizeikontakt / Gefängnis | A,W | P | Haftjahre, Akteneintrag, gesondertes Haftmenü, kein Straftat-Spam in Haft |
 | Delikte | Bankraub / Schmuggel | A | O | Offiziell im Store aufgeführt |
 | Delikte | Haftentlassung / Get Out Of Jail Free Card | H | P | Reguläre Entlassung ja, Sonderitem nein |
 | Reisen | Auswanderung | H | S | Länderwahl, Kosten, Job endet |
+| Reisen | Urlaub | W | P | Einfache Reiseaktion mit Kosten und Glückseffekt; kein Reisekatalog |
+| Gefängnis | Haftalltag / Bibliothek / Hof / Job | W | P | Haftbereich mit eigenen Aktivitäten und jährlichen Grenzen, kein Fluchtsystem |
+| Aktivitäten | Körper und Geist / Freizeit | W | P | Fitness, Bücher, Bibliothek, Meditation, Arzt, Spaziergang, Ehrenamt, Lotterie |
+| Delikte | Taschendiebstahl / Ladendiebstahl / Einbruch | W | P | Drei eigene Risiko-Modelle; keine exakt verifizierten Originalformeln |
+
 | Reisen | Golden Passport | H | O | Offizielles Premium-Item |
 | Sonderfunktionen | God Mode | H | O | Kein vollständiger Charaktereditor |
 | Sonderfunktionen | Bitizenship | H | P | Spielfunktionen nicht monetarisiert |
