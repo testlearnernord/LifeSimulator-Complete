@@ -22,8 +22,16 @@ with sync_playwright() as playwright:
         page.locator('[data-action="event"]').first.click()
     page.locator('nav [data-action="tab"][data-id="career"]').click()
     expect(page.get_by_text('Stellenangebote')).to_be_visible()
+    expect(page.get_by_text('Eigenes Unternehmen')).to_be_visible()
+    expect(page.get_by_text('Café & Gastronomie')).to_be_visible()
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     expect(page.get_by_text('Fitnessstudio')).to_be_visible()
+    page.locator('[data-action="category"][data-id="social"]').click()
+    expect(page.get_by_role('heading', name='Social Media')).to_be_visible()
+    expect(page.get_by_text('YouTube')).to_be_visible()
+    page.locator('[data-action="category"][data-id=""]').click()
+    page.locator('nav [data-action="tab"][data-id="assets"]').click()
+    expect(page.get_by_text('Immobilien und Fahrzeuge')).to_be_visible()
     page.get_by_role('button', name='Hauptmenü öffnen').click()
     expect(page.get_by_text('Spielstände verwalten')).to_be_visible()
     with page.expect_download() as download_info:
@@ -44,11 +52,26 @@ with sync_playwright() as playwright:
     if page.locator('[data-action="event"]').count():
         page.locator('[data-action="event"]').first.click()
     context.set_offline(False)
+    # Reach the social-media minimum age using the actual game's age/event loop.
+    for _ in range(11):
+        page.locator('.age-button').click()
+        if page.locator('[data-action="event"]').count():
+            page.locator('[data-action="event"]').first.click()
+    expect(page.locator('.year-group h2').last).to_contain_text('Alter: 13 Jahre')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="social"]').click()
+    page.locator('[data-action="social"][data-id="YouTube|join"]').click()
+    page.locator('[data-action="social"][data-id="YouTube|post"]').click()
+    expect(page.get_by_text('1 Beiträge')).to_be_visible()
+    page.reload(wait_until='networkidle')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="social"]').click()
+    expect(page.get_by_text('1 Beiträge')).to_be_visible()
     page.get_by_role('button', name='Zum Lebenslauf').click()
     import os
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.2 mobile navigation, stats, saves, exports and offline: PASSED')
+    print('v0.4 mobile expansion UI, social persistence, stats, saves and offline: PASSED')
     context.close()
     browser.close()
