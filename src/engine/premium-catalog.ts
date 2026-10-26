@@ -20,7 +20,7 @@ export const PREMIUM_CATALOG:PremiumItem[]=[
  {id:'business',name:'Business',group:'Job-Packs',status:'teilweise',description:'Unternehmensführung mit Produkt- und Personalentscheidungen',source:'official'},
  {id:'music-producer',name:'Music Producer',group:'Job-Packs',status:'offen',description:'Tracks produzieren und Künstler betreuen',source:'official'},
  {id:'landlord',name:'Landlord',group:'Expansion-Packs',status:'teilweise',description:'Immobilien vermieten und Mieter verwalten',source:'official'},
- {id:'investor',name:'Investor',group:'Expansion-Packs',status:'offen',description:'Investitionen und Wertpapierhandel',source:'official'},
+ {id:'investor',name:'Investor',group:'Expansion-Packs',status:'teilweise',description:'Aktien, Fonds, Anleihen, Penny Stocks, Krypto und Finanzberater im eigenen Marktsystem',source:'official'},
  {id:'cult',name:'C.U.L.T.',group:'Expansion-Packs',status:'offen',description:'Kult mit eigenen Anhängern führen',source:'official'},
  {id:'black-market',name:'Black Market',group:'Expansion-Packs',status:'offen',description:'Spezielle Handels- und Auktionsmechaniken',source:'official'},
  {id:'movie-director',name:'Movie Director',group:'Expansion-Packs',status:'offen',description:'Filme drehen, Besetzung und Produktionsentscheidungen',source:'official'},
