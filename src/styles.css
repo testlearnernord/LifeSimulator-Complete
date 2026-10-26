@@ -42,3 +42,14 @@
 .tile .button.smallbtn{flex:none}
 .info-card p.small{margin:5px 0 11px}
 @media(max-width:390px){.list-entry{min-height:68px;padding:10px 9px}.list-text b{font-size:14px}.metric{grid-template-columns:23px 78px minmax(0,1fr) 39px}.profilebar{padding:7px 9px}.profile-name{font-size:15px}}
+
+/* Admin creator and character-edit controls */
+.creator-options{margin:10px 0;padding:8px 11px;border:1px solid #d8e6ee;background:#f3f9fc;text-align:left;border-radius:9px}
+.creator-options summary{font-size:13px;font-weight:800;color:#14699b;padding:6px;cursor:pointer;line-height:1.4}
+.stat-edit{display:grid;gap:4px;padding:9px 5px}
+.range-field{margin:3px 0 5px}
+.range-field>span{display:flex;justify-content:space-between;align-items:center;gap:7px}
+.range-value{color:#077bad;font-weight:850;font-variant-numeric:tabular-nums}
+.range-field input[type=range]{width:100%;accent-color:#09a33e;min-height:34px;background:transparent;cursor:pointer}
+.dialog .creator-options{margin:12px 0 0}
+.dialog .stat-edit{text-align:left}
