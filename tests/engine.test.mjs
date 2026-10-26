@@ -65,6 +65,7 @@ test('hard work affects performance, is limited per year and leads to bonuses',(
 test('gifts and shared time affect social bond and money',()=>{
  let s=advance(born(),20);
  const r=s.person.relationships[0];
+ s.person.cash=1000;
  const balance=s.person.cash;
  s=applyAction(s,{type:'RELATION',id:r.id,key:'gift'});
  assert.equal(s.person.cash,balance-100);
