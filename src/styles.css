@@ -67,3 +67,16 @@
 .rental-panel .row{display:flex;flex-wrap:wrap;gap:7px}
 .rental-panel .smallbtn{min-height:35px}
 @media(max-width:380px){.social-card .smallbtn,.rental-panel .smallbtn{font-size:12px;padding:7px 9px}}
+
+
+/* v0.5: premium inventory and safe mobile controls */
+.premium-list{display:flex;flex-direction:column;border:1px solid #dfebf2;background:#fff;margin:5px 0 15px;border-radius:8px;overflow:hidden}
+.premium-line{display:flex;align-items:center;gap:10px;padding:12px 10px;border-bottom:1px solid #e7f0f4;min-height:58px}
+.premium-line:last-child{border-bottom:none}
+.premium-line>span:first-child{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.premium-line b{color:#0a5b88;font-size:13px}
+.premium-line small{font-size:11px;color:#627c8d;line-height:1.4}
+.premium-status{white-space:nowrap;border-radius:15px;font-size:10px;padding:5px 8px;font-weight:750;background:#e9eef3;color:#647889}
+.premium-status.spielbar{background:#d9f1e1;color:#116838}
+.premium-status.teilweise{background:#fff0d5;color:#895300}
+@media(max-width:380px){.premium-line{padding:10px 7px}.premium-status{font-size:9px;padding:4px 6px}}
