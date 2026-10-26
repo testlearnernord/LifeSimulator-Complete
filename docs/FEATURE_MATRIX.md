@@ -13,7 +13,7 @@
 | Lebenszyklus | Alter und Tod | A | S | Modellierte Sterblichkeitskurve |
 | Lebenszyklus | Mehrere Generationen | H | S | Kinder als Nachfolger bei Tod; vereinfachte Vererbung |
 | Lebenszyklus | Unbegrenzte Generationen (Bitizenship) | H | P | Im Projekt nicht monetarisiert, solange Kinder vorhanden |
-| Attribute | Gesundheit | A | S | Fortschreibung durch Alter und Aktivitäten |
+| Attribute | Gesundheit | A | S | Fortschreibung durch Alter und Aktivitäten; im eigenen Editor frei einstellbar |
 | Attribute | Glück | A | S | Aktivitäten / Ereignisse |
 | Attribute | Intelligenz | A | S | Lernen / Bücher |
 | Attribute | Aussehen | H | S | Angezeigter und veränderbarer Wert |
@@ -112,3 +112,8 @@
 - **C** Community-Karrierelexikon: https://bitlifecareers.github.io/
 
 Die offizielle Hilfe und der App Store haben höhere Aussagekraft als Community-Seiten. Wo nur `W` oder `C` belegt ist, wurde der Nachweisgrad entsprechend herabgestuft.
+
+### Implementiert seit 0.3.0, aber nicht originalgetreu
+
+- Eigener kostenloser Admin-Editor für die vier sichtbaren Charakterwerte bei der Geburt und während eines Lebens. Er beansprucht **keine** Funktionsgleichheit mit dem vollständigen God Mode des Originals (z. B. Aussehen, Talente, Verwandten-Editor oder Adelsstatus).
+- Offene DLC- und Spezialkarriereeinträge bleiben unverändert offen, bis tatsächlich spielbare Simulation, Tests und UI vorhanden sind.
