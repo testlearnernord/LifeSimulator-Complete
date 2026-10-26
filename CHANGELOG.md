@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 – 2026-10-26 (Premium-Inventar, fünf neue Sonderfunktionen)
+
+- 40 nachgewiesene bzw. community-recherchierte Add-on-Angebote als strukturierter Katalog mit Herkunft und ehrlichem Status (nicht unbedingt vollständig).
+- Neues Premium-Inventar mit bedienbaren Extras und kostenloser Admin-Freischaltung für alle tatsächlich programmierten Mechaniken.
+- Time Machine: bounded snapshots (max. 15 Alterungsschritte), 1–5 Jahre zurück, auch nach dem Tod; Zukunftsstände verfallen.
+- Golden Pacifier: Familienplanung mit bis zu drei Kindern, frei gewähltem Geschlecht und vererbtem Spezialtalent; jährlich begrenzt.
+- Golden Diploma: Auswahl von bis zu zwei individuellen Sofortabschlüssen.
+- Get Out of Jail Free Card: vorzeitige Freilassung und Löschung des vereinfachten Vorstrafenstatus.
+- Hollywood Star: Instant-Bekanntheit in ausgewählten normalen Berufen und als Unternehmer/in.
+- Zusätzlich vier gewöhnliche, bekanntheitsfähige Berufe; bestehende Spielstände mit Schema 1 bleiben nutzbar.
+- Neue Engine- und mobile UI-Regressionstests sowie recherchierte Quellen in docs/PREMIUM_INVENTORY.md.
+- **Nicht enthalten:** vollständige Original-Spiel-DLCs, audiovisuelle Originaldateien, Originaltexte oder exakte proprietäre Berechnungsregeln.
+
+
+
 ## 0.4.0 – 2026-10-26 (Social Media, Unternehmertum, Vermietung)
 
 - New optional save-state fields for social platform accounts, fame, business ownership and per-property rentals.
