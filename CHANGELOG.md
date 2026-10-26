@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 – 2026-10-26 (Social Media, Unternehmertum, Vermietung)
+
+- New optional save-state fields for social platform accounts, fame, business ownership and per-property rentals.
+- Five playable social platforms: posting, follower growth and churn, viral chances, annual post quotas and sponsorship payments.
+- Three startup business types with separated company accounts, product research, marketing, staff, annual revenue/cost accounting, bankruptcy and sale.
+- House rentals with tenant matching, vacancy, rent, repairs, condition and eviction.
+- New activity, career and property menus using existing touch UI.
+- Automated regression tests cover expansion entry conditions, state validation, financing, bankruptcy and save compatibility.
+- **Scope warning:** These are independent simulations of documented feature categories, not 1:1 implementations of their original interfaces, tuning or DLC content.
+
+
 ## 0.3.0 – 2026-10-26 (menus, prison, careers, life feed)
 
 - Drill-down activity categories and relationship detail screens inspired by familiar life-sim navigation; all artwork and texts are original.
