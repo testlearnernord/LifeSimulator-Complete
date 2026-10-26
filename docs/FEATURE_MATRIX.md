@@ -136,6 +136,7 @@ Die offizielle Hilfe und der App Store haben höhere Aussagekraft als Community-
 | Golden Diploma | **P** | Zwei Sofortabschlüsse aus vier Studienrichtungen |
 | Hollywood Star | **P** | Bekanntheit in einigen Jobs und als Unternehmer |
 | God Mode, Bitizenship, Boss Mode | **P** | Nur vereinzelte Teilfunktionen, nicht komplette Originalpakete |
-| Investor, Cult, Black Market, Zoo, Casino, Secret Agent, Movie Director, Ultimate Fighter | **O** | Kein vollständiges spielbares Pack |
+| Investor Expansion Pack | **P** | Fiktives Depot mit fünf Klassen, Kauf/Verkauf, Marktänderungen, Dividenden und Finanzberater |
+| Cult, Black Market, Zoo, Casino, Secret Agent, Movie Director, Ultimate Fighter | **O** | Kein vollständiges spielbares Pack |
 
 **Kein 1:1-Anspruch:** Alle fünf Mechaniken sind eigene Umsetzung bekannter Grundfunktionen. Proprietäre Parameter und viele zugehörige Inhalte fehlen. Die übrigen Kaufangebote sind nicht „kostenlos freigeschaltet“, sondern noch nicht programmiert.
