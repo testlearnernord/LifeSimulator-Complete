@@ -100,3 +100,88 @@ test('editing life attributes is persistent and rejects invalid values',()=>{
  assert.throws(()=>createLife({name:'Broken',gender:'divers',country:'Deutschland',seed:42,stats:{health:NaN}}),/Ungültig/);
  assert.equal(isSaveGame(changed),true);
 });
+
+
+const resolved=s=>s.person.pending?applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind}):s;
+test('social platforms enforce age, joining and realistic annual posting limits',()=>{
+ let s=born();
+ assert.throws(()=>applyAction(s,{type:'SOCIAL',key:'join',platform:'YouTube'}),/13/);
+ s=resolved(advance(s,13));
+ s=applyAction(s,{type:'SOCIAL',key:'join',platform:'YouTube'});
+ assert.equal(s.person.social.YouTube.followers,0);
+ for(let i=0;i<3;i++)s=applyAction(s,{type:'SOCIAL',key:'post',platform:'YouTube'});
+ assert.equal(s.person.social.YouTube.posts,3);
+ assert.ok(s.person.social.YouTube.followers>0);
+ assert.throws(()=>applyAction(s,{type:'SOCIAL',key:'post',platform:'YouTube'}),/dieses Jahr/);
+ assert.throws(()=>applyAction(s,{type:'SOCIAL',key:'sponsor',platform:'YouTube'}),/10.000/);
+ assert.ok(isSaveGame(s));
+});
+test('social sponsorship pays from followers with one sponsor per year',()=>{
+ let s=resolved(advance(born(),18));
+ s=applyAction(s,{type:'SOCIAL',key:'join',platform:'Instagram'});
+ s.person.social.Instagram.followers=45000;
+ const original=s.person.cash;
+ s=applyAction(s,{type:'SOCIAL',key:'sponsor',platform:'Instagram'});
+ assert.ok(s.person.cash>original);
+ assert.throws(()=>applyAction(s,{type:'SOCIAL',key:'sponsor',platform:'Instagram'}),/dieses Jahr/);
+ s=resolved(applyAction(s,{type:'AGE'}));
+ assert.ok(s.person.social.Instagram.followers<=45000);
+ assert.ok(isSaveGame(s));
+});
+test('business requires capital and contains separate company books',()=>{
+ let s=resolved(advance(born(),22));
+ s.person.cash=100000;
+ s=applyAction(s,{type:'BUSINESS',key:'open',sector:'technology'});
+ assert.equal(s.person.cash,10000);
+ assert.equal(s.person.business.cash,90000);
+ assert.throws(()=>applyAction(s,{type:'BUSINESS',key:'open',sector:'cafe'}),/bereits/);
+ s=applyAction(s,{type:'BUSINESS',key:'develop'});
+ s=applyAction(s,{type:'BUSINESS',key:'market'});
+ s=applyAction(s,{type:'BUSINESS',key:'hire'});
+ assert.equal(s.person.business.staff,2);
+ assert.ok(s.person.business.quality>45);
+ assert.ok(s.person.business.brand>15);
+ assert.ok(isSaveGame(s));
+});
+test('business can go bankrupt, and ownership can be sold for cash',()=>{
+ let s=resolved(advance(born(),25));
+ s.person.cash=50000;
+ s=applyAction(s,{type:'BUSINESS',key:'open',sector:'cafe'});
+ s.person.business.cash=-1000000;
+ s=resolved(applyAction(s,{type:'AGE'}));
+ assert.equal(s.person.business,null);
+ let t=resolved(advance(born(),18));
+ t.person.cash=50000;
+ t=applyAction(t,{type:'BUSINESS',key:'open',sector:'cafe'});
+ const cash=t.person.cash;
+ t=applyAction(t,{type:'BUSINESS',key:'sell'});
+ assert.equal(t.person.business,null);
+ assert.ok(t.person.cash>cash);
+ assert.ok(isSaveGame(t));
+});
+test('landlord property ownership supports tenants, repairs and rental income',()=>{
+ let s=resolved(advance(born(),21));
+ s.person.cash=300000;
+ s=applyAction(s,{type:'BUY',id:'house-small'});
+ const id=s.person.assets[0].id;
+ s=applyAction(s,{type:'RENTAL',key:'advertise',id});
+ assert.ok(s.person.assets[0].rental);
+ s.person.assets[0].rental.occupied=true;
+ const before=s.person.cash;
+ s=resolved(applyAction(s,{type:'AGE'}));
+ assert.ok(s.person.assets[0].rental.condition<90);
+ assert.ok(s.person.cash>=before-50000);
+ assert.ok(isSaveGame(s));
+});
+test('prison excludes business and social actions and new save fields are validated',()=>{
+ let s=resolved(advance(born(),21));
+ s.person.prisonYears=2;
+ assert.throws(()=>applyAction(s,{type:'BUSINESS',key:'open',sector:'cafe'}),/Haft/);
+ assert.throws(()=>applyAction(s,{type:'SOCIAL',key:'join',platform:'TikTok'}),/Haft/);
+ s.person.prisonYears=0;
+ s=applyAction(s,{type:'SOCIAL',key:'join',platform:'TikTok'});
+ assert.equal(isSaveGame(s),true);
+ assert.equal(isSaveGame({...s,person:{...s.person,fame:Infinity}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,social:{TikTok:{followers:-2,posts:1,warnings:0}}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,business:{sector:'technology',name:'Test',cash:0,staff:-1,quality:5,brand:5,age:0}}}),false);
+});
