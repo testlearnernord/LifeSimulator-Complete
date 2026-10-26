@@ -15,7 +15,7 @@ with sync_playwright() as playwright:
     assert page.get_by_role('button', name='Neues Leben beginnen').is_visible()
     page.get_by_role('button', name='Neues Leben beginnen').click()
     page.locator('input[name=name]').fill('Testspieler')
-    page.get_by_role('button', name='Leben beginnen').click()
+    page.get_by_role('button', name='Leben beginnen', exact=True).click()
     assert page.locator('h1').first.inner_text() == 'Testspieler'
     page.get_by_role('button', name='＋ Ein Jahr älter').click()
     assert '1' in page.locator('.age-chip').inner_text()
