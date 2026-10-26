@@ -149,7 +149,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  if(action.type==='REWIND'){
   if(!Number.isInteger(action.years)||action.years<1||action.years>5)throw Error('Ungültige Zeitreise.');
   const target=p.age-action.years;
-  const index=(s.checkpoints||[]).findLastIndex(c=>c.age===target);
+  let index=-1;for(let i=0;i<(s.checkpoints||[]).length;i++){if(s.checkpoints![i]!.age===target)index=i;}
   if(index<0)throw Error('Für dieses Lebensjahr ist kein Zeitreise-Speicherpunkt vorhanden.');
   const snapshot=s.checkpoints![index]!;
   s.person=structuredClone(snapshot.person);s.seed=snapshot.seed;
