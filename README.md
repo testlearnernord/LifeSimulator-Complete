@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.3.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.4.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -59,6 +59,17 @@ Der vollständige Quellcode ist eingecheckt. `.github/workflows/ci.yml` führt T
 
 ## Qualität
 
-`npm test` führt deterministische Unit-/Integrations-Zustandstests und 80 Langzeit-Lebenssimulationen durch. Die Tests laufen in Node ohne Framework. GitHub Actions wiederholt diese Tests bei Pushes und Pull Requests. Ein Playwright-Mobile-Chromium-Test ist in der CI vorbereitet, konnte in dieser Sandbox mangels erlaubter Browsernavigation nicht ausgeführt werden; iOS-Safari ist nicht getestet.
+`npm test` führt deterministische Unit-/Integrations-Zustandstests und 80 Langzeit-Lebenssimulationen durch. Die Tests laufen in Node ohne Framework. GitHub Actions wiederholt diese Tests bei Pushes und Pull Requests. Ein Playwright-Mobile-Chromium-Test ist in der CI vorbereitet, konnte in dieser Sandbox mangels erlaubter Browsernavigation nicht ausgeführt werden; iOS-Safari auf echter Hardware ist nicht getestet. Auf GitHub Actions läuft ein mobiler Chromium-E2E-Test.
 
 Die Simulation ist urheberrechtlich und organisatorisch unabhängig von BitLife und Candywriter; Originalspiel-Inhalte werden nicht kopiert. **Versionsstand / Quellen:** siehe Feature-Matrix, recherchiert am 25.10.2026.
+
+
+## Neu in 0.4.0: Drei miteinander verknüpfte Erweiterungen
+
+- **Social Media:** Profile bei YouTube, TikTok, Instagram, Twitter und Facebook, Followerentwicklung, virale Beiträge, Bekanntheit und Sponsoren. Unter Aktivitäten → Social Media.
+- **Unternehmen:** Café, Modegeschäft oder Technologieunternehmen mit getrennter Firmenkasse, Mitarbeitern, Marketing, Produktqualität, Jahresbilanz, Insolvenz und Verkauf. Unter Beruf → Eigenes Unternehmen.
+- **Immobilienvermietung:** Eigene Häuser inserieren, Mieter finden, Jahresmieten erhalten, renovieren, Mietverhältnis beenden. Unter Besitz.
+
+Die Systeme sind vollständig offline spielbare, eigene Modelle; *sie reproduzieren weder die originalen Zufallswahrscheinlichkeiten noch den kompletten Umfang der entsprechenden BitLife-Erweiterungen*. Vorhandene Spielstände bleiben nutzbar: neue Felder sind optional.
+
+Build und Tests: `npm run check && npm test`. Der aktuelle GitHub Pages Build wird unter https://testlearnernord.github.io/LifeSimulator-Complete/ veröffentlicht. iPhone-Safari auf echter Hardware muss separat getestet werden.
