@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.4.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.5.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -73,3 +73,12 @@ Die Simulation ist urheberrechtlich und organisatorisch unabhängig von BitLife 
 Die Systeme sind vollständig offline spielbare, eigene Modelle; *sie reproduzieren weder die originalen Zufallswahrscheinlichkeiten noch den kompletten Umfang der entsprechenden BitLife-Erweiterungen*. Vorhandene Spielstände bleiben nutzbar: neue Felder sind optional.
 
 Build und Tests: `npm run check && npm test`. Der aktuelle GitHub Pages Build wird unter https://testlearnernord.github.io/LifeSimulator-Complete/ veröffentlicht. iPhone-Safari auf echter Hardware muss separat getestet werden.
+
+## Version 0.5.0: Kaufbare Zusatzinhalte erfassen und eigenständig umsetzen
+
+Unter **Hauptmenü → Premium-Inhalte** befindet sich ein recherchiertes Inventar von 40 bekannten Zusatzinhalten mit Status, Quellen und Hinweisen zur Originalverfügbarkeit. Fünf neue Sonderfunktionen sind tatsächlich spielbar: Time Machine, Golden Pacifier, Golden Diploma, Hollywood Star und Get Out of Jail Free Card. Die bisherigen Systeme von v0.4 (Unternehmen und Vermietung) bleiben erhalten.
+
+**Sämtliche selbst entwickelte Inhalte sind kostenlos.** Das Projekt greift nicht auf fremde Käufe oder Lizenzen zu. Offene Shop-Angebote sind ausdrücklich keine freigeschalteten Original-DLCs.
+
+Technische Details und Quellen: [Premium-Inventar](docs/PREMIUM_INVENTORY.md). Zeitreise speichert höchstens 15 vergangene Jahresstände; bestehende Speicherstände bleiben gültig. Weil Snapshots zusätzlich Platz benötigen, regelmäßig JSON-Backups exportieren.
+
