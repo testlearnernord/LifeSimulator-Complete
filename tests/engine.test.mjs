@@ -185,3 +185,80 @@ test('prison excludes business and social actions and new save fields are valida
  assert.equal(isSaveGame({...s,person:{...s.person,social:{TikTok:{followers:-2,posts:1,warnings:0}}}}),false);
  assert.equal(isSaveGame({...s,person:{...s.person,business:{sector:'technology',name:'Test',cash:0,staff:-1,quality:5,brand:5,age:0}}}),false);
 });
+
+
+test('time machine rewinds complete character state and truncates future history',()=>{
+ let s=advance(born(),6);
+ const before=s.person.age;
+ const originalCash=s.person.cash;
+ s.person.cash=9999;
+ s=applyAction(s,{type:'AGE'});
+ assert.equal(s.person.age,before+1);
+ assert.ok(s.checkpoints?.length);
+ s=applyAction(s,{type:'REWIND',years:1});
+ assert.equal(s.person.age,before);
+ assert.equal(s.person.cash,9999);
+ assert.ok(isSaveGame(s));
+ assert.throws(()=>applyAction(s,{type:'REWIND',years:7}),/Ungültige/);
+ const old=born();assert.throws(()=>applyAction(old,{type:'REWIND',years:1}),/Speicherpunkt/);
+ assert.ok(originalCash!==9999);
+});
+test('time machine can restore an alive state after death',()=>{
+ let s=born();
+ s.person.age=116;s.person.stats.health=0;
+ s=applyAction(s,{type:'AGE'});
+ assert.equal(s.person.alive,false);
+ s=applyAction(s,{type:'REWIND',years:1});
+ assert.equal(s.person.age,116);
+ assert.equal(s.person.alive,true);
+ assert.ok(isSaveGame(s));
+});
+test('golden pacifier creates selected triplets with persistent talents',()=>{
+ let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ if(!s.person.relationships.some(r=>r.kind==='Partner'&&r.alive))s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ const start=s.person.relationships.filter(r=>r.kind==='Kind').length;
+ s=applyAction(s,{type:'BIRTH',count:3,gender:'weiblich',talent:'sport'});
+ const children=s.person.relationships.filter(r=>r.kind==='Kind');
+ assert.equal(children.length,start+3);
+ assert.ok(children.slice(-3).every(r=>r.gender==='weiblich'&&r.talent==='sport'));
+ assert.throws(()=>applyAction(s,{type:'BIRTH',count:3,gender:'weiblich',talent:'sport'}),/dieses Jahr/);
+ assert.ok(isSaveGame(s));
+});
+test('release card ends imprisonment and clears record',()=>{
+ const s=born();s.person.prisonYears=4;s.person.record=true;
+ const released=applyAction(s,{type:'PREMIUM',key:'jail-card'});
+ assert.equal(released.person.prisonYears,0);
+ assert.equal(released.person.record,false);
+ assert.equal(s.person.prisonYears,4);
+ assert.throws(()=>applyAction(released,{type:'PREMIUM',key:'jail-card'}),/nicht im Gefängnis/);
+});
+test('golden diploma is immediate, capped and career-compatible',()=>{
+ let s=advance(born(),18);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s=applyAction(s,{type:'PREMIUM',key:'golden-diploma',subject:'Medizin'});
+ s=applyAction(s,{type:'PREMIUM',key:'golden-diploma',subject:'Ingenieurwesen'});
+ assert.equal(s.person.degree,true);
+ assert.deepEqual(s.person.degrees,['Medizin','Ingenieurwesen']);
+ assert.equal(s.person.universityYears,0);
+ assert.throws(()=>applyAction(s,{type:'PREMIUM',key:'golden-diploma',subject:'Rechtswissenschaften'}),/maximal zwei/);
+ assert.ok(isSaveGame(s));
+});
+test('Hollywood Star requires an eligible occupation and grants instant fame',()=>{
+ let s=advance(born(),18);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ assert.throws(()=>applyAction(s,{type:'PREMIUM',key:'hollywood-star'}),/Beruf/);
+ s.person.stats.smarts=90;
+ s=applyAction(s,{type:'JOB',id:'writer'});
+ s=applyAction(s,{type:'PREMIUM',key:'hollywood-star'});
+ assert.ok(s.person.fame>=80);
+ assert.ok(isSaveGame(s));
+});
+test('premium checkpoints and child talent validation reject corruption',()=>{
+ const s=born();
+ assert.ok(isSaveGame(s));
+ assert.equal(isSaveGame({...s,checkpoints:[{age:500,person:s.person,seed:s.seed}]}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,degrees:['Medizin','Medizin']}}),false);
+ const bad=structuredClone(s);bad.person.relationships[0].talent='invalid';
+ assert.equal(isSaveGame(bad),false);
+});
