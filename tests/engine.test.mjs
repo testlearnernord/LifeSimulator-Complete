@@ -263,3 +263,53 @@ test('premium checkpoints and child talent validation reject corruption',()=>{
  const bad=structuredClone(s);bad.person.relationships[0].talent='invalid';
  assert.equal(isSaveGame(bad),false);
 });
+
+
+test('investor supports paid trades with bounded quantities, positions and fair sale proceeds',()=>{
+ let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=100000;
+ const start=s.person.cash;
+ s=applyAction(s,{type:'INVEST',key:'buy',assetId:'equity',quantity:5});
+ assert.equal(s.person.investments[0].quantity,5);
+ assert.ok(s.person.cash<start);
+ assert.ok(netWorth(s.person)<start);
+ assert.throws(()=>applyAction(s,{type:'INVEST',key:'buy',assetId:'equity',quantity:0}),/zwischen/);
+ assert.throws(()=>applyAction(s,{type:'INVEST',key:'sell',assetId:'equity',quantity:6}),/nicht genug/);
+ s=applyAction(s,{type:'INVEST',key:'sell',assetId:'equity',quantity:5});
+ assert.equal(s.person.investments.length,0);
+ assert.ok(s.person.cash<start);
+ assert.ok(isSaveGame(s));
+});
+test('investment markets change on aging and bond or equity holdings earn income',()=>{
+ let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=100000;
+ s=applyAction(s,{type:'INVEST',key:'buy',assetId:'bond',quantity:100});
+ const price=s.person.marketPrices?.bond||100;
+ s=applyAction(s,{type:'AGE'});
+ assert.ok(Number.isFinite(s.person.marketPrices?.bond));
+ assert.notEqual(s.person.marketPrices?.bond,price);
+ assert.ok(isSaveGame(s));
+});
+test('investment advisor has yearly costs and buys diversified fund when affordable',()=>{
+ let s=advance(born(),20);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=150000;
+ s=applyAction(s,{type:'INVEST',key:'advisor-hire'});
+ assert.equal(s.person.financialAdvisor,true);
+ assert.throws(()=>applyAction(s,{type:'INVEST',key:'advisor-hire'}),/bereits/);
+ s=applyAction(s,{type:'AGE'});
+ assert.ok((s.person.investments||[]).some(p=>p.assetId==='fund'));
+ assert.ok(isSaveGame(s));
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s=applyAction(s,{type:'INVEST',key:'advisor-fire'});
+ assert.equal(s.person.financialAdvisor,false);
+});
+test('investment portfolio and price corruption cannot pass save validation',()=>{
+ const s=born();
+ assert.equal(isSaveGame({...s,person:{...s.person,marketPrices:{crypto:NaN}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,investments:[{assetId:'fake',quantity:1,costBasis:100}]}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,investments:[{assetId:'equity',quantity:0,costBasis:100}]}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,financialAdvisor:'yes'}}),false);
+});
