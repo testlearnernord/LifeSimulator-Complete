@@ -73,7 +73,7 @@ with sync_playwright() as playwright:
     page.locator('[data-action="premiumopen"]').click()
     expect(page.get_by_role('heading', name='Zusatzinhalte')).to_be_visible()
     expect(page.locator('.premium-line')).to_have_count(40)
-    expect(page.get_by_text('Golden Pacifier', exact=True)).to_be_visible()
+    expect(page.locator('.premium-line b', has_text='Golden Pacifier')).to_be_visible()
     expect(page.get_by_text('Movie Director', exact=True)).to_be_visible()
     import os
     os.makedirs('artifacts', exist_ok=True)
