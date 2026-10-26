@@ -84,3 +84,19 @@ test('optional new progress fields are validated and legacy saves work',()=>{
  assert.equal(isSaveGame({...s,person:{...s.person,careerPerformance:-5}}),false);
  assert.equal(isSaveGame({...s,person:{...s.person,salaryBonus:Infinity}}),false);
 });
+
+
+test('free admin character designer overrides initial random attributes',()=>{
+ const s=createLife({name:'Custom',gender:'weiblich',country:'Deutschland',seed:55,stats:{health:99,happiness:31,smarts:77,looks:4}});
+ assert.deepEqual(s.person.stats,{health:99,happiness:31,smarts:77,looks:4});
+ assert.equal(isSaveGame(s),true);
+});
+test('editing life attributes is persistent and rejects invalid values',()=>{
+ const s=born();
+ const changed=applyAction(s,{type:'CUSTOMIZE',stats:{health:100,happiness:90,smarts:80,looks:70}});
+ assert.deepEqual(changed.person.stats,{health:100,happiness:90,smarts:80,looks:70});
+ assert.notDeepEqual(s.person.stats,changed.person.stats);
+ assert.throws(()=>applyAction(s,{type:'CUSTOMIZE',stats:{health:101,happiness:50,smarts:50,looks:50}}),/Ungültig/);
+ assert.throws(()=>createLife({name:'Broken',gender:'divers',country:'Deutschland',seed:42,stats:{health:NaN}}),/Ungültig/);
+ assert.equal(isSaveGame(changed),true);
+});
