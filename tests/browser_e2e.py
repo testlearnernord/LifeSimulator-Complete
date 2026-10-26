@@ -40,6 +40,14 @@ with sync_playwright() as playwright:
     expect(page.locator('.profile-name')).to_contain_text('Testspieler')
     page.locator('.age-button').click()
     expect(page.locator('.year-group h2').last).to_contain_text('Alter: 2 Jahre')
+    # Screenshot of the actual rendered app, captured in mobile Chromium.
+    if page.locator('[data-action="event"]').count():
+        page.locator('[data-action="event"]').first.click()
+    context.set_offline(False)
+    page.get_by_role('button', name='Zum Lebenslauf').click()
+    import os
+    os.makedirs('artifacts', exist_ok=True)
+    page.screenshot(path='artifacts/life-mobile.png', full_page=True)
     assert not errors, f'Browser errors: {errors}'
     print('v0.2 mobile navigation, stats, saves, exports and offline: PASSED')
     context.close()
