@@ -1,5 +1,7 @@
 import {CAREERS,COUNTRIES,ITEMS,LAST_NAMES,NAMES} from './catalog.js';
 import type {Action,Entry,NewLife,Pending,Person,Relationship,SaveGame,Stat} from './types.js';
+import {advanceExpansions,businessAction,rentalAction,socialAction,validExtensions} from './expansions.js';
+import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
 const rng=(s:SaveGame)=>{s.seed^=s.seed<<13;s.seed^=s.seed>>>17;s.seed^=s.seed<<5;s.seed>>>=0;return s.seed/4294967296;};
@@ -9,6 +11,11 @@ const uid=(s:SaveGame)=>`${s.person.age}-${Math.floor(rng(s)*1e9).toString(36)}`
 const log=(s:SaveGame,text:string,tone:Entry['tone']='normal')=>{const p=s.person;p.history.unshift({id:uid(s),age:p.age,text,tone});p.history=p.history.slice(0,240);};
 const stat=(p:Person,key:Stat,value:number)=>{p.stats[key]=clamp(p.stats[key]+value);};
 const useAnnual=(p:Person,key:string,limit=1)=>{p.yearlyActions??={};const count=p.yearlyActions[key]||0;if(count>=limit)throw Error('Diese Aktivität kannst du dieses Jahr nicht öfter ausführen.');p.yearlyActions[key]=count+1;};
+const expansionHooks=(s:SaveGame):ExpansionHooks=>({
+ random:()=>rng(s),log:(message,tone)=>log(s,message,tone),
+ stat:(key,change)=>stat(s.person,key,change),
+ annual:(key,limit)=>useAnnual(s.person,key,limit)
+});
 const lockedUp=(p:Person)=>p.prisonYears>0;
 const requireFree=(p:Person)=>{if(lockedUp(p))throw Error('Während der Haft ist diese Aktivität nicht möglich. Öffne die Gefängnisaktivitäten.');};
 const relation=(s:SaveGame,kind:Relationship['kind'],age:number):Relationship=>({id:uid(s),name:`${pick(s,NAMES)} ${pick(s,LAST_NAMES)}`,kind,gender:kind==='Mutter'?'weiblich':kind==='Vater'?'männlich':chance(s,.5)?'weiblich':'männlich',age,bond:clamp(35+rng(s)*50),alive:true});
@@ -42,6 +49,7 @@ function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=sc
  const expense=p.age>=18? Math.round(6500+(p.age>25?3000:0)) : 0;
  const assetExpense=p.assets.reduce((a,b)=>a+b.annualCost,0);
  p.cash-=expense+assetExpense;
+ advanceExpansions(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
  if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
@@ -143,7 +151,10 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
- case 'AGE':age(s);break;
+ case 'SOCIAL':socialAction(s,action.key,action.platform,expansionHooks(s));break;
+  case 'BUSINESS':businessAction(s,action.key,action.sector,expansionHooks(s));break;
+  case 'RENTAL':rentalAction(s,action.key,action.id,expansionHooks(s));break;
+  case 'AGE':age(s);break;
  case 'ACTIVITY':activity(s,action.key);break;
  case 'RELATION':interact(s,action.id,action.key);break;
  case 'EVENT':resolve(s,action.kind);break;
@@ -167,7 +178,8 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(!p.stats||!(['health','happiness','smarts','looks'] as Stat[]).every(k=>num(p.stats[k],0,100)))return false;
  if(!Array.isArray(p.relationships)||p.relationships.length>1000||!p.relationships.every(r=>str(r.id,100)&&str(r.name,150)&&['Mutter','Vater','Elternteil','Partner','Kind','Freund'].includes(r.kind)&&['weiblich','männlich','divers'].includes(r.gender)&&int(r.age,0,200)&&num(r.bond,0,100)&&typeof r.alive==='boolean'))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
+ if(!validExtensions(p))return false;
+  if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
  if(p.salaryBonus!==undefined&&!num(p.salaryBonus,0,1e9))return false;
