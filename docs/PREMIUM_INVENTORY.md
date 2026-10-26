@@ -19,7 +19,7 @@ Der App Store listet nur einen Teil der In-App-Käufe (die angezeigten Angebote 
 |---|---|---|---|
 | Basispremium | Bitizenship, God Mode, Bitizenship+God Mode, Boss Mode | dauerhaft | **Teilweise**: Eigene lokale Spielstände, Charakterattribute, keine Werbung, einige berufliche Systeme |
 | Job-Packs | Mafia, Profisport, Musiker, Schauspieler, Politiker, Astronaut, Model, Street Hustler, Dealer, Business, Music Producer | spezialisierte Karrieren | **Offen**, Business **teilweise** |
-| Expansion Packs | Landlord, Investor, C.U.L.T., Black Market, Movie Director, Secret Agent, Zoo, Casino, Grand Prix/Racing, Outdoor Lifestyle | Spielsysteme | Landlord **teilweise**, Rest **offen** |
+| Expansion Packs | Landlord, Investor, C.U.L.T., Black Market, Movie Director, Secret Agent, Zoo, Casino, Grand Prix/Racing, Outdoor Lifestyle | Spielsysteme | Landlord und Investor **teilweise**, Rest **offen** |
 | Items | Golden Pacifier, Get Out of Jail Free Card, Hollywood Star, Assassin's Blade, Golden Passport, Promiscuity Potion, Golden Diploma, Golden Piggy Bank, Golden Resume, Friendship Bracelet | permanente/spezielle Gegenstände | **Eigene spielbare Funktionen:** Pacifier, Jail Card, Hollywood Star, Diploma. Rest **offen** |
 | Verschiedenes | Time Machine, Ultimate Fighter Mode, Challenge Vault, Luxury Lifestyle, BitPass/Seasons (historisch) | Modi und Sammlungen | Time Machine **spielbar**; weitere offen; Seasons offiziell eingestellt |
 
@@ -30,8 +30,9 @@ Der App Store listet nur einen Teil der In-App-Käufe (die angezeigten Angebote 
 3. **Get Out of Jail Free Card:** Bei Haft sofortige Entlassung und Löschung des vereinfachten Strafregisters. **Einschränkung:** keine differenzierten Vorstrafen-/Justizsysteme.
 4. **Golden Diploma:** Sofortabschluss in einer von vier Richtungen, insgesamt bis zu zwei unterschiedliche Abschlüsse. Die vorhandenen akademischen Berufe erkennen den `degree`-Wert. **Einschränkung:** viele originale Studiengänge und Spezialanforderungen fehlen.
 5. **Hollywood Star:** In mehreren Berufszweigen bzw. bei eigenem Unternehmen sofortige Bekanntheit. **Einschränkung:** nur ein reduziertes Rufsystem, keine komplette Prominentenkarriere.
-6. **God Mode / Bitizenship / Boss Mode:** Einzelne freie Funktionen (Charakterwerte, Generationen, einige Karrierebereiche), aber **nicht als vollständige Pakete implementiert**.
-7. **Landlord & Business:** Echte eigene Miet- und Unternehmensmechaniken aus Version 0.4, aber nicht vollständiger Originalumfang.
+6. **Investor (Teilumfang):** fünf fiktive Anlageklassen (Aktien, Anleihen, Fonds, Penny Stocks, Krypto), selbst generierte Jahreskurse, Handelsgebühren, Kauf/Verkauf, Dividenden/Zinsen, Finanzberater und Depotbewertung. **Einschränkung:** keine echten Livekurse, keine Insidertrading-, Nachrichten- oder vollständigen Beratermechaniken.
+7. **God Mode / Bitizenship / Boss Mode:** Einzelne freie Funktionen (Charakterwerte, Generationen, einige Karrierebereiche), aber **nicht als vollständige Pakete implementiert**.
+8. **Landlord & Business:** Echte eigene Miet- und Unternehmensmechaniken aus Version 0.4, aber nicht vollständiger Originalumfang.
 
 ## Offizielle Referenzquellen
 
