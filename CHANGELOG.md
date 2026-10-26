@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 – 2026-10-26 (menus, prison, careers, life feed)
+
+- Drill-down activity categories and relationship detail screens inspired by familiar life-sim navigation; all artwork and texts are original.
+- Condensed chronology: the latest five age groups are shown by default, with expandable previous years and long-action histories.
+- Distinct theft risks and two attempts per year, with meaningful prison restrictions (fixes repeated crime while incarcerated).
+- Prison-yard exercises, cell meditation, prison library and low-paid work; prison-specific annual event.
+- Career performance, annual hard-work choice, raise negotiations and advancement-based salary bonuses.
+- Additional options: library, walks, volunteering, holidays, lottery, gifts and spending time together.
+- Version-1 save files remain readable; all new state fields are optional and individually validated.
+- Automated regression tests added for prison restrictions, crime quotas, career progression, and legacy save compatibility.
+
+**Limitations:** The original game's exact formulas, menus, media and DLC gameplay are not fully reproduced. iPhone Safari hardware validation remains outstanding.
+
+
 ## v0.2.0 – Klassische mobile Life-Sim-Oberfläche
 
 - Rot gehaltene Kopfzeile, Charakterprofil mit Avatar, Land, Lebensphase und Kontostand
