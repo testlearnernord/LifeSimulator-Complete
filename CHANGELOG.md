@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.0 – Klassische mobile Life-Sim-Oberfläche
+
+- Rot gehaltene Kopfzeile, Charakterprofil mit Avatar, Land, Lebensphase und Kontostand
+- Chronologisch gruppierter, scrollbarerer Lebenslauf mit Altersüberschriften
+- Große, immer erreichbare grüne Alters-Schaltfläche in blauer Navigation
+- Vier permanente farbige Statusbalken für Glück, Gesundheit, Intelligenz und Aussehen
+- Smartphone-taugliches Hochformat, Safe-Area-Abstände und eigenständige Icons
+- Navigation direkt zu Beruf, Besitz, Beziehungen und Aktivitäten
+- Aktualisierte Playwright-Mobiltests mit Offline-/Speicherstandprüfung und Screenshot-Artefakt
+- Unverändertes Savegame-Schema 1: bestehende Speicherstände werden weiterverwendet
+
+**Offen:** Die meisten Erweiterungen und Spezialkarrieren des Referenzspiels fehlen; keine nachgewiesene 1:1-Funktionsgleichheit. Safari auf einem echten iPhone muss noch separat geprüft werden.
+
+# Changelog
+
 ## 0.1.0 – 2026-10-25 (initial playable milestone)
 
 - Standalone German text-based life simulation with a new name, layout, writing, and custom app icon.
