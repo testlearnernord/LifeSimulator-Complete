@@ -134,7 +134,10 @@ function nextGeneration(s:SaveGame,childId:string):SaveGame{
  const previous={name:p.name,age:p.age,cause:p.causeOfDeath||'Unbekannt'};
  const inheritance=Math.max(0,Math.floor((p.cash+p.assets.reduce((a,b)=>a+b.value,0))*.8));
  const copy=createLife({name:child.name,gender:child.gender,country:p.country,seed:(s.seed^0x9e3779b9)>>>0,generation:p.generation+1,inheritance});
- copy.id=s.id;copy.ancestry=[...s.ancestry,previous];copy.person.age=child.age;copy.person.school=schoolFor(child.age,0,false);
+ copy.id=s.id;copy.ancestry=[...s.ancestry,previous];copy.person.age=child.age;copy.person.school=schoolFor(child.age,0,false);copy.person.talent=child.talent;
+  if(child.talent==='intelligenz')copy.person.stats.smarts=Math.max(80,copy.person.stats.smarts);
+  if(child.talent==='sport')copy.person.stats.health=Math.max(85,copy.person.stats.health);
+  if(child.talent==='schauspiel')copy.person.stats.looks=Math.max(80,copy.person.stats.looks);
  const partner=p.relationships.find(r=>r.kind==='Partner'&&r.alive);
  copy.person.relationships=partner?[{...partner,kind:partner.gender==='weiblich'?'Mutter':partner.gender==='männlich'?'Vater':'Elternteil'}]:[];
  log(copy,`Du führst die Familie in Generation ${copy.person.generation} weiter. Erbe: ${money(inheritance)}.`,'good');return copy;
@@ -143,9 +146,51 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  if(!isSaveGame(input))throw Error('Ungültiger Spielstand.');
  const s:SaveGame=structuredClone(input);const p=s.person;
  if(action.type==='NEW_GENERATION')return nextGeneration(s,action.id);
+ if(action.type==='REWIND'){
+  if(!Number.isInteger(action.years)||action.years<1||action.years>5)throw Error('Ungültige Zeitreise.');
+  const target=p.age-action.years;
+  const index=(s.checkpoints||[]).findLastIndex(c=>c.age===target);
+  if(index<0)throw Error('Für dieses Lebensjahr ist kein Zeitreise-Speicherpunkt vorhanden.');
+  const snapshot=s.checkpoints![index]!;
+  s.person=structuredClone(snapshot.person);s.seed=snapshot.seed;
+  s.checkpoints=s.checkpoints!.slice(0,index);
+  s.updated=Date.now();return s;
+ }
  if(!p.alive)throw Error('Dieses Leben ist bereits beendet.');
  if(p.pending&&action.type!=='EVENT')throw Error('Bitte zuerst die offene Entscheidung treffen.');
  switch(action.type){
+ case 'BIRTH':{
+   if(p.age<18||p.prisonYears>0)throw Error('Ein geplanter Nachwuchs ist jetzt nicht möglich.');
+   if(!p.relationships.some(r=>r.kind==='Partner'&&r.alive))throw Error('Du brauchst eine Partnerschaft.');
+   if(![1,2,3].includes(action.count)||!['weiblich','männlich','divers'].includes(action.gender)||!['musik','sport','schauspiel','intelligenz','keines'].includes(action.talent))throw Error('Ungültige Geburtsplanung.');
+   useAnnual(p,'premium:birth');
+   for(let i=0;i<action.count;i++){const child=relation(s,'Kind',0);child.gender=action.gender;child.talent=action.talent;child.bond=80;p.relationships.push(child);}
+   stat(p,'happiness',8*action.count);
+   log(s,action.count===1?'Ein Kind wurde geboren. Du hast dessen besondere Eigenschaften geplant.':`Deine Familie wächst um ${action.count} Kinder. Du hast Geschlecht und Talente festgelegt.`,'good');
+   break;
+ }
+ case 'PREMIUM':{
+   if(action.key==='jail-card'){
+    if(p.prisonYears<=0)throw Error('Du befindest dich nicht im Gefängnis.');
+    p.prisonYears=0;p.record=false;
+    stat(p,'happiness',15);
+    log(s,'Du wurdest freigelassen und deine Vorstrafe wurde gestrichen.','good');
+   }else if(action.key==='golden-diploma'){
+    if(p.age<18||p.universityYears>0)throw Error('Erst nach der Schulzeit und außerhalb eines laufenden Studiums möglich.');
+    const degree=action.subject||'Geisteswissenschaften';
+    if(!['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(degree))throw Error('Ungültiger Studiengang.');
+    p.degrees??=[];if(p.degrees.includes(degree)||p.degrees.length>=2)throw Error('Du kannst maximal zwei verschiedene Abschlüsse auswählen.');
+    p.degrees.push(degree);p.degree=true;p.school='Abgeschlossen';
+    log(s,`Du hast sofort deinen Abschluss in ${degree} erhalten.`,'good');
+   }else if(action.key==='hollywood-star'){
+    const famousJobs=['writer','chef','reporter','app-developer','dj','magician','model','actor','singer','musician','politician','athlete'];
+    if(!famousJobs.includes(p.jobId||'')&&!p.business)throw Error('Du benötigst einen Beruf mit Bekanntheitspotenzial oder ein Unternehmen.');
+    p.fame=Math.max(p.fame||0,80);
+    stat(p,'happiness',5);
+    log(s,'Du bist schlagartig bekannt geworden.','good');
+   }else throw Error('Unbekannter Gegenstand.');
+   break;
+ }
  case 'CUSTOMIZE':{
   if(s.adminFullAccess!==true)throw Error('Diese Funktion ist nicht freigeschaltet.');
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
@@ -154,7 +199,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  case 'SOCIAL':socialAction(s,action.key,action.platform,expansionHooks(s));break;
   case 'BUSINESS':businessAction(s,action.key,action.sector,expansionHooks(s));break;
   case 'RENTAL':rentalAction(s,action.key,action.id,expansionHooks(s));break;
-  case 'AGE':age(s);break;
+  case 'AGE':{s.checkpoints??=[];s.checkpoints.push({age:p.age,person:structuredClone(p),seed:s.seed});if(s.checkpoints.length>15)s.checkpoints.splice(0,s.checkpoints.length-15);age(s);break;}
  case 'ACTIVITY':activity(s,action.key);break;
  case 'RELATION':interact(s,action.id,action.key);break;
  case 'EVENT':resolve(s,action.kind);break;
@@ -176,7 +221,9 @@ export function isSaveGame(value:unknown):value is SaveGame{
  const p=x.person as Person;
  if(!str(p.id,150)||!str(p.name,100)||!str(p.country,50)||!['weiblich','männlich','divers'].includes(p.gender)||!int(p.age,0,200)||!num(p.cash)||typeof p.alive!=='boolean'||!str(p.school,40)||typeof p.degree!=='boolean'||!int(p.universityYears,0,4)||!int(p.jobYears,0,200)||!int(p.prisonYears,0,200)||typeof p.record!=='boolean'||!int(p.generation,1,1000)||!str(p.causeOfDeath,500)&&p.causeOfDeath!==null||p.jobId!==null&&!str(p.jobId,100))return false;
  if(!p.stats||!(['health','happiness','smarts','looks'] as Stat[]).every(k=>num(p.stats[k],0,100)))return false;
- if(!Array.isArray(p.relationships)||p.relationships.length>1000||!p.relationships.every(r=>str(r.id,100)&&str(r.name,150)&&['Mutter','Vater','Elternteil','Partner','Kind','Freund'].includes(r.kind)&&['weiblich','männlich','divers'].includes(r.gender)&&int(r.age,0,200)&&num(r.bond,0,100)&&typeof r.alive==='boolean'))return false;
+ if(!Array.isArray(p.relationships)||p.relationships.length>1000||!p.relationships.every(r=>str(r.id,100)&&str(r.name,150)&&['Mutter','Vater','Elternteil','Partner','Kind','Freund'].includes(r.kind)&&['weiblich','männlich','divers'].includes(r.gender)&&int(r.age,0,200)&&num(r.bond,0,100)&&typeof r.alive==='boolean'&&(r.talent===undefined||['musik','sport','schauspiel','intelligenz','keines'].includes(r.talent))))return false;
+ if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
+ if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
  if(!validExtensions(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
@@ -186,6 +233,13 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.reputation!==undefined&&!num(p.reputation,0,100))return false;
  if(p.marriedPartnerId!==undefined&&p.marriedPartnerId!==null&&!str(p.marriedPartnerId,100))return false;
  if(p.grades!==undefined&&!num(p.grades,0,100))return false;
+ if(x.checkpoints!==undefined){
+  if(!Array.isArray(x.checkpoints)||x.checkpoints.length>15)return false;
+  for(const cp of x.checkpoints){
+   if(!cp||!int(cp.age,0,200)||!int(cp.seed,0,0xffffffff)||!cp.person||cp.person.age!==cp.age)return false;
+   if(!isSaveGame({...x,checkpoints:undefined,person:cp.person}))return false;
+  }
+ }
  if(p.pending!==null){const ev=p.pending;if(!ev||!str(ev.id,100)||!str(ev.heading,200)||!str(ev.detail,1000)||!Array.isArray(ev.options)||ev.options.length<1||ev.options.length>12||!ev.options.every(o=>str(o.label,250)&&str(o.kind,100)))return false;}
  return true;
 }
