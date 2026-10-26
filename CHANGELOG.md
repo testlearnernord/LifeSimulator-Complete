@@ -9,6 +9,7 @@
 - Career performance, annual hard-work choice, raise negotiations and advancement-based salary bonuses.
 - Additional options: library, walks, volunteering, holidays, lottery, gifts and spending time together.
 - Version-1 save files remain readable; all new state fields are optional and individually validated.
+- Free admin attribute editor on life creation and during an active life (four live-updating controls, backed by the reducer and tests).
 - Automated regression tests added for prison restrictions, crime quotas, career progression, and legacy save compatibility.
 
 **Limitations:** The original game's exact formulas, menus, media and DLC gameplay are not fully reproduced. iPhone Safari hardware validation remains outstanding.
