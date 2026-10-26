@@ -41,7 +41,9 @@ Browser: `http://localhost:4173`. `dist/` enthält die fertig gebaute Web-App. D
 
 ## GitHub
 
-Das Projektarchiv kann in ein neues Repository `LifeSimulator-Complete` hochgeladen werden. Das verbundene GitHub-Tool in dieser Sitzung erlaubt Arbeiten mit existierenden Repositories, bietet aber **kein Anlegen eines neuen Repository** an; der Upload wurde daher nicht als erfolgt markiert.
+Repository: https://github.com/testlearnernord/LifeSimulator-Complete
+
+Der vollständige Quellcode ist eingecheckt. `.github/workflows/ci.yml` führt TypeScript-Prüfung, Simulationstests und einen Browser-Smoke-Test aus. `.github/workflows/deploy.yml` veröffentlicht die PWA, sobald unter **Settings → Pages → Build and deployment → Source: GitHub Actions** ausgewählt wurde. Diese einmalige Pages-Freischaltung erfordert einen manuellen Schritt im GitHub-Repository.
 
 ## Admin und Kosten
 
