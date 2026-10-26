@@ -1,6 +1,6 @@
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-25. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.25.x (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.3.0 (2026-10-26).
+**Referenzdatum:** 2026-10-25. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.25.x (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.4.0 (2026-10-26).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -40,7 +40,7 @@
 | Karriere | Teilzeitjobs | W | O | Noch nicht integriert |
 | Karriere | Militär | W | O | Keine Einsätze, Laufbahnen oder Minenfelder |
 | Karriere | Fame / Berühmtheit | H | O | Kein Fame-System |
-| Karriere | Social Media / SoundCloud | A | O | 2025/26 belegter Funktionsumfang |
+| Karriere | Social Media / SoundCloud | A | P | Fünf Plattformen, Reichweite, Beiträge, Sponsoring, Bekanntheit; kein SoundCloud-Katalog, Formeln eigener Entwurf |
 | Karriere | Mafia Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Pro Athlete Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Musician Job Pack | H,W | O | Nicht implementiert |
@@ -82,7 +82,7 @@
 | Delikte | Taschendiebstahl / Ladendiebstahl / Einbruch | W | P | Drei eigene Risiko-Modelle; keine exakt verifizierten Originalformeln |
 
 | Reisen | Golden Passport | H | O | Offizielles Premium-Item |
-| Sonderfunktionen | God Mode | H | O | Kein vollständiger Charaktereditor |
+| Sonderfunktionen | God Mode | H | P | Vier sichtbare Charakterwerte frei anpassbar, andere Aspekte noch offen |
 | Sonderfunktionen | Bitizenship | H | P | Spielfunktionen nicht monetarisiert |
 | Sonderfunktionen | Boss Mode | H | O | Kein künstliches Paywall-System, Job-Packs fehlen |
 | Sonderfunktionen | Hollywood Star | H | O | Item und sofortige Berühmtheit fehlen |
@@ -112,6 +112,12 @@
 - **C** Community-Karrierelexikon: https://bitlifecareers.github.io/
 
 Die offizielle Hilfe und der App Store haben höhere Aussagekraft als Community-Seiten. Wo nur `W` oder `C` belegt ist, wurde der Nachweisgrad entsprechend herabgestuft.
+
+### Implementiert seit 0.4.0 (eigene, nicht identische Modelle)
+
+- **Social Media:** Profile auf fünf Plattformen, drei Posts/Jahr/Plattform, virale Ereignisse, Followerabgänge, Sponsoring ab 10.000 Followern, Bekanntheit. Referenz für die EXISTENZ solcher Systeme: [Social Media Update v1.37](https://progameguides.com/bitlife/bitlife-social-media-update-patch-notes-v1-37/). Formeln und Häufigkeiten sind eigene Implementierung.
+- **Unternehmen:** Drei Branchen, private und geschäftliche Konten, Personal, Produktentwicklung, Marketing, Entnahmen, Verkauf und Insolvenz. Existenz und Kernaktivitäten: [Offizielles Help Center](https://bitlifeapp.com/help/). Branchenauswahl und Berechnung nicht exakt.
+- **Vermietung:** Eigene Häuser können Inserate schalten, Mieter beherbergen, Mieteinnahmen erzielen, renoviert und geräumt werden. Referenz: [App-Store-Landlord-Erweiterung](https://apps.apple.com/de/app/bitlife-life-simulator/id1374403536). Mieten/Leerstandsdaten sind eigene Modelle.
 
 ### Implementiert seit 0.3.0, aber nicht originalgetreu
 
