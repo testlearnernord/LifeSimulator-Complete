@@ -150,6 +150,6 @@ with sync_playwright() as playwright:
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.10 acting school, music, family, health, saves and offline: PASSED')
+    print('v0.11 crime progression, acting, school, family, saves and offline: PASSED')
     context.close()
     browser.close()
