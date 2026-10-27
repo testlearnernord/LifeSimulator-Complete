@@ -50,6 +50,27 @@ function renderBusiness(p:Person){
  ${card('🏦','Unternehmen verkaufen','Verkauf zum Schätzwert','business','sell','Verkaufen',p.prisonYears>0)}
  </div>`;
 }
+function renderSchoolPanel(p:Person){
+ if(p.age<6||p.age>=18)return '';
+ const r=p.schoolRecord;
+ const active=p.prisonYears===0;
+ return `${heading('Schulalltag')}
+ <div class='academic-card'>
+ <div class='school-score'><span>📘</span><div><b>Dein Zeugnis</b><small>${html(p.school)} · ${p.age} Jahre</small></div><strong>${r?.performance??p.grades??50}%</strong></div>
+ <div class='school-metrics'>
+ ${[['Leistungen',r?.performance??p.grades??50],['Anwesenheit',r?.attendance??90],['Disziplin',r?.discipline??85]].map(([title,value])=>`<div><span>${title}</span><meter min='0' max='100' value='${value}'></meter><b>${value}%</b></div>`).join('')}
+ </div><p class='small'>AG: ${r?.club&&r.club!=='kein'?html(r.club):'Keine'} · Schulische Leistungen beeinflussen deinen Abschluss und mögliche Stipendien.</p>
+ <div class='row school-actions'>
+ ${button('Lernen','education','study','smallbtn',!active)}
+ ${button('Nachhilfe (150 €)','education','tutor','smallbtn',!active||p.cash<150)}
+ ${button('Lehrergespräch','education','teacher','smallbtn',!active)}
+ </div></div>
+ ${heading('Schulaktivitäten')}<div class='stack'>
+ ${menuRow('🤝','Mit Mitschülern treffen','Soziale Kontakte und Glück verbessern','education','socialize',!active)}
+ ${menuRow('🎨','Arbeitsgemeinschaft beitreten','Sport, Musik, Technik und Kunst','category','school-clubs',!active)}
+ ${menuRow('🎒','Unterricht schwänzen','Mehr Freizeit, aber schlechtere Noten und Disziplin','education','skip',!active)}
+ </div>`;
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -57,6 +78,7 @@ function renderCareer(p:Person){
  return `<div class='panel-intro'><span class='panel-emoji'>🎓</span><div><h2>Ausbildung und Karriere</h2><span>${html(p.school)}</span></div></div>
  ${jailed?`<div class='prison-warning'>🔒 Noch ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'} Haft. Freie Arbeit und Studium sind derzeit gesperrt.</div>`:''}
  ${heading('Ausbildung')}<div class='info-card'><b>${html(p.school)}</b><p class='small'>${p.degree?'Universitätsabschluss':p.universityYears>0?`Noch ${p.universityYears} Studienjahre`:p.age<18?'Schulpflicht':'Kein Hochschulabschluss'}</p><div class='row'>${button('Lernen','activity','study','smallbtn',p.age<6||p.age>24||p.school==='Abgeschlossen'||jailed)}${button('Universität beginnen','study','','smallbtn',!canStudy)}</div></div>
+ ${renderSchoolPanel(p)}
  ${heading('Beruf',p.jobId?'Beschäftigt':'Arbeitssuchend')}
  <div class='info-card'><b>${html(careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr`:'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
@@ -134,7 +156,7 @@ function renderActivities(p:Person){
  ${menuRow('🎩','Accessoires','Kleidung und persönliche Gegenstände','category','accessories',p.age<8)}
  ${menuRow('🧸','Adoption','Ein Kind aufnehmen · ab 21 Jahren','lifestyle','adopt',p.age<21||p.prisonYears>0||p.cash<3000)}
  ${menuRow('🦊','Kriminalität','Taschendiebstahl, Ladendiebstahl und Einbruch','category','crime',p.age<12)}
- ${menuRow('🩺','Arzt','Arztbesuche und Behandlungen','category','mind',p.prisonYears>0)}
+ ${menuRow('🩺','Arzt & Gesundheit','Untersuchungen, Krankheiten und Behandlung','category','health',p.prisonYears>0)}
  ${menuRow('🌐','Auswandern','In ein anderes Land ziehen','category','travel',p.age<18||p.prisonYears>0)}
  ${menuRow('🧬','Fruchtbarkeitsklinik','Medizinische Behandlung für 1.500 €','lifestyle','fertility',p.age<18||p.age>55||p.prisonYears>0||p.cash<1500)}
  ${menuRow('🎲','Glücksspiel','Im Casino spielen','lifestyle','gamble',p.age<18||p.prisonYears>0||p.cash<100)}
@@ -144,6 +166,7 @@ function renderActivities(p:Person){
  ${menuRow('🏦','Kredit','Bankdarlehen beantragen oder tilgen','category','loans',p.age<18||p.prisonYears>0)}
  ${menuRow('💸','Lotterie','Ein Los für 20 € kaufen','activity','lottery',p.age<18||p.cash<20)}
  ${menuRow('🧠','Körper & Geist','Fitnessstudio, Bibliothek und Meditation','category','mind',p.prisonYears>0)}
+ ${menuRow('🎓','Schule','Lernen, Nachhilfe und Arbeitsgemeinschaften','category','school',p.age<6||p.age>=18||p.prisonYears>0)}
  ${menuRow('❤️','Liebe und Familie','Partnerschaft, Nachwuchs und Kontakte','category','love',p.age<16)}
  ${menuRow('📱','Social Media','Reichweite und Werbepartner','category','social',p.age<13)}
  ${menuRow('✈️','Reisen','Urlaub und weitere Länder','category','travel',p.age<18)}
@@ -153,6 +176,16 @@ function renderActivities(p:Person){
  if(activitySection==='accessories')return `${back}${heading('Accessoires')}<div class='stack'>${['Sonnenbrille','Mütze','Armbanduhr','Hut','Schal'].map((name,i)=>menuRow(['🕶️','🧢','⌚','🎩','🧣'][i]!,name,'75 € · Aussehen und Glück verbessern','lifestyle','accessory|'+name,p.cash<75)).join('')}</div><div class='info-card'>Aktuell: ${html(p.accessory||'Kein Accessoire')}</div>`;
  if(activitySection==='identity')return `${back}${heading('Identität')}<div class='info-card'>Aktuelle Angabe: <b>${html(p.gender)}</b><p class='small'>Ab 16 Jahren kannst du die Angabe ändern.</p><div class='stack'>${['weiblich','männlich','divers'].map(g=>menuRow('🪪',g,'Persönliche Angabe aktualisieren','lifestyle','identity|'+g,g===p.gender)).join('')}</div></div>`;
  if(activitySection==='loans')return `${back}${heading('Finanzen & Kredite')}<div class='info-card'>Offene Restschuld: <b>${money(p.loanBalance||0)}</b></div><div class='stack'>${[10000,25000,50000].map(q=>menuRow('💶','Kredit '+money(q),'6,5 % Zinsen jährlich · laufende Tilgung','lifestyle','loan|'+q,!!p.loanBalance||(!p.jobId&&!p.business)||p.record)).join('')}${[1000,5000,10000].map(q=>menuRow('📤','Tilgen: '+money(q),'Sondertilgung aus deinem Kontostand','lifestyle','repay|'+q,!p.loanBalance||p.cash<Math.min(p.loanBalance||0,q))).join('')}</div>`;
+ if(activitySection==='school')return `${back}${renderSchoolPanel(p)}`;
+ if(activitySection==='school-clubs')return `${back}${heading('Schul-AG auswählen')}<div class='stack'>${([['⚽','sport','Sport-AG','Fitness und Teamgeist'],['🎹','musik','Musik-AG','Freude und musikalische Interessen'],['🛠️','technik','Technik-AG','Technisches Denken und Intelligenz'],['🎨','kunst','Kunst-AG','Kreativität und Freizeit']] as const).map(([emoji,code,name,description])=>menuRow(emoji,name,description,'education','club|'+code,p.schoolRecord?.club===code)).join('')}</div>`;
+ if(activitySection==='health')return `${back}${heading('Gesundheit')}${p.illness?`<div class='prison-warning'>🤒 ${html(p.illness.diagnosed?p.illness.kind:'Nicht diagnostizierte Beschwerden')} · Intensität ${p.illness.severity}%</div>`:`<div class='info-card'>Derzeit ist keine akute Erkrankung bekannt.</div>`}
+ <div class='stack'>
+ ${menuRow('🩺','Gesundheitscheck','100 € · Beschwerden diagnostizieren','medical','checkup',p.cash<100)}
+ ${menuRow('💊','Behandlung','350 € · Erkrankung behandeln','medical','treat',!p.illness||!p.illness.diagnosed||p.cash<350)}
+ ${menuRow('🧑‍⚕️','Gesprächstherapie','220 € · Glück und Belastung verbessern','medical','therapy',p.age<12||p.cash<220)}
+ ${menuRow('🛌','Ausruhen','Ruhe und Erholung ohne Kosten','medical','rest')}
+ ${menuRow('💉','Allgemeiner Arztbesuch','150 € · Gesundheit stärken','activity','doctor',p.cash<150)}
+ </div>`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
  if(activitySection==='love')return `${back}${heading('Liebe und Familie')}<div class='stack'>${card('💕','Partnersuche','Neue Beziehung beginnen','activity','date','Suchen',p.age<16||p.relationships.some(r=>r.kind==='Partner'&&r.alive))}${card('👶','Nachwuchs','Versucht, Eltern zu werden','activity','child','Versuchen',p.age<18||p.age>55||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}</div>`;
  if(activitySection==='crime')return `${back}<div class='prison-warning'>⚠️ Straftaten können zu Geldstrafen, Vorstrafen und Gefängnis führen. Maximal zwei Versuche je Lebensjahr.</div>${heading('Straftaten')}<div class='stack'>${card('👜','Taschendiebstahl','Mittleres Risiko, kleiner Gewinn','activity','crime:pickpocket','Versuchen',p.age<12)}${card('🛍️','Ladendiebstahl','Geringeres Risiko und geringere Beute','activity','crime:shoplift','Versuchen',p.age<12)}${card('🏠','Einbruch','Hohes Risiko und höhere Beute','activity','crime:burglary','Versuchen',p.age<12)}</div>`;
@@ -179,7 +212,7 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.6.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.7.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -229,7 +262,9 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='export'){if(current)exportGame(current);return;}
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
- else if(kind==='lifestyle'){const separator=id.indexOf('|');await action({type:'LIFESTYLE',key:(separator>=0?id.slice(0,separator):id) as 'adopt'|'fertility'|'license'|'loan'|'repay'|'accessory'|'gamble'|'identity',value:separator>=0?id.slice(separator+1):undefined});}
+ else if(kind==='education'){const [key,club]=id.split('|');await action({type:'EDUCATION',key:key as 'study'|'tutor'|'socialize'|'club'|'skip'|'teacher',club:club as import('./engine/types.js').SchoolRecord['club']|undefined});}
+  else if(kind==='medical'){await action({type:'MEDICAL',key:id as 'checkup'|'treat'|'therapy'|'rest'});}
+  else if(kind==='lifestyle'){const separator=id.indexOf('|');await action({type:'LIFESTYLE',key:(separator>=0?id.slice(0,separator):id) as 'adopt'|'fertility'|'license'|'loan'|'repay'|'accessory'|'gamble'|'identity',value:separator>=0?id.slice(separator+1):undefined});}
   else if(kind==='activity'){playSound('tap');await action({type:'ACTIVITY',key:id});}
  else if(kind==='social'){const sep=id.lastIndexOf('|');await action({type:'SOCIAL',platform:id.slice(0,sep) as import('./engine/types.js').SocialPlatform,key:id.slice(sep+1) as 'join'|'post'|'sponsor'|'delete'});}
   else if(kind==='business'){const sep=id.indexOf('|');await action({type:'BUSINESS',key:(sep<0?id:id.slice(0,sep)) as 'open'|'develop'|'market'|'hire'|'fire'|'sell'|'invest'|'withdraw',sector:sep<0?undefined:id.slice(sep+1) as import('./engine/types.js').BusinessSector});}
