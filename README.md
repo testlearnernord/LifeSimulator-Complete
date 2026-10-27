@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.6.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.7.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -94,4 +94,15 @@ Auf Grundlage der echten BitLife-3.26.0i-iPhone-Screenshots wurden die **Lebensc
 Neu spielbare Aktivitäten mit realen Zustandsänderungen: **Adoption, Fruchtbarkeitsklinik, Führerscheinprüfung, Kredite mit 6,5 % Modellzins und jährlicher Tilgung, Identitätsangabe ändern, fünf Accessoires und einfaches Casinospiel**. Ein Neugeborener bekommt Geburtsstadt, zufälligen Geburtstag, Sternzeichen, Elternberufe und eine individuelle Geburtsgeschichte. Alte Spielstände behalten ihre Daten.
 
 Die ausführliche Prioritäten- und Lückenübersicht steht in [SCREENSHOT_GAP_ANALYSIS.md](docs/SCREENSHOT_GAP_ANALYSIS.md). Als »offen« markierte DLCs wie Casino-Besitz, Museum, Racing und Zoo sind weiterhin keine spielbaren Features. **Keine BitLife-Originalgrafiken, Originalsounds oder Anzeigen eingebaut.**
+
+
+## Lebenslinien 0.7.0 – Schul- und Gesundheitssystem (27.10.2026)
+
+Schüler von 6 bis 17 Jahren haben jetzt ein gespeichertes Zeugnis mit **Leistungen, Anwesenheit und Disziplin**. Noten verändern sich jährlich und durch Lernen, Nachhilfe, Schwänzen oder Gespräche mit Lehrkräften. Vier Arbeitsgemeinschaften haben jeweils eigene Wirkungen. Es gibt Schulkonflikte mit Entscheidungen, eine Abschlussbewertung und ein mögliches Stipendium beim Studienbeginn.
+
+**Gesundheit:** Erkältung, Grippe und Erschöpfung entstehen gelegentlich als Spielfolgen. Über `Aktivitäten → Arzt & Gesundheit` kannst du eine Untersuchung, Behandlung, Gesprächstherapie oder Ruhe wählen. Krankheit und Schweregrad werden gespeichert und ändern sich mit dem Lebensalter. Das System ist eine spielerische Vereinfachung, keine medizinische Auskunft.
+
+Alle neuen Eigenschaften bleiben mit alten Speicherständen und der Time Machine kompatibel. Menüs: **Beruf → Schulalltag** oder **Aktivitäten → Schule** und **Aktivitäten → Arzt & Gesundheit**.
+
+[Technische Umsetzung und offene Punkte](docs/SCHOOL_HEALTH_DESIGN.md)
 
