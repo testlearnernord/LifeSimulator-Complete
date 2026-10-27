@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.8.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.9.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -114,3 +114,11 @@ Unter **Beziehungen** kannst du jetzt aktiv Freundschaften schließen, gemeinsam
 Die Lebenssimulation berücksichtigt nun den Unterhalt minderjähriger Kinder. Beim Generationswechsel können Förderung, Wertpapiere und Schulden den Nachfolger beeinflussen. Sämtliche Mechaniken sind **eigenständige Näherungen**, nicht BitLife-Originalcode. Alte Spielstände bleiben kompatibel.
 
 [Details, Grenzen und Umsetzungsnotizen](docs/FAMILY_RELATIONSHIPS.md).
+
+## Version 0.9.0: Musiker-Job-Pack teilweise spielbar
+
+Unter **Beruf → Musikerkarriere** oder **Aktivitäten → Musik** kannst du ab acht Jahren Gesang oder Instrumente üben und ab 18 eine professionelle Solo- oder Bandkarriere beginnen. Vorspiele führen mit ausreichender Fertigkeit und etwas Glück zu einem Vertrag. Plattenfirmen, Genres, Tantiemensätze und Vertragslaufzeiten beeinflussen die Karriere. Veröffentlichungen, Konzerte, Tourneen und Werbung verändern Ruhm, Finanzen und Popularität. Eine eigene Diskografie sowie jährliche Einnahmen älterer Aufnahmen bleiben auch nach Vertragsende erhalten.
+
+Das System ist **für alle kostenlos** und funktioniert ohne Konto, Internet oder Lizenzkauf. Die Berechnungen, Plattenfirmen, Texte und Titel sind eigenständig entworfen. Es handelt sich ausdrücklich **noch nicht um das vollständige originale Musician Job Pack**.
+
+[Quellen, Mechaniken und offene Funktionen](docs/MUSICIAN_CAREER.md).
