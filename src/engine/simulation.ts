@@ -4,6 +4,7 @@ import {advanceExpansions,businessAction,rentalAction,socialAction,validExtensio
 import {advanceInvestments,investAction,portfolioValue,validInvestments} from './investments.js';
 import {advanceLifestyle,lifestyleAction,validLifestyle} from './lifestyle.js';
 import {educationAction,educationYear,medicalAction,healthYear,validSchoolHealth} from './schoolHealth.js';
+import {familyAction,familyYear,relationshipTrust,validFamily} from './family.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -25,7 +26,7 @@ const CITIES:Record<string,string[]>={Deutschland:['Hamburg','Berlin','Köln','K
 const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const ZODIAC=['Steinbock','Wassermann','Fische','Widder','Stier','Zwillinge','Krebs','Löwe','Jungfrau','Waage','Skorpion','Schütze'];
 const OCCUPATIONS=['Verwaltungsangestellte/r','Elektriker/in','Pflegekraft','Lehrer/in','Büroangestellte/r','Koch/Köchin','Techniker/in'];
-const relation=(s:SaveGame,kind:Relationship['kind'],age:number):Relationship=>({id:uid(s),name:`${pick(s,NAMES)} ${pick(s,LAST_NAMES)}`,kind,gender:kind==='Mutter'?'weiblich':kind==='Vater'?'männlich':chance(s,.5)?'weiblich':'männlich',age,bond:clamp(35+rng(s)*50),alive:true});
+const relation=(s:SaveGame,kind:Relationship['kind'],age:number):Relationship=>({id:uid(s),name:`${pick(s,NAMES)} ${pick(s,LAST_NAMES)}`,kind,gender:kind==='Mutter'?'weiblich':kind==='Vater'?'männlich':chance(s,.5)?'weiblich':'männlich',age,bond:clamp(35+rng(s)*50),alive:true,lastContactAge:s.person.age});
 const event=(s:SaveGame,heading:string,detail:string,options:Pending['options'])=>{s.person.pending={id:uid(s),heading,detail,options};};
 function schoolFor(age:number,uniYears:number,degree:boolean):Person['school']{if(age<6)return 'Kindergarten';if(age<11)return 'Grundschule';if(age<18)return 'Weiterführende Schule';if(uniYears>0)return 'Universität';return 'Abgeschlossen';}
 export function createLife(input:NewLife):SaveGame{
@@ -77,6 +78,7 @@ function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=sc
  advanceExpansions(s,expansionHooks(s));
  advanceInvestments(s,expansionHooks(s));
  advanceLifestyle(s,expansionHooks(s));
+  familyYear(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
  educationYear(s,expansionHooks(s));
@@ -132,15 +134,16 @@ function activity(s:SaveGame,key:string){const p=s.person;
  }
 }
 function interact(s:SaveGame,id:string,key:string){const p=s.person;const r=p.relationships.find(r=>r.id===id);if(!r||!r.alive)throw Error('Diese Person ist nicht verfügbar.');
- if(lockedUp(p)&&!['talk','letter'].includes(key))requireFree(p);
- if(key==='talk'){useAnnual(p,'talk:'+id,3);r.bond=clamp(r.bond+8);stat(p,'happiness',3);log(s,`Du hast mit ${r.name} gesprochen.`,'good');}
- else if(key==='compliment'){useAnnual(p,'compliment:'+id,2);r.bond=clamp(r.bond+11);log(s,`Du hast ${r.name} ein Kompliment gemacht.`,'good');}
- else if(key==='argue'){r.bond=clamp(r.bond-20);stat(p,'happiness',-4);log(s,`Du hattest Streit mit ${r.name}.`,'bad');}
- else if(key==='marry'){if(p.marriedPartnerId===r.id)throw Error('Ihr seid bereits verheiratet.');if(r.kind!=='Partner'||p.age<18||r.bond<65)throw Error('Eine Hochzeit ist noch nicht möglich.');if(p.cash<2500)throw Error('Die Hochzeit kostet 2.500 €.');p.cash-=2500;r.bond=clamp(r.bond+10);p.marriedPartnerId=r.id;log(s,`Du hast ${r.name} geheiratet!`,'good');}
- else if(key==='breakup'){if(r.kind!=='Partner')throw Error('Nur Partner können sich trennen.');r.alive=false;p.marriedPartnerId=null;stat(p,'happiness',-16);log(s,`Du hast dich von ${r.name} getrennt.`,'bad');}
- else if(key==='letter'){if(!lockedUp(p))throw Error('Briefe sind hier nur im Gefängnis-Menü verfügbar.');useAnnual(p,'letter:'+id,2);r.bond=clamp(r.bond+5);log(s,`Du hast ${r.name} einen Brief geschrieben.`,'good');}
- else if(key==='gift'){if(p.cash<100)throw Error('Ein Geschenk kostet 100 €.');useAnnual(p,'gift:'+id);p.cash-=100;r.bond=clamp(r.bond+16);stat(p,'happiness',4);log(s,`Du hast ${r.name} beschenkt.`,'good');}
- else if(key==='time'){useAnnual(p,'time:'+id,2);r.bond=clamp(r.bond+12);stat(p,'happiness',5);log(s,`Du hast Zeit mit ${r.name} verbracht.`,'good');}
+ if(r.estranged)throw Error('Zwischen euch besteht kein Kontakt. Versuche eine Versöhnung.');
+  if(lockedUp(p)&&!['talk','letter'].includes(key))requireFree(p);
+ if(key==='talk'){useAnnual(p,'talk:'+id,3);r.bond=clamp(r.bond+8);r.trust=clamp(relationshipTrust(r)+3);r.lastContactAge=p.age;stat(p,'happiness',3);log(s,`Du hast mit ${r.name} gesprochen.`,'good');}
+ else if(key==='compliment'){useAnnual(p,'compliment:'+id,2);r.bond=clamp(r.bond+11);r.trust=clamp(relationshipTrust(r)+3);r.lastContactAge=p.age;log(s,`Du hast ${r.name} ein Kompliment gemacht.`,'good');}
+ else if(key==='argue'){r.bond=clamp(r.bond-20);r.trust=clamp(relationshipTrust(r)-12);r.lastContactAge=p.age;stat(p,'happiness',-4);log(s,`Du hattest Streit mit ${r.name}.`,'bad');}
+ else if(key==='marry'){if(p.marriedPartnerId===r.id)throw Error('Ihr seid bereits verheiratet.');if(r.kind!=='Partner'||p.age<18||r.bond<65)throw Error('Eine Hochzeit ist noch nicht möglich.');if(p.cash<2500)throw Error('Die Hochzeit kostet 2.500 €.');p.cash-=2500;r.bond=clamp(r.bond+10);p.marriedPartnerId=r.id;r.trust=clamp(relationshipTrust(r)+8);r.lastContactAge=p.age;log(s,`Du hast ${r.name} geheiratet!`,'good');}
+ else if(key==='breakup'){if(r.kind!=='Partner')throw Error('Nur Partner können sich trennen.');if(p.marriedPartnerId===r.id)throw Error('Verheiratete Paare müssen sich scheiden lassen.');r.kind='Ex-Partner';r.estranged=true;r.trust=clamp(relationshipTrust(r)-24);r.bond=clamp(r.bond-22);r.lastContactAge=p.age;stat(p,'happiness',-16);log(s,`Du hast dich von ${r.name} getrennt.`,'bad');}
+ else if(key==='letter'){if(!lockedUp(p))throw Error('Briefe sind hier nur im Gefängnis-Menü verfügbar.');useAnnual(p,'letter:'+id,2);r.bond=clamp(r.bond+5);r.lastContactAge=p.age;log(s,`Du hast ${r.name} einen Brief geschrieben.`,'good');}
+ else if(key==='gift'){if(p.cash<100)throw Error('Ein Geschenk kostet 100 €.');useAnnual(p,'gift:'+id);p.cash-=100;r.bond=clamp(r.bond+16);r.trust=clamp(relationshipTrust(r)+6);r.lastContactAge=p.age;stat(p,'happiness',4);log(s,`Du hast ${r.name} beschenkt.`,'good');}
+ else if(key==='time'){useAnnual(p,'time:'+id,2);r.bond=clamp(r.bond+12);r.trust=clamp(relationshipTrust(r)+5);r.lastContactAge=p.age;stat(p,'happiness',5);log(s,`Du hast Zeit mit ${r.name} verbracht.`,'good');}
  else throw Error('Unbekannte Interaktion.');
 }
 function resolve(s:SaveGame,kind:string){const p=s.person;const pending=p.pending;if(!pending||!pending.options.some(o=>o.kind===kind))throw Error('Keine passende Entscheidung vorhanden.');p.pending=null;
@@ -229,7 +232,8 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
- case 'EDUCATION':educationAction(s,action.key,action.club,expansionHooks(s));break;
+ case 'FAMILY':familyAction(s,action.key,action.id,expansionHooks(s),()=>relation(s,'Freund',p.age));break;
+  case 'EDUCATION':educationAction(s,action.key,action.club,expansionHooks(s));break;
   case 'MEDICAL':medicalAction(s,action.key,expansionHooks(s));break;
   case 'LIFESTYLE':lifestyleAction(s,action.key,action.value,expansionHooks(s),()=>{
     const child=relation(s,'Kind',0);child.bond=82;s.person.relationships.push(child);
@@ -262,11 +266,11 @@ export function isSaveGame(value:unknown):value is SaveGame{
  const p=x.person as Person;
  if(!str(p.id,150)||!str(p.name,100)||!str(p.country,50)||!['weiblich','männlich','divers'].includes(p.gender)||!int(p.age,0,200)||!num(p.cash)||typeof p.alive!=='boolean'||!str(p.school,40)||typeof p.degree!=='boolean'||!int(p.universityYears,0,4)||!int(p.jobYears,0,200)||!int(p.prisonYears,0,200)||typeof p.record!=='boolean'||!int(p.generation,1,1000)||!str(p.causeOfDeath,500)&&p.causeOfDeath!==null||p.jobId!==null&&!str(p.jobId,100))return false;
  if(!p.stats||!(['health','happiness','smarts','looks'] as Stat[]).every(k=>num(p.stats[k],0,100)))return false;
- if(!Array.isArray(p.relationships)||p.relationships.length>1000||!p.relationships.every(r=>str(r.id,100)&&str(r.name,150)&&['Mutter','Vater','Elternteil','Partner','Kind','Freund'].includes(r.kind)&&['weiblich','männlich','divers'].includes(r.gender)&&int(r.age,0,200)&&num(r.bond,0,100)&&typeof r.alive==='boolean'&&(r.talent===undefined||['musik','sport','schauspiel','intelligenz','keines'].includes(r.talent))))return false;
+ if(!Array.isArray(p.relationships)||p.relationships.length>1000||!p.relationships.every(r=>str(r.id,100)&&str(r.name,150)&&['Mutter','Vater','Elternteil','Partner','Ex-Partner','Kind','Freund'].includes(r.kind)&&['weiblich','männlich','divers'].includes(r.gender)&&int(r.age,0,200)&&num(r.bond,0,100)&&typeof r.alive==='boolean'&&(r.talent===undefined||['musik','sport','schauspiel','intelligenz','keines'].includes(r.talent))))return false;
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
