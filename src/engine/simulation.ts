@@ -71,11 +71,11 @@ function yearlyEvent(s:SaveGame){const p=s.person;
  else if(roll<.55&&p.age>=18){event(s,'Ein unerwarteter Fund',`Du findest eine fremde Geldbörse auf dem Weg nach Hause.`,[{label:'Zurückgeben',kind:'walletReturn'},{label:'Geld behalten',kind:'walletKeep'}]);}
 }
 function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;p.jobId=null;log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
-function age(s:SaveGame){const p=s.person;p.age++;const releasedThisYear=p.prisonYears===1;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
+function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.age++;const releasedThisYear=p.prisonYears===1;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
  for(const r of p.relationships){r.age++;if(r.alive&&chance(s,Math.max(.001,(r.age-68)*.006))) {r.alive=false;log(s,`${r.name} ist verstorben.`,'bad');}}
  if(p.prisonYears>0){p.prisonYears--;if(p.prisonYears===0)log(s,'Du wurdest aus dem Gefängnis entlassen.','good');}
  else if(p.jobId){const job=CAREERS.find(j=>j.id===p.jobId);if(job){const pay=Math.round(job.salary*(1+Math.min(.60,p.jobYears*.025))*.76);p.cash+=pay+Math.round((p.salaryBonus||0)*.76);p.jobYears++;if(p.jobYears%3===0&&(p.careerPerformance||50)>=65){p.salaryBonus=(p.salaryBonus||0)+Math.round(job.salary*.05);log(s,`Du wurdest aufgrund deiner guten Arbeit befördert. Dein Jahresgehalt steigt.`,'good');}p.careerPerformance=clamp((p.careerPerformance??50)-4);log(s,`Du hast ${money(pay+Math.round((p.salaryBonus||0)*.76))} Nettolohn als ${job.title} verdient.`,'good');}}
- const expense=p.age>=18?(p.prisonYears>0?600:Math.round(6500+(p.age>25?3000:0))):0;
+ const expense=p.age>=18?(jailedAtStart?600:Math.round(6500+(p.age>25?3000:0))):0;
  const assetExpense=p.assets.reduce((a,b)=>a+b.annualCost,0);
  p.cash-=expense+assetExpense;
  advanceExpansions(s,expansionHooks(s));
