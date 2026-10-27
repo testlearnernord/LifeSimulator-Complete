@@ -686,3 +686,112 @@ test('music save validation rejects hostile and impossible values, old saves rem
  const legacy=structuredClone(s);delete legacy.person.musicSkills;delete legacy.person.musicCareer;
  assert.ok(isSaveGame(legacy));
 });
+
+
+test('actor lessons enforce age limits, three lessons per year and talent advantage',()=>{
+ assert.throws(()=>applyAction(born(),{type:'ACTOR',key:'lesson'}),/ab acht/);
+ let s=advance(born(),8),b=structuredClone(s);
+ s.person.talent='schauspiel';b.person.talent='keines';
+ s=applyAction(s,{type:'ACTOR',key:'lesson'});
+ b=applyAction(b,{type:'ACTOR',key:'lesson'});
+ assert.equal(s.person.actingSkill-b.person.actingSkill,6);
+ s=applyAction(s,{type:'ACTOR',key:'lesson'});
+ s=applyAction(s,{type:'ACTOR',key:'lesson'});
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'lesson'}),/dieses Jahr/);
+ s=advance(s,10);s.person.cash=500;
+ const original=s.person.cash;
+ s=applyAction(s,{type:'ACTOR',key:'lesson'});
+ assert.equal(s.person.cash,original-175);
+ assert.ok(isSaveGame(s));
+});
+test('extras produce real cash and actor experience, restricted to adulthood',()=>{
+ let s=born();
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'extra'}),/ab 18/);
+ s=advance(s,18);s.person.cash=1000;
+ s=applyAction(s,{type:'ACTOR',key:'extra'});
+ assert.ok(s.person.cash>1000);
+ assert.equal(s.person.actorCareer.extraCount,1);
+ s=applyAction(s,{type:'ACTOR',key:'extra'});
+ s=applyAction(s,{type:'ACTOR',key:'extra'});
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'extra'}),/dieses Jahr/);
+ assert.ok(isSaveGame(s));
+});
+test('talent agents require funds, find castings and charge commissions',()=>{
+ let s=advance(born(),22);
+ s.person.cash=7000;
+ s=applyAction(s,{type:'ACTOR',key:'hire-agent'});
+ assert.equal(s.person.cash,5500);
+ assert.equal(s.person.actorCareer.agent,true);
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'hire-agent'}),/bereits/);
+ s=applyAction(s,{type:'ACTOR',key:'agent-search'});
+ assert.ok(s.person.actorCareer.agentLeadId);
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'agent-search'}),/dieses Jahr/);
+ s=applyAction(s,{type:'ACTOR',key:'fire-agent'});
+ assert.equal(s.person.actorCareer.agentLeadId,null);
+ assert.equal(s.person.actorCareer.agent,false);
+ assert.ok(isSaveGame(s));
+});
+test('casting validates age, skill and exclusive film/TV commitments',()=>{
+ let s=advance(born(),24);
+ s.person.cash=80000;s.person.actingSkill=100;s.person.stats.looks=100;
+ s.person.actorCareer={agent:true,reputation:100,extraCount:3,awards:0,credits:[],current:null};
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'audition',offerId:'drama-film'}),/Altersgruppe/);
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'audition',offerId:'missing'}),/Unbekannte/);
+ let role=null;
+ for(let k=0;k<3;k++){
+   s=applyAction(s,{type:'ACTOR',key:'audition',offerId:'thriller-film'});
+   if(s.person.actorCareer.current){role=s.person.actorCareer.current;break;}
+ }
+ assert.ok(role);
+ assert.equal(role.kind,'Film');
+ assert.throws(()=>applyAction(s,{type:'JOB',id:'retail'}),/Schauspielrolle/);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'audition',role:'Gesang',mode:'Solo'}),/Schauspielrolle/);
+ assert.ok(isSaveGame(s));
+});
+test('TV production pays episode fees, creates filmography, fame and concludes after seasons',()=>{
+ let s=advance(born(),25);s.person.cash=25000;s.person.actingSkill=90;
+ s.person.actorCareer={agent:true,reputation:65,extraCount:1,awards:0,credits:[],current:{offerId:'urban-series',title:'Stadtlichter',kind:'Serie',role:'Hauptrolle',quality:80,payPerUnit:6800,episodes:10,yearsLeft:3}};
+ const original=s.person.cash;
+ s=advance(s,1);
+ assert.equal(s.person.actorCareer.current.yearsLeft,2);
+ assert.equal(s.person.actorCareer.credits.length,1);
+ assert.ok(s.person.actorCareer.credits[0].earnings>0);
+ assert.ok((s.person.fame||0)>0);
+ assert.ok(s.person.cash>original);
+ s=advance(s,2);
+ assert.equal(s.person.actorCareer.current,null);
+ assert.equal(s.person.actorCareer.credits.length,3);
+ assert.ok(isSaveGame(s));
+});
+test('film role finishes in one year and Hollywood Star recognizes active actor career',()=>{
+ let s=advance(born(),29);s.person.cash=11000;
+ s.person.actingSkill=100;
+ s.person.actorCareer={agent:false,reputation:35,extraCount:0,awards:0,credits:[],current:{offerId:'indie-film',title:'Hinter dem Horizont',kind:'Film',role:'Nebenrolle',quality:62,payPerUnit:15000,episodes:1,yearsLeft:1}};
+ s=applyAction(s,{type:'PREMIUM',key:'hollywood-star'});
+ assert.ok((s.person.fame||0)>=80);
+ s=advance(s,1);
+ assert.equal(s.person.actorCareer.current,null);
+ assert.equal(s.person.actorCareer.credits.length,1);
+ assert.ok(isSaveGame(s));
+});
+test('actors can rehearse, terminate roles and keep their acting history',()=>{
+ let s=advance(born(),23);s.person.cash=11000;s.person.actingSkill=55;
+ s.person.actorCareer={agent:false,reputation:40,extraCount:0,awards:0,credits:[],current:{offerId:'campus-series',title:'Campusleben',kind:'Serie',role:'Nebenrolle',quality:52,payPerUnit:1800,episodes:12,yearsLeft:2}};
+ const prev=s.person.actingSkill;
+ s=applyAction(s,{type:'ACTOR',key:'rehearse'});
+ assert.ok(s.person.actingSkill>prev);
+ s=applyAction(s,{type:'ACTOR',key:'quit'});
+ assert.equal(s.person.actorCareer.current,null);
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'rehearse'}),/keine feste/);
+ assert.ok(isSaveGame(s));
+});
+test('actor save schema protects from fabricated film roles while preserving old saves',()=>{
+ const s=born();
+ assert.ok(isSaveGame(s));
+ assert.equal(isSaveGame({...s,person:{...s.person,actingSkill:101}}),false);
+ const state={agent:false,reputation:30,extraCount:0,awards:0,credits:[],current:null};
+ assert.equal(isSaveGame({...s,person:{...s.person,actorCareer:{...state,credits:[{title:'fake',kind:'Film',role:'Hauptrolle',age:5,earnings:10,rating:70}]}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,actorCareer:{...state,current:{offerId:'indie-film',title:'Invented',kind:'Film',role:'Nebenrolle',quality:62,payPerUnit:15000,episodes:1,yearsLeft:1}}}}),false);
+ const old=structuredClone(s);delete old.person.actingSkill;delete old.person.actorCareer;
+ assert.ok(isSaveGame(old));
+});
