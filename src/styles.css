@@ -153,3 +153,20 @@ html,body,#app{background:#e3e9f1}
 .profile-stat .meter{height:18px}
 .profile-stat>span{color:#4a2b35;font-weight:750}
 @media(max-width:390px){.brand{font-size:19px}.topbar{min-height:72px}.menu-entry{min-height:73px;padding:10px 11px}.menu-entry .list-text b{font-size:15px}.menu-entry .list-text small{font-size:12px}.bottomnav{grid-template-columns:1fr 1fr 90px 1fr 1fr}.age-button{height:94px;width:94px}.metric{grid-template-columns:21px 72px minmax(0,1fr) 39px}}
+
+
+/* v0.7 education + health gameplay */
+.academic-card{background:white;border:1px solid #d0deea;padding:12px 13px 15px;margin:0 0 9px}
+.school-score{display:flex;align-items:center;gap:10px;color:#075a92;margin-bottom:13px}
+.school-score>span{font-size:31px}
+.school-score>div{flex:1;display:grid;gap:4px}
+.school-score b{font-size:16px}
+.school-score small{font-size:11px;color:#667c8b}
+.school-score>strong{font-size:22px;letter-spacing:-.4px}
+.school-metrics{display:grid;gap:9px;margin:8px 0 14px}
+.school-metrics>div{display:grid;grid-template-columns:85px minmax(0,1fr) 37px;align-items:center;gap:7px;font-size:11px;color:#0b5d8d}
+.school-metrics meter{width:100%;height:14px;accent-color:#269b48}
+.school-metrics b{text-align:right;font-size:11px;font-variant-numeric:tabular-nums}
+.school-actions{gap:6px}
+.school-actions .smallbtn{white-space:normal;min-height:40px}
+@media(max-width:390px){.school-metrics>div{grid-template-columns:74px minmax(0,1fr) 34px}.school-actions .smallbtn{font-size:11px}}
