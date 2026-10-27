@@ -79,7 +79,7 @@ export function actorAction(s:SaveGame,key:'lesson'|'extra'|'hire-agent'|'fire-a
   if((p.actingSkill??0)<offer.skill)throw Error('Für dieses Casting brauchst du mehr Schauspielerfahrung.');
   h.annual('actor:audition',3);
   const recommended=c.agent&&c.agentLeadId===offer.id;
-  const chance=Math.min(.93,.16+(p.actingSkill??0)*.005+c.reputation*.002+p.stats.looks*.001+(recommended?.17:0)-(offer.role==='Hauptrolle'?.14:0));
+  const chance=Math.min(.93,.16+(p.actingSkill??0)*.005+c.reputation*.002+p.stats.looks*.001+(recommended?0.17:0)-(offer.role==='Hauptrolle'?.14:0));
   if(h.random()>=chance){
    h.stat('happiness',-3);
    h.log('Beim Vorsprechen für „'+offer.title+'“ hast du keine Zusage bekommen.','bad');
@@ -152,6 +152,7 @@ export function validActing(p:Person):boolean{
   if(!credit||typeof credit.title!=='string'||credit.title.length>90||!['Film','Serie'].includes(credit.kind)||!['Nebenrolle','Hauptrolle'].includes(credit.role)||!integer(credit.age,0,p.age)||!integer(credit.earnings,-1_000_000,20_000_000)||!integer(credit.rating,0,100))return false;
  }
  if(c.current!==null){
+  if(!c.current||typeof c.current!=='object')return false;
   const role=c.current;
   const offer=ACTING_OFFERS.find(o=>o.id===role.offerId);
   if(!offer||!role||role.title!==offer.title||role.kind!==offer.kind||role.role!==offer.role||role.quality!==offer.quality||role.payPerUnit!==offer.fee||role.episodes!==offer.episodes||!integer(role.yearsLeft,1,offer.seasons))return false;
