@@ -465,3 +465,103 @@ test('school and health save fields reject malformed payloads but preserve legac
  assert.equal(isSaveGame({...original,person:{...original.person,illness:{kind:'Grippe',severity:-1,years:0,diagnosed:true}}}),false);
  assert.equal(isSaveGame({...original,person:{...original.person,illness:{kind:'Wrong',severity:30,years:0,diagnosed:true}}}),false);
 });
+
+
+test('breakup preserves the person as a living ex-partner instead of killing them',()=>{
+ let s=advance(born(),22);
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ const partner=s.person.relationships.find(r=>r.kind==='Partner');
+ assert.ok(partner);
+ s=applyAction(s,{type:'RELATION',id:partner.id,key:'breakup'});
+ const ex=s.person.relationships.find(r=>r.id===partner.id);
+ assert.equal(ex.kind,'Ex-Partner');
+ assert.equal(ex.alive,true);
+ assert.equal(ex.estranged,true);
+ assert.throws(()=>applyAction(s,{type:'RELATION',id:ex.id,key:'talk'}),/Kontakt/);
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ assert.equal(s.person.relationships.filter(r=>r.kind==='Partner'&&r.alive).length,1);
+ assert.ok(isSaveGame(s));
+});
+test('family day bonds with family, costs adults money and enforces annual limits',()=>{
+ let s=advance(born(),21);
+ const initial=s.person.relationships.filter(r=>r.alive&&['Mutter','Vater'].includes(r.kind)).map(r=>({id:r.id,bond:r.bond}));
+ s.person.cash=5000;
+ s=applyAction(s,{type:'FAMILY',key:'family-day'});
+ assert.equal(s.person.cash,4850);
+ for(const entry of initial)assert.ok(s.person.relationships.find(r=>r.id===entry.id).bond>=entry.bond);
+ assert.throws(()=>applyAction(s,{type:'FAMILY',key:'family-day'}),/dieses Jahr/);
+ assert.ok(isSaveGame(s));
+});
+test('making new friends is available from age five and limited per year',()=>{
+ assert.throws(()=>applyAction(born(),{type:'FAMILY',key:'meet'}),/ab 5/);
+ let s=advance(born(),9);
+ s=applyAction(s,{type:'FAMILY',key:'meet'});
+ s=applyAction(s,{type:'FAMILY',key:'meet'});
+ assert.throws(()=>applyAction(s,{type:'FAMILY',key:'meet'}),/dieses Jahr/);
+ const contacts=s.person.relationships.filter(r=>r.kind==='Freund');
+ assert.ok(contacts.length<=2);
+ assert.ok(contacts.every(r=>r.alive&&r.lastContactAge===s.person.age&&r.trust===54));
+ assert.ok(isSaveGame(s));
+});
+test('child development responds to targeted care and annual upkeep',()=>{
+ let s=advance(born(),28);
+ s.person.cash=12000;
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ s=applyAction(s,{type:'BIRTH',count:1,gender:'weiblich',talent:'musik'});
+ const child=s.person.relationships.find(r=>r.kind==='Kind');
+ assert.ok(child);
+ child.age=8;
+ const value=child.development??50;
+ s=applyAction(s,{type:'FAMILY',key:'teach-child',id:child.id});
+ const pupil=s.person.relationships.find(r=>r.id===child.id);
+ assert.ok(pupil.development>value);
+ assert.equal(s.person.cash,11800);
+ s=advance(s,1);
+ assert.ok(s.person.cash<=10600);
+ assert.ok(isSaveGame(s));
+});
+test('divorce preserves ex and charges settlement, allowing future partners',()=>{
+ let s=advance(born(),25);
+ s.person.cash=20000;
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ const partner=s.person.relationships.find(r=>r.kind==='Partner');
+ partner.bond=80;
+ s=applyAction(s,{type:'RELATION',id:partner.id,key:'marry'});
+ assert.equal(s.person.marriedPartnerId,partner.id);
+ const cash=s.person.cash;
+ assert.throws(()=>applyAction(s,{type:'RELATION',id:partner.id,key:'breakup'}),/scheiden/);
+ s=applyAction(s,{type:'FAMILY',key:'divorce',id:partner.id});
+ assert.equal(s.person.cash,cash-Math.round(cash*.25));
+ assert.equal(s.person.marriedPartnerId,null);
+ const ex=s.person.relationships.find(r=>r.id===partner.id);
+ assert.equal(ex.kind,'Ex-Partner');
+ assert.equal(ex.alive,true);
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ assert.equal(s.person.relationships.filter(r=>r.kind==='Partner').length,1);
+ assert.ok(isSaveGame(s));
+});
+test('estrangement can be managed and relationships decay after years without contact',()=>{
+ let s=advance(born(),22);
+ const parent=s.person.relationships.find(r=>r.kind==='Mutter');
+ assert.ok(parent);
+ s=applyAction(s,{type:'FAMILY',key:'distance',id:parent.id});
+ assert.equal(s.person.relationships.find(r=>r.id===parent.id).estranged,true);
+ assert.throws(()=>applyAction(s,{type:'RELATION',id:parent.id,key:'gift'}),/Kontakt/);
+ s=applyAction(s,{type:'FAMILY',key:'reconcile',id:parent.id});
+ assert.ok(isSaveGame(s));
+ let t=advance(born(),7);
+ const mom=t.person.relationships.find(r=>r.kind==='Mutter');
+ const original=mom.bond;
+ t=advance(t,4);
+ const afterwards=t.person.relationships.find(r=>r.id===mom.id);
+ assert.ok(!afterwards.alive||afterwards.bond<=original);
+});
+test('invalid new relationship fields are rejected while legacy records still load',()=>{
+ const s=born();
+ assert.equal(isSaveGame({...s,person:{...s.person,relationships:s.person.relationships.map((r,i)=>i? r:{...r,trust:Infinity})}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,relationships:s.person.relationships.map((r,i)=>i? r:{...r,development:50})}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,relationships:s.person.relationships.map((r,i)=>i? r:{...r,estranged:'yes'})}}),false);
+ const legacy=structuredClone(s);
+ for(const r of legacy.person.relationships){delete r.lastContactAge;delete r.trust;delete r.estranged;}
+ assert.ok(isSaveGame(legacy));
+});
