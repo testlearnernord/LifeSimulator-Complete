@@ -7,6 +7,7 @@ import {FINANCIAL_ASSETS,getMarketPrice,portfolioValue} from './engine/investmen
 import {MUSIC_ROLES,musicSkill,musicActive} from './engine/music.js';
 import {ACTING_OFFERS,actingActive,actingOffersFor} from './engine/acting.js';
 import {CRIME_TYPES,CRIME_LABELS,CRIME_RANKS,crimeRisk,criminal} from './engine/crime.js';
+import {DIRECTOR_GENRES,DIRECTOR_BUDGETS} from './engine/director.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -121,6 +122,30 @@ function renderActor(p:Person){
  ${c&&c.credits.length?`${heading('Filmografie & Auszeichnungen')}<div class="info-card"><b>${c.credits.length} Engagements · ${c.awards} Preise</b></div><div class="stack">
  ${c.credits.slice().reverse().map(r=>`<div class="acting-credit"><b>${html(r.title)}</b><small>${r.kind} · ${r.role} · Alter ${r.age} · Kritikerwertung ${r.rating}% · ${money(r.earnings)}</small></div>`).join('')}</div>`:''}`;
 }
+function renderDirector(p:Person){
+ const c=p.directorCareer,q=c?.current,blocked=p.prisonYears>0;
+ const info=heading('Filmregie',q?'Projekt in Arbeit':'Eigene Filmproduktion')+
+  '<div class="info-card"><h3>🎬 Regiestudio</h3><p>Regiefähigkeit: <b>'+(c?.skill??0)+'%</b> · Branchenruf: '+(c?.reputation??10)+'% · Bekanntheit: '+(p.fame??0)+'%</p>'+
+  '<div class="meter"><div style="width:'+(c?.skill??0)+'%"></div></div><p class="small">Filmkurse ab 14 Jahren, Erwachsene zahlen 250 € pro Kurs. Bis zu drei Kurse jährlich.</p>'+
+  button('Regie üben','director','study','button-wide',blocked||p.age<14||(p.age>=18&&p.cash<250))+'</div>';
+ let actions='';
+ if(!q){
+  actions=heading('Neues Filmprojekt')+'<div class="well">Wähle Genre und Produktionsbudget. Du finanzierst den Film vorab; nach der Premiere fließen Restbudget und Erlöse zurück. Pro Jahr kann ein Projekt gestartet werden.</div><div class="stack">'+
+  DIRECTOR_GENRES.flatMap(genre=>Object.entries(DIRECTOR_BUDGETS).map(([size,budget])=>
+   menuRow('🎥',genre+' · '+(size==='kurz'?'Kurzfilm':size==='mittel'?'Independent':'Großproduktion'),
+    'Budget '+money(budget)+' · Besetzung, Dreh und Premiere','director','start|'+genre+'|'+size,blocked||p.age<18||p.cash<budget))).join('')+'</div>';
+ }else{
+  actions=heading('Laufende Produktion')+'<div class="info-card"><h3>'+html(q.title)+'</h3><p>'+html(q.genre)+' · '+(q.phase==='casting'?'Casting':q.phase==='shooting'?'Dreharbeiten':'Premiere bereit')+'</p>'+
+   '<p class="small">Budget '+money(q.budget)+' · ausgegeben '+money(q.spent)+' · Drehbuch '+q.script+'% · Ensemble '+q.cast+'% · Aufnahmen '+q.footage+'%</p>'+
+   (q.phase==='casting'?'<div class="stack">'+menuRow('🧑‍🎤','Nachwuchsensemble','23 % des Budgets · günstiger, weniger erfahren','director','cast|newcomers',blocked)+menuRow('🌟','Bekannte Darsteller','48 % des Budgets · ab 40.000 € Budget','director','cast|stars',blocked||q.budget<40000)+'</div>':
+    q.phase==='shooting'?'<div class="stack">'+menuRow('🎞️','Sorgfältiger Dreh','40 % des Budgets · bessere Filmqualität','director','shoot|careful',blocked)+menuRow('⚡','Schneller Dreh','25 % des Budgets · weniger Aufwand','director','shoot|quick',blocked)+'</div>':
+    button('Film veröffentlichen','director','release','button-wide',blocked))+
+   button('Produktion abbrechen','director','cancel','ghost smallbtn',blocked)+'</div>';
+ }
+ const filmography=c?.films.length?heading('Filmografie & Preise')+'<div class="info-card">'+c.films.length+' Filme · '+c.awards+' Auszeichnungen</div><div class="stack">'+
+  c.films.map(f=>'<div class="acting-credit"><b>'+html(f.title)+'</b><small>'+html(f.genre)+' · Alter '+f.age+' · Kritiker '+f.rating+'% · Kinokasse '+money(f.boxOffice)+(f.award?' · 🏆 Preis':'')+'</small></div>').join('')+'</div>':'';
+ return info+actions+filmography;
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -131,6 +156,7 @@ function renderCareer(p:Person){
  ${renderSchoolPanel(p)}
  ${renderMusic(p)}
  ${renderActor(p)}
+ ${heading('Filmregie')}${menuRow('🎬','Regiestudio','Drehbuch, Casting, Produktion und Filmografie','category','director')}
  ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)?'Aktive Karriere':'Arbeitssuchend')}
  <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
@@ -232,7 +258,7 @@ function renderActivities(p:Person){
  const option=(emoji:string,title:string,description:string,id:string)=>`<button class='list-entry category-row' data-action='category' data-id='${id}'><span class='list-emoji'>${emoji}</span><span class='list-text'><b>${title}</b><small>${description}</small></span><span class='chevron'>›</span></button>`;
  if(!activitySection){return `<div class='screen-welcome'>Wähle eine Aktivität. Mit jedem Lebensjahr ändern sich die verfügbaren Möglichkeiten.</div>
  ${heading('Besondere Aktivitäten')}<div class='stack'>
- ${menuRow('🎬','Filmregie','Filmproduktionen leiten · Erweiterung noch offen','premiumopen','',true)}
+ ${menuRow('🎬','Filmregie','Filme produzieren, besetzen und veröffentlichen','category','director')}
  ${menuRow('🧛','Vampir-Modus','Spezialmodus · noch nicht verfügbar','premiumopen','',true)}
  ${menuRow('🌲','Outdoor-Leben','Zusätzliche Outdoor-Erlebnisse · geplant','premiumopen','',true)}
  </div>${heading('Alle Aktivitäten')}<div class='stack'>
@@ -271,6 +297,7 @@ function renderActivities(p:Person){
  ${menuRow('🛌','Ausruhen','Ruhe und Erholung ohne Kosten','medical','rest')}
  ${menuRow('💉','Allgemeiner Arztbesuch','150 € · Gesundheit stärken','activity','doctor',p.cash<150)}
  </div>`;
+ if(activitySection==='director')return `${back}${renderDirector(p)}`;
  if(activitySection==='acting')return `${back}${renderActor(p)}`;
  if(activitySection==='music')return `${back}${renderMusic(p)}`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
@@ -342,7 +369,7 @@ root.addEventListener('submit',async e=>{const target=e.target;if(!(target insta
 root.addEventListener('input',e=>{const t=e.target;if(!(t instanceof HTMLInputElement)||t.type!=='range')return;const output=t.closest('.range-field')?.querySelector('output');if(output)output.textContent=t.value+'%';});
 root.addEventListener('change',async e=>{const target=e.target;if(!(target instanceof HTMLInputElement)||target.id!=='import-file'||!target.files?.[0])return;try{const imported=await importGame(target.files[0]);current=imported;games=await listGames();tab='life';modal=null;notify('Spielstand erfolgreich importiert.',true);}catch(error){notify(error instanceof Error?error.message:'Import fehlgeschlagen.');}});
 root.addEventListener('click',async e=>{const target=e.target;if(!(target instanceof Element))return;const control=target.closest<HTMLElement>('[data-action]');if(!control||control instanceof HTMLButtonElement&&control.disabled)return;const kind=control.dataset.action||'';const id=control.dataset.id||'';
- if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if(id==='school-clubs'&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
+ if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if((id==='school-clubs'||id==='director')&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
  if(kind==='load'){try{current=await (await import('./storage/database.js')).getGame(id);tab='life';modal=null;render();}catch{notify('Spielstand konnte nicht geladen werden.');}return;}
  if(kind==='deleteprompt'){deleteTarget=id;modal='delete';render();return;}
  if(kind==='deleteconfirm'){await deleteGame(id);games=await listGames();if(current?.id===id)current=games[0]||null;modal='saves';render();return;}
@@ -350,6 +377,7 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
  else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
+ else if(kind==='director'){const [key,choice,budget]=id.split('|');await action({type:'DIRECTOR',key:key as 'study'|'start'|'cast'|'shoot'|'release'|'cancel',genre:key==='start'?choice as import('./engine/types.js').DirectorGenre:undefined,budget:key==='start'?budget as 'kurz'|'mittel'|'gross':undefined,choice:key==='cast'||key==='shoot'?choice as 'newcomers'|'stars'|'careful'|'quick':undefined});}
  else if(kind==='actor'){const sep=id.indexOf('|');await action({type:'ACTOR',key:(sep>=0?id.slice(0,sep):id) as 'lesson'|'extra'|'hire-agent'|'fire-agent'|'agent-search'|'audition'|'rehearse'|'quit',offerId:sep>=0?id.slice(sep+1):undefined});}
  else if(kind==='music'){const args=id.split('|');await action({type:'MUSIC',key:args[0] as 'practice'|'audition'|'single'|'album'|'concert'|'tour'|'promote'|'quit',mode:args[0]==='audition'?args[1] as 'Solo'|'Band':undefined,role:(args[0]==='practice'?args[1]:args[0]==='audition'?args[2]:undefined) as import('./engine/types.js').MusicRole|undefined});}
    else if(kind==='family'){const sep=id.indexOf('|');await action({type:'FAMILY',key:(sep>=0?id.slice(0,sep):id) as 'meet'|'family-day'|'apologize'|'assist'|'teach-child'|'reconcile'|'divorce'|'distance',id:sep>=0?id.slice(sep+1):undefined});}
