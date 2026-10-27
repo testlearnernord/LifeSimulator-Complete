@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.10.0 (2026-10-27).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.11.0 (2026-10-27).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -192,3 +192,15 @@ Vollständige Einordnung und Quellen: [MUSICIAN_CAREER.md](MUSICIAN_CAREER.md). 
 | Movie Director | **O – offen** | Regie- und Produktionskarriere noch nicht umgesetzt |
 
 Schauspielerkarriere enthält mehrere Staffeljahre, agentenvermittelte Castingvorschläge und konkrete Konsequenzen für Geld, Ruf und Bekanntheit. Es fehlen generierte Filmproduktionen, Agentenbeziehungen, Vertragsverhandlungen, dramatische Drehsituationen, vollständige Preise und Interaktionen. [Details und Quellen](ACTOR_CAREER.md).
+
+## Kriminelle Laufbahn (Version 0.11.0)
+
+| Bereich | Status | Spielmechaniken |
+|---|---|---|
+| Gewöhnliche Delikte | Teilweise | Drei XP-Skills, dynamisches Risiko, Fahndungsdruck und Vorstrafen |
+| Haftkontakte | Teilweise | Mitgefangene, Mentoring, Vertrauen und Kontakte nach Freilassung |
+| Kriminelles Netzwerk | Teilweise | Aufnahme über Kontakte, Rangstufen, abstrakte Aufträge und Verrat |
+| Neustart | Teilweise | Bewährung, Ausstieg und reduzierte Haftkosten |
+| Mafia Job Pack | Offen | Keine vollumfängliche Bandenkarriere, Hierarchien und Erzählketten |
+
+[Genauer Umfang und Grenzen](CRIME_CAREER.md). Alle Regeln sind eigene Modelle.
