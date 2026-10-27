@@ -10,7 +10,7 @@ export const PREMIUM_CATALOG:PremiumItem[]=[
  {id:'god-bundle',name:'Bitizenship + God Mode',group:'Freischaltungen',status:'teilweise',description:'Kombinierter Kauf zweier Freischaltungen',source:'official'},
  {id:'mafia',name:'Mafia',group:'Job-Packs',status:'offen',description:'Organisierte Kriminalität als Spezialkarriere',source:'official'},
  {id:'pro-athlete',name:'Pro Athlete',group:'Job-Packs',status:'offen',description:'Professionelle Sportkarriere',source:'official'},
- {id:'musician',name:'Musician',group:'Job-Packs',status:'offen',description:'Musikindustrie und Künstlerkarriere',source:'official'},
+ {id:'musician',name:'Musician',group:'Job-Packs',status:'teilweise',description:'Unterricht, Vorspiele, Solo/Band, Verträge, Veröffentlichungen, Auftritte und Tantiemen',source:'official'},
  {id:'actor',name:'Actor',group:'Job-Packs',status:'offen',description:'Film- und Fernsehkarriere',source:'official'},
  {id:'politician',name:'Politician',group:'Job-Packs',status:'offen',description:'Politische Laufbahn und Wahlen',source:'official'},
  {id:'astronaut',name:'Astronaut',group:'Job-Packs',status:'offen',description:'Weltraumkarriere',source:'community'},
