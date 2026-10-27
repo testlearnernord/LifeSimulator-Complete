@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.10.0 – 2026-10-27 (Actor special career)
+
+- Optional acting skill and acting career persistence, backwards compatible with schema-1 saves and Time Machine.
+- Acting lessons from eight years old, faster progression for the acting special talent.
+- Adult extra work, talent agent hiring, agent casting recommendations, audition limits and role-based skill/age requirements.
+- Fictional castings for seven film and TV offers with varied salaries, scripts, lead/supporting roles and production lengths.
+- Production-year net pay and 12% talent agent commission; critic reviews, reputation, fame and occasional awards.
+- Multi-year TV series contracts and one-year film production, rehearsals, quitting with reputational damage, persistent filmography.
+- Exclusive occupation checks across acting, music and standard employment. Hollywood Star recognizes active actor careers.
+- Responsive client UI, engine safety checks, automated tests and accurate feature status in the free premium inventory.
+- Remaining differences documented in docs/ACTOR_CAREER.md. No original commercial game assets or licenses used.
+
+
+
 ## 0.9.0 – 2026-10-27 (Musician Special Career)
 
 - Musician job pack partially implemented: four learnable music skills from childhood, three lessons per role/year, and meaningful music talent acceleration.
