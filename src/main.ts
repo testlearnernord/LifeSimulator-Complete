@@ -70,9 +70,15 @@ function renderPeople(p:Person){
  ${p.prisonYears>0?card('✉️','Brief schreiben','Kontakt aus dem Gefängnis halten','relation',`${r.id}|letter`,'Schreiben'):card('💬','Gespräch führen','Ein wenig miteinander reden','relation',`${r.id}|talk`,'Reden')}
  ${p.prisonYears===0?`${card('🎁','Geschenk machen','100 € ausgeben und Freude machen','relation',`${r.id}|gift`,'Schenken',p.cash<100)}${card('☀️','Zeit verbringen','Gemeinsam einen Tag verbringen','relation',`${r.id}|time`,'Unternehmen')}${card('😊','Kompliment machen','Zuneigung ausdrücken','relation',`${r.id}|compliment`,'Sagen')}${card('⚡','Streit anfangen','Kann eure Beziehung beschädigen','relation',`${r.id}|argue`,'Streiten')}`:''}
  ${r.kind==='Partner'&&p.prisonYears===0?`${card('💍','Heiraten',p.marriedPartnerId===r.id?'Bereits verheiratet':'Ab 18 Jahren, gute Beziehung, 2.500 €','relation',`${r.id}|marry`,'Heiraten',p.marriedPartnerId===r.id||p.age<18||r.bond<65||p.cash<2500)}${card('💔','Trennung','Die Beziehung beenden','relation',`${r.id}|breakup`,'Trennen')}`:''}</div>`;}
- return `<div class='panel-intro'><span class='panel-emoji'>💕</span><div><h2>Beziehungen</h2><span>${living.length} Menschen in deinem Leben</span></div></div>
- ${heading('Familie, Liebe und Freundschaft')}<div class='stack'>${living.map(r=>`<button class='list-entry' data-action='relview' data-id='${html(r.id)}'><span class='list-emoji'>${r.kind==='Kind'?'🧒':r.kind==='Partner'?'❤️':r.kind==='Freund'?'🫂':'👪'}</span><span class='list-text'><b>${html(r.name)}</b><small>${r.kind} · ${r.age} Jahre · ${r.bond}%</small><span class='relationship-meter'><span style='width:${r.bond}%'></span></span></span><span class='chevron'>›</span></button>`).join('')}</div>
- ${heading('Liebe und Familie')}<div class='stack'>${card('💘','Partnersuche','Ab 16 Jahren','activity','date','Suchen',p.age<16||p.prisonYears>0||living.some(r=>r.kind==='Partner'))}${card('👶','Nachwuchs','Ein Kind bekommen','activity','child','Versuchen',p.age<18||p.age>55||p.prisonYears>0||!living.some(r=>r.kind==='Partner'))}</div>`;
+ const family=living.filter(r=>['Mutter','Vater','Elternteil'].includes(r.kind));
+ const romantic=living.filter(r=>r.kind==='Partner');
+ const children=living.filter(r=>r.kind==='Kind');
+ const friends=living.filter(r=>r.kind==='Freund');
+ const item=(r:Person['relationships'][number])=>`<button class='list-entry family-entry' data-action='relview' data-id='${html(r.id)}'><span class='list-emoji'>${r.kind==='Mutter'?'👩':r.kind==='Vater'?'👨':r.kind==='Kind'?'🧒':r.kind==='Partner'?'❤️':'🫂'}</span><span class='list-text'><b>${html(r.name)} <span class='family-role'>${html(r.kind)}</span></b><small>${r.age} Jahre ${r.occupation?'· '+html(r.occupation):''}</small><span class='relationship-meter'><span style='width:${r.bond}%'></span></span></span><span class='chevron'>›</span></button>`;
+ const group=(title:string,rels:typeof living)=>rels.length?`${heading(title)}<div class='stack'>${rels.map(item).join('')}</div>`:'';
+ return `${heading('Besonderes')}<div class='stack'>${menuRow('🕯️','Gemeinschaft','Eigene Glaubensgemeinschaft gründen · noch offen','relview','',true)}</div>
+ ${group('Eltern',family)}${group('Partner',romantic)}${group('Kinder',children)}${group('Freunde',friends)}
+ ${heading('Familienplanung')}<div class='stack'>${menuRow('💘','Partnersuche','Ab 16 Jahren','activity','date',p.age<16||p.prisonYears>0||romantic.length>0)}${menuRow('👶','Nachwuchs','Ein Kind bekommen','activity','child',p.age<18||p.age>55||p.prisonYears>0||romantic.length===0)}</div>`;
 }
 function rentalPanel(p:Person,a:Person['assets'][number]){
  if(a.kind!=='Haus')return '';
