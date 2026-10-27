@@ -7,6 +7,7 @@ import {educationAction,educationYear,medicalAction,healthYear,validSchoolHealth
 import {familyAction,familyYear,relationshipTrust,validFamily} from './family.js';
 import {advanceMusic,musicAction,validMusic} from './music.js';
 import {actorAction,advanceActing,actingActive,validActing} from './acting.js';
+import {advanceCrime,crimeAction,crimeReleased,validCrime} from './crime.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -70,15 +71,17 @@ function yearlyEvent(s:SaveGame){const p=s.person;
  else if(roll<.55&&p.age>=18){event(s,'Ein unerwarteter Fund',`Du findest eine fremde Geldbörse auf dem Weg nach Hause.`,[{label:'Zurückgeben',kind:'walletReturn'},{label:'Geld behalten',kind:'walletKeep'}]);}
 }
 function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;p.jobId=null;log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
-function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
+function age(s:SaveGame){const p=s.person;p.age++;const releasedThisYear=p.prisonYears===1;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
  for(const r of p.relationships){r.age++;if(r.alive&&chance(s,Math.max(.001,(r.age-68)*.006))) {r.alive=false;log(s,`${r.name} ist verstorben.`,'bad');}}
  if(p.prisonYears>0){p.prisonYears--;if(p.prisonYears===0)log(s,'Du wurdest aus dem Gefängnis entlassen.','good');}
  else if(p.jobId){const job=CAREERS.find(j=>j.id===p.jobId);if(job){const pay=Math.round(job.salary*(1+Math.min(.60,p.jobYears*.025))*.76);p.cash+=pay+Math.round((p.salaryBonus||0)*.76);p.jobYears++;if(p.jobYears%3===0&&(p.careerPerformance||50)>=65){p.salaryBonus=(p.salaryBonus||0)+Math.round(job.salary*.05);log(s,`Du wurdest aufgrund deiner guten Arbeit befördert. Dein Jahresgehalt steigt.`,'good');}p.careerPerformance=clamp((p.careerPerformance??50)-4);log(s,`Du hast ${money(pay+Math.round((p.salaryBonus||0)*.76))} Nettolohn als ${job.title} verdient.`,'good');}}
- const expense=p.age>=18? Math.round(6500+(p.age>25?3000:0)) : 0;
+ const expense=p.age>=18?(p.prisonYears>0?600:Math.round(6500+(p.age>25?3000:0))):0;
  const assetExpense=p.assets.reduce((a,b)=>a+b.annualCost,0);
  p.cash-=expense+assetExpense;
  advanceExpansions(s,expansionHooks(s));
  advanceInvestments(s,expansionHooks(s));
+  advanceCrime(s,expansionHooks(s));
+  if(releasedThisYear)crimeReleased(p);
  advanceMusic(s,expansionHooks(s));
  advanceActing(s,expansionHooks(s));
  advanceLifestyle(s,expansionHooks(s));
@@ -109,19 +112,10 @@ function activity(s:SaveGame,key:string){const p=s.person;
  case 'study':if(p.age>=6&&p.age<18){educationAction(s,'study',undefined,expansionHooks(s));break;}useAnnual(p,'study');if(p.age<6||p.age>24||p.school==='Abgeschlossen')throw Error('Du bist derzeit nicht in der Schule.');stat(p,'smarts',5);stat(p,'happiness',-1);log(s,'Du hast fleißig gelernt.','good');break;
  case 'date':useAnnual(p,'date');if(p.age<16)throw Error('Dating ist erst ab 16 möglich.');if(p.relationships.some(r=>r.kind==='Partner'&&r.alive))throw Error('Du bist bereits in einer Beziehung.');{const r=relation(s,'Partner',Math.max(16,p.age+Math.floor(rng(s)*7)-3));p.relationships.push(r);log(s,`Du bist jetzt mit ${r.name} zusammen.`,'good');}break;
  case 'crime':
- case 'crime:pickpocket':
- case 'crime:shoplift':
- case 'crime:burglary':{
-  if(p.age<12)throw Error('Kriminalität ist erst ab 12 möglich.');
-  useAnnual(p,'crime',2);
-  const level=key==='crime:burglary'?3:key==='crime:shoplift'?1:2;
-  const reward=level*120+Math.floor(rng(s)*level*900);
-  const caught=chance(s,Math.min(.83,.26+level*.085+(p.record ? 0.1 : 0)));
-  if(caught){p.record=true;p.prisonYears=1+Math.floor(rng(s)*level+1);p.jobId=null;p.salaryBonus=0;p.cash-=Math.min(Math.max(0,p.cash),400+level*250);stat(p,'happiness',-20);log(s,`Du wurdest gefasst und zu ${p.prisonYears} Jahren Haft verurteilt.`,'bad');}
-  else{p.cash+=reward;stat(p,'happiness',2);log(s,`Der Diebstahl brachte ${money(reward)} ein.`,'good');}
-  p.reputation=clamp((p.reputation??50)-level*6);break;
- }
- case 'library':useAnnual(p,'library',2);stat(p,'smarts',6);log(s,'Du hast die öffentliche Bibliothek besucht und dazugelernt.','good');break;
+  case 'crime:pickpocket':
+  case 'crime:shoplift':
+  case 'crime:burglary':crimeAction(s,key==='crime'?'pickpocket':key.slice(6) as 'pickpocket'|'shoplift'|'burglary',undefined,undefined,expansionHooks(s));break;
+  case 'library':useAnnual(p,'library',2);stat(p,'smarts',6);log(s,'Du hast die öffentliche Bibliothek besucht und dazugelernt.','good');break;
  case 'walk':useAnnual(p,'walk',2);stat(p,'health',3);stat(p,'happiness',4);log(s,'Ein langer Spaziergang hat dir gutgetan.','good');break;
  case 'volunteer':if(p.age<14)throw Error('Freiwilligenarbeit ist ab 14 möglich.');useAnnual(p,'volunteer');stat(p,'happiness',7);p.reputation=clamp((p.reputation??50)+8);log(s,'Du hast ehrenamtlich geholfen und neue Kontakte geknüpft.','good');break;
  case 'vacation':if(p.age<18)throw Error('Allein verreisen ist erst ab 18 möglich.');if(p.cash<2000)throw Error('Die Reise kostet 2.000 €.');useAnnual(p,'vacation');p.cash-=2000;stat(p,'happiness',20);stat(p,'health',4);log(s,'Du hast einen Urlaub gemacht.','good');break;
@@ -247,6 +241,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
    });break;
  case 'INVEST':investAction(s,action.key,action.assetId,action.quantity,expansionHooks(s));break;
  case 'SOCIAL':socialAction(s,action.key,action.platform,expansionHooks(s));break;
+  case 'CRIME':crimeAction(s,action.key,action.contactId,action.skill,expansionHooks(s));break;
   case 'BUSINESS':businessAction(s,action.key,action.sector,expansionHooks(s));break;
   case 'RENTAL':rentalAction(s,action.key,action.id,expansionHooks(s));break;
   case 'AGE':{s.checkpoints??=[];s.checkpoints.push({age:p.age,person:structuredClone(p),seed:s.seed});if(s.checkpoints.length>15)s.checkpoints.splice(0,s.checkpoints.length-15);age(s);break;}
@@ -277,7 +272,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
