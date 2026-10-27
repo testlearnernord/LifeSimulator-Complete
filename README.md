@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.5.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.6.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -86,3 +86,12 @@ Technische Details und Quellen: [Premium-Inventar](docs/PREMIUM_INVENTORY.md). Z
 ### Anleger-Erweiterung (0.5.0)
 
 Das Investor-System ist nun teilweise spielbar. Unter **Besitz → Investments** stehen fünf fiktive Anlageklassen (Aktien, Anleihen, Fonds, Penny Stocks und Kryptowährungen) mit Kauf/Verkauf, Depotwert, Jahreskursen, Dividenden/Zinsen und Finanzberater zur Verfügung. Keine echten Kurse oder exakten BitLife-Formeln. Das Depot ist in die Vermögensanzeige, Speicherstände und die Zeitreise integriert.
+
+## Version 0.6.0: Screenshotgestützter Interface- und Gameplay-Abgleich (27.10.2026)
+
+Auf Grundlage der echten BitLife-3.26.0i-iPhone-Screenshots wurden die **Lebenschronik, ein eigener Steckbrief, die Vollbildmenüs für Besitz, Beziehungen und Aktivitäten**, blaue Titelbalken, graue Bereichsüberschriften und altersspezifische Menüfreigaben überarbeitet. Das UI ist inspiriert, aber verwendet eigene Gestaltung, Namen und Assets.
+
+Neu spielbare Aktivitäten mit realen Zustandsänderungen: **Adoption, Fruchtbarkeitsklinik, Führerscheinprüfung, Kredite mit 6,5 % Modellzins und jährlicher Tilgung, Identitätsangabe ändern, fünf Accessoires und einfaches Casinospiel**. Ein Neugeborener bekommt Geburtsstadt, zufälligen Geburtstag, Sternzeichen, Elternberufe und eine individuelle Geburtsgeschichte. Alte Spielstände behalten ihre Daten.
+
+Die ausführliche Prioritäten- und Lückenübersicht steht in [SCREENSHOT_GAP_ANALYSIS.md](docs/SCREENSHOT_GAP_ANALYSIS.md). Als »offen« markierte DLCs wie Casino-Besitz, Museum, Racing und Zoo sind weiterhin keine spielbaren Features. **Keine BitLife-Originalgrafiken, Originalsounds oder Anzeigen eingebaut.**
+
