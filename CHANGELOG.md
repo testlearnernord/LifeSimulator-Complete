@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0 – 2026-10-27 (Progressive crime and prison contacts)
+
+- Three separately trainable crime skills, with experience from success or failure.
+- Detection risk now incorporates skill, intelligence, police attention, convictions, probation and trust in contacts.
+- Prison contacts: discover fellow inmates, build trust, receive mentoring, keep contacts after release.
+- Age-restricted underground groups with three promotion levels, abstract jobs and unreliable allies.
+- Police attention cooldown, limited probation, rehabilitation and leaving the network.
+- Prison-year adult living costs reduced to 600 € without retroactive debt adjustment.
+- New crime and prison menus, save validation, time rewind, engine and browser tests.
+- Fictional gameplay, not a complete Mafia Job Pack.
+
+
+
 ## 0.10.0 – 2026-10-27 (Actor special career)
 
 - Optional acting skill and acting career persistence, backwards compatible with schema-1 saves and Time Machine.
