@@ -195,3 +195,12 @@ html,body,#app{background:#e3e9f1}
 .music-release>b{font-size:14px;color:#0c6598}
 .music-release>small{font-size:12px;color:#708190;line-height:1.4}
 @media(max-width:390px){.music-skill{grid-template-columns:minmax(66px,1fr) minmax(55px,1fr) auto;gap:6px}.music-audition .smallbtn{font-size:11px;padding:8px 7px}}
+
+
+/* v0.10: self-designed actor casting and credit cards */
+.acting-summary .meter{margin:9px 0 13px;height:16px}
+.acting-summary>h3{font-size:18px;color:#095c97;margin:3px 0 10px}
+.acting-credit{display:flex;flex-direction:column;gap:5px;padding:13px 14px;background:white;border-bottom:1px solid #b5c7d6}
+.acting-credit b{font-size:14px;color:#0b639b}
+.acting-credit small{font-size:12px;color:#687e8d;line-height:1.5}
+@media(max-width:390px){.acting-summary .row{gap:7px;flex-wrap:wrap}.acting-summary .smallbtn{min-height:40px}}
