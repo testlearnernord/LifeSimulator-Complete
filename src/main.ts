@@ -4,6 +4,7 @@ import {CAREERS,COUNTRIES,ITEMS} from './engine/catalog.js';
 import {BUSINESS_SECTORS,SOCIAL_PLATFORMS} from './engine/expansions.js';
 import {PREMIUM_CATALOG,PREMIUM_GROUPS} from './engine/premium-catalog.js';
 import {FINANCIAL_ASSETS,getMarketPrice,portfolioValue} from './engine/investments.js';
+import {MUSIC_ROLES,musicSkill,musicActive} from './engine/music.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -71,6 +72,24 @@ function renderSchoolPanel(p:Person){
  ${menuRow('🎒','Unterricht schwänzen','Mehr Freizeit, aber schlechtere Noten und Disziplin','education','skip',!active)}
  </div>`;
 }
+function renderMusic(p:Person){
+ const c=p.musicCareer,jailed=p.prisonYears>0,active=musicActive(p);
+ const skills=MUSIC_ROLES.map(role=>`<div class="music-skill"><div><b>${html(role)}</b><strong>${musicSkill(p,role)}%</strong></div><div class="meter"><div style="width:${musicSkill(p,role)}%"></div></div>${button('Üben','music','practice|'+role,'smallbtn',jailed||p.age<8||(p.age>=18&&p.cash<120))}</div>`).join('');
+ const audition=MUSIC_ROLES.map(role=>`<div class="music-audition"><b>${html(role)} · ${musicSkill(p,role)}%</b><div class="row">${button('Solo-Vorspiel','music','audition|Solo|'+role,'smallbtn',jailed||p.age<18||musicSkill(p,role)<45)}${button('Band-Vorspiel','music','audition|Band|'+role,'smallbtn',jailed||p.age<18||musicSkill(p,role)<45)}</div></div>`).join('');
+ const releases=(c?.releases||[]).slice().reverse().map(r=>`<div class="music-release"><b>${html(r.title)}</b><small>${r.kind} · Alter ${r.year} · ${r.units.toLocaleString('de-DE')} Verkäufe · Qualität ${r.quality}%</small></div>`).join('');
+ return `${heading('Musikerkarriere',c?c.mode+' · '+c.popularity+'% Popularität':'Üben und Vorspielen')}
+ <div class="info-card"><b>🎤 Musikfähigkeiten</b><p class="small">Unterricht ab 8 Jahren, für Minderjährige kostenlos und danach 120 €. Musiktalent steigert den Lernfortschritt.</p>${skills}</div>
+ ${c?`<div class="info-card"><b>${html(c.mode)} · ${html(c.genre)}</b><p>Plattenfirma: ${html(c.label)} · Tantiemen: ${c.royalty}% · Laufzeit: ${c.contractYears} Jahre</p><p>Popularität ${c.popularity}%</p><div class="meter"><div style="width:${c.popularity}%"></div></div></div>`:''}
+ ${active?`${heading('Musik veröffentlichen und auftreten')}<div class="stack">
+ ${menuRow('🎵','Single veröffentlichen','600 € · einmal jährlich','music','single',jailed||p.cash<600)}
+ ${menuRow('💿','Album aufnehmen','2.500 € · einmal jährlich','music','album',jailed||p.cash<2500)}
+ ${menuRow('🎙️','Konzert geben','Einzelauftritt mit Honorar','music','concert',jailed||p.cash<350)}
+ ${menuRow('🌍','Tournee spielen','8.000 € · ab 35% Popularität','music','tour',jailed||p.cash<8000||(c?.popularity??0)<35)}
+ ${menuRow('📣','Werbung schalten','1.200 € · Hörer gewinnen','music','promote',jailed||p.cash<1200)}
+ ${menuRow('✍️','Vertrag kündigen','Diskografie und Tantiemen bleiben','music','quit',jailed)}
+ </div>`:`${heading('Vorspiele bei Plattenfirmen')}<div class="well">Ab 18 Jahren, mindestens 45% Können. Bis zu drei Versuche jährlich.</div><div class="stack">${audition}</div>`}
+ ${releases?`${heading('Diskografie')}<div class="stack">${releases}</div>`:''}`;
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -79,10 +98,11 @@ function renderCareer(p:Person){
  ${jailed?`<div class='prison-warning'>🔒 Noch ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'} Haft. Freie Arbeit und Studium sind derzeit gesperrt.</div>`:''}
  ${heading('Ausbildung')}<div class='info-card'><b>${html(p.school)}</b><p class='small'>${p.degree?'Universitätsabschluss':p.universityYears>0?`Noch ${p.universityYears} Studienjahre`:p.age<18?'Schulpflicht':'Kein Hochschulabschluss'}</p><div class='row'>${button('Lernen','activity','study','smallbtn',p.age<6||p.age>24||p.school==='Abgeschlossen'||jailed)}${button('Universität beginnen','study','','smallbtn',!canStudy)}</div></div>
  ${renderSchoolPanel(p)}
+ ${renderMusic(p)}
  ${heading('Beruf',p.jobId?'Beschäftigt':'Arbeitssuchend')}
  <div class='info-card'><b>${html(careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr`:'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
- ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed;return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
+ ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
 function renderPeople(p:Person){
  const living=p.relationships.filter(r=>r.alive);
@@ -167,6 +187,7 @@ function renderActivities(p:Person){
  ${menuRow('🏦','Kredit','Bankdarlehen beantragen oder tilgen','category','loans',p.age<18||p.prisonYears>0)}
  ${menuRow('💸','Lotterie','Ein Los für 20 € kaufen','activity','lottery',p.age<18||p.cash<20)}
  ${menuRow('🧠','Körper & Geist','Fitnessstudio, Bibliothek und Meditation','category','mind',p.prisonYears>0)}
+ ${menuRow('🎶','Musik','Unterricht, Vorspiele, Singles und Tourneen','category','music',p.age<8||p.prisonYears>0)}
  ${menuRow('🎓','Schule','Lernen, Nachhilfe und Arbeitsgemeinschaften','category','school',p.age<6||p.age>=18||p.prisonYears>0)}
  ${menuRow('❤️','Liebe und Familie','Partnerschaft, Nachwuchs und Kontakte','category','love',p.age<16)}
  ${menuRow('📱','Social Media','Reichweite und Werbepartner','category','social',p.age<13)}
@@ -187,6 +208,7 @@ function renderActivities(p:Person){
  ${menuRow('🛌','Ausruhen','Ruhe und Erholung ohne Kosten','medical','rest')}
  ${menuRow('💉','Allgemeiner Arztbesuch','150 € · Gesundheit stärken','activity','doctor',p.cash<150)}
  </div>`;
+ if(activitySection==='music')return `${back}${renderMusic(p)}`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
  if(activitySection==='love')return `${back}${heading('Liebe und Familie')}<div class='stack'>${card('💕','Partnersuche','Neue Beziehung beginnen','activity','date','Suchen',p.age<16||p.relationships.some(r=>r.kind==='Partner'&&r.alive))}${card('👶','Nachwuchs','Versucht, Eltern zu werden','activity','child','Versuchen',p.age<18||p.age>55||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}</div>`;
  if(activitySection==='crime')return `${back}<div class='prison-warning'>⚠️ Straftaten können zu Geldstrafen, Vorstrafen und Gefängnis führen. Maximal zwei Versuche je Lebensjahr.</div>${heading('Straftaten')}<div class='stack'>${card('👜','Taschendiebstahl','Mittleres Risiko, kleiner Gewinn','activity','crime:pickpocket','Versuchen',p.age<12)}${card('🛍️','Ladendiebstahl','Geringeres Risiko und geringere Beute','activity','crime:shoplift','Versuchen',p.age<12)}${card('🏠','Einbruch','Hohes Risiko und höhere Beute','activity','crime:burglary','Versuchen',p.age<12)}</div>`;
@@ -213,7 +235,7 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.8.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.9.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -263,7 +285,8 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='export'){if(current)exportGame(current);return;}
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
- else if(kind==='family'){const sep=id.indexOf('|');await action({type:'FAMILY',key:(sep>=0?id.slice(0,sep):id) as 'meet'|'family-day'|'apologize'|'assist'|'teach-child'|'reconcile'|'divorce'|'distance',id:sep>=0?id.slice(sep+1):undefined});}
+ else if(kind==='music'){const args=id.split('|');await action({type:'MUSIC',key:args[0] as 'practice'|'audition'|'single'|'album'|'concert'|'tour'|'promote'|'quit',mode:args[0]==='audition'?args[1] as 'Solo'|'Band':undefined,role:(args[0]==='practice'?args[1]:args[0]==='audition'?args[2]:undefined) as import('./engine/types.js').MusicRole|undefined});}
+   else if(kind==='family'){const sep=id.indexOf('|');await action({type:'FAMILY',key:(sep>=0?id.slice(0,sep):id) as 'meet'|'family-day'|'apologize'|'assist'|'teach-child'|'reconcile'|'divorce'|'distance',id:sep>=0?id.slice(sep+1):undefined});}
    else if(kind==='education'){const [key,club]=id.split('|');await action({type:'EDUCATION',key:key as 'study'|'tutor'|'socialize'|'club'|'skip'|'teacher',club:club as import('./engine/types.js').SchoolRecord['club']|undefined});}
   else if(kind==='medical'){await action({type:'MEDICAL',key:id as 'checkup'|'treat'|'therapy'|'rest'});}
   else if(kind==='lifestyle'){const separator=id.indexOf('|');await action({type:'LIFESTYLE',key:(separator>=0?id.slice(0,separator):id) as 'adopt'|'fertility'|'license'|'loan'|'repay'|'accessory'|'gamble'|'identity',value:separator>=0?id.slice(separator+1):undefined});}
