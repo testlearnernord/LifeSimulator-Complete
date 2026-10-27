@@ -168,14 +168,15 @@ function nextGeneration(s:SaveGame,childId:string):SaveGame{
  const p=s.person;const child=p.relationships.find(r=>r.id===childId&&r.kind==='Kind'&&r.alive);
  if(p.alive||!child)throw Error('Generationswechsel erst nach dem Tod zu einem lebenden Kind möglich.');
  const previous={name:p.name,age:p.age,cause:p.causeOfDeath||'Unbekannt'};
- const inheritance=Math.max(0,Math.floor((p.cash+p.assets.reduce((a,b)=>a+b.value,0))*.8));
+ const inheritance=Math.max(0,Math.floor((p.cash+p.assets.reduce((a,b)=>a+b.value,0)+portfolioValue(p)-(p.loanBalance||0))*.8));
  const copy=createLife({name:child.name,gender:child.gender,country:p.country,seed:(s.seed^0x9e3779b9)>>>0,generation:p.generation+1,inheritance});
  copy.id=s.id;copy.ancestry=[...s.ancestry,previous];copy.person.age=child.age;copy.person.school=schoolFor(child.age,0,false);copy.person.talent=child.talent;
+  if(child.development!==undefined)copy.person.stats.smarts=Math.max(copy.person.stats.smarts,Math.round(25+child.development*.7));
   if(child.talent==='intelligenz')copy.person.stats.smarts=Math.max(80,copy.person.stats.smarts);
   if(child.talent==='sport')copy.person.stats.health=Math.max(85,copy.person.stats.health);
   if(child.talent==='schauspiel')copy.person.stats.looks=Math.max(80,copy.person.stats.looks);
  const partner=p.relationships.find(r=>r.kind==='Partner'&&r.alive);
- copy.person.relationships=partner?[{...partner,kind:partner.gender==='weiblich'?'Mutter':partner.gender==='männlich'?'Vater':'Elternteil'}]:[];
+ copy.person.relationships=partner?[{...partner,lastContactAge:child.age,kind:partner.gender==='weiblich'?'Mutter':partner.gender==='männlich'?'Vater':'Elternteil'}]:[];
  log(copy,`Du führst die Familie in Generation ${copy.person.generation} weiter. Erbe: ${money(inheritance)}.`,'good');return copy;
 }
 export function applyAction(input:SaveGame,action:Action):SaveGame{
@@ -289,4 +290,4 @@ export function isSaveGame(value:unknown):value is SaveGame{
  return true;
 }
 export function careerName(p:Person){return CAREERS.find(c=>c.id===p.jobId)?.title||'Keine Anstellung';}
-export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0)+portfolioValue(p);}
+export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0)+portfolioValue(p)-(p.loanBalance||0);}
