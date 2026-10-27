@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.11.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.12.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -19,9 +19,10 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Freundschaften, Dating, Heirat, Trennung, Kinder, Familienfortsetzung
 - Ärzte, Fitnessstudio, Lesen, Meditation, Diebstahl, Gefängnis
 - Kaufen/Verkaufen von Häusern und Autos, Auswanderung
+- Filmregie mit Budget, Casting, Dreh, Kinopremiere, Filmografie und Auszeichnungen
 - Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
 
-**Nicht spielbar:** die meisten DLCs, Spezialkarrieren, Schauspielerei, Musik, Mafia, Unternehmen, Zoos, Investor, Regie und Fighter Mode, außerdem originalgetreue Formeln, grafische Assets und Sounds des Originals. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
+**Teilweise spielbar:** Musik, Schauspiel, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
 
 ## Lokal installieren und starten
 
