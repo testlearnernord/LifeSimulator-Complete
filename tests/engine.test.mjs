@@ -587,3 +587,102 @@ test('family inheritance includes investments, deducts debt, and upbringing affe
  assert.ok(next.person.stats.smarts>=95);
  assert.ok(isSaveGame(next));
 });
+
+
+test('music lessons have an age gate, childhood is free, and adult lessons cost money',()=>{
+ let s=born();
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'practice',role:'Gesang'}),/ab acht/);
+ s=advance(s,8);
+ s=applyAction(s,{type:'MUSIC',key:'practice',role:'Gesang'});
+ const one=s.person.musicSkills.Gesang;
+ assert.ok(one>=5);
+ s=applyAction(s,{type:'MUSIC',key:'practice',role:'Gesang'});
+ s=applyAction(s,{type:'MUSIC',key:'practice',role:'Gesang'});
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'practice',role:'Gesang'}),/dieses Jahr/);
+ s=advance(s,10);s.person.cash=1000;
+ s=applyAction(s,{type:'MUSIC',key:'practice',role:'Gitarre'});
+ assert.equal(s.person.cash,880);
+ assert.ok(isSaveGame(s));
+});
+test('music talent boosts lesson learning using the same deterministic starting state',()=>{
+ let a=advance(born(),9);let b=structuredClone(a);
+ a.person.talent='musik';b.person.talent='keines';
+ a=applyAction(a,{type:'MUSIC',key:'practice',role:'Klavier'});
+ b=applyAction(b,{type:'MUSIC',key:'practice',role:'Klavier'});
+ assert.equal(a.person.musicSkills.Klavier-b.person.musicSkills.Klavier,7);
+});
+test('musician auditions create solo/band label contracts and prevent parallel full-time jobs',()=>{
+ let s=advance(born(),21);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'audition',role:'Gesang',mode:'Solo'}),/45/);
+ s.person.musicSkills={Gesang:100};s.person.cash=10000;
+ let joined=false;
+ for(let attempt=0;attempt<3;attempt++){
+  s=applyAction(s,{type:'MUSIC',key:'audition',role:'Gesang',mode:'Solo'});
+  if(s.person.musicCareer?.contractYears>0){joined=true;break;}
+ }
+ assert.ok(joined);
+ assert.equal(s.person.musicCareer.mode,'Solo');
+ assert.ok(s.person.musicCareer.royalty>0);
+ assert.throws(()=>applyAction(s,{type:'JOB',id:'retail'}),/Musikvertrag/);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'audition',role:'Gesang',mode:'Band'}),/Musikvertrag/);
+ assert.ok(isSaveGame(s));
+});
+test('music releases cost production money, produce songs and receive later royalties',()=>{
+ let s=advance(born(),22);
+ s.person.cash=60000;
+ s.person.musicSkills={Gesang:92};
+ s.person.musicCareer={mode:'Solo',role:'Gesang',genre:'Pop',label:'Nordlicht Records',royalty:22,contractYears:5,popularity:65,releases:[]};
+ s=applyAction(s,{type:'MUSIC',key:'single'});
+ const c=s.person.musicCareer;
+ assert.equal(c.releases.length,1);
+ assert.equal(c.releases[0].kind,'Single');
+ assert.ok(c.releases[0].units>0);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'album'}),/dieses Jahr/);
+ s=advance(s,1);
+ assert.ok(s.person.history.some(x=>x.text.includes('jährlichen Tantiemen')));
+ s.person.cash=60000;
+ s=applyAction(s,{type:'MUSIC',key:'album'});
+ assert.equal(s.person.musicCareer.releases.length,2);
+ assert.equal(s.person.musicCareer.releases[1].kind,'Album');
+ assert.ok(isSaveGame(s));
+});
+test('concert and tour affect fame, health, popularities and annual limits',()=>{
+ let s=advance(born(),24);
+ s.person.cash=50000;
+ s.person.musicSkills={Gesang:85};
+ s.person.musicCareer={mode:'Band',role:'Gesang',genre:'Rock',label:'Atlas Klangwerke',royalty:12,contractYears:4,popularity:45,releases:[]};
+ const health=s.person.stats.health;
+ s=applyAction(s,{type:'MUSIC',key:'tour'});
+ assert.ok(s.person.musicCareer.popularity>45);
+ assert.ok(s.person.stats.health<health);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'tour'}),/dieses Jahr/);
+ s=applyAction(s,{type:'MUSIC',key:'concert'});
+ assert.ok((s.person.fame??0)>0);
+ s=applyAction(s,{type:'MUSIC',key:'quit'});
+ assert.equal(s.person.musicCareer.contractYears,0);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'album'}),/aktiven Musikvertrag/);
+ assert.ok(isSaveGame(s));
+});
+test('musician career expiry preserves discography and an expired contract can be renewed',()=>{
+ let s=advance(born(),24);
+ s.person.cash=25000;
+ s.person.musicSkills={Gesang:100};
+ s.person.musicCareer={mode:'Solo',role:'Gesang',genre:'Rock',label:'Nordlicht Records',royalty:20,contractYears:1,popularity:55,releases:[{title:'Nordwind',kind:'Single',year:22,units:50000,quality:75}]};
+ s=advance(s,1);
+ assert.equal(s.person.musicCareer.contractYears,0);
+ assert.ok(s.person.musicCareer.releases.length===1);
+ s=applyAction(s,{type:'MUSIC',key:'audition',role:'Gesang',mode:'Band'});
+ assert.equal(s.person.musicCareer?.releases.length,1);
+ assert.ok(isSaveGame(s));
+});
+test('music save validation rejects hostile and impossible values, old saves remain valid',()=>{
+ const s=born();
+ assert.ok(isSaveGame(s));
+ assert.equal(isSaveGame({...s,person:{...s.person,musicSkills:{Gesang:101}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,musicSkills:{Unknown:20}}}),false);
+ const sample={mode:'Solo',role:'Gesang',genre:'Pop',label:'Nordlicht Records',royalty:10,contractYears:3,popularity:50,releases:[]};
+ assert.equal(isSaveGame({...s,person:{...s.person,musicCareer:{...sample,royalty:999}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,musicCareer:{...sample,releases:[{title:'abc',kind:'Single',year:200,units:1000,quality:30}]}}}),false);
+ const legacy=structuredClone(s);delete legacy.person.musicSkills;delete legacy.person.musicCareer;
+ assert.ok(isSaveGame(legacy));
+});
