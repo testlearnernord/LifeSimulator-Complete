@@ -1,0 +1,7 @@
+# Filmregie (v0.12.0)
+
+Die globale BitLife-App nennt den **Movie Director Expansion Pack** offiziell (2026) und erwähnt Casting, Filmproduktion und Kinoerfolge. Offizielle Quellen: https://bitlifeapp.com/ , https://bitlifeapp.com/moviedirector und https://apps.apple.com/de/app/bitlife-life-simulator/id1374403536 .
+
+**Eigenständige Umsetzung:** Ab 14 sind bis zu drei Filmkurse jährlich möglich; ab 18 kann man mit eigenem Kapital ein Drama, eine Komödie oder einen Thriller als Kurz-, Independent- oder Großproduktion beginnen. Auf das Casting (Nachwuchs oder Stars) folgen ein schneller oder sorgfältiger Dreh und die Premiere. Die Filmwertung hängt von Drehbuch, Besetzung, Dreharbeiten und Regiefähigkeit ab. Einspielergebnis, Verleiheranteil, Restbudget, Ruf, Bekanntheit, Filmpreise und Filmografie werden gespeichert. Verzögerungen verursachen Kosten, nach drei Jahren wird ein offenes Projekt eingestellt. Ein Filmstart pro Jahr. Keine In-App-Käufe, alle Inhalte offline.
+
+**Grenzen:** Keine Filmfestivals, Studios, Vertragsverhandlungen, echten Stars, vollständigen Produktionsereignisse oder belegten Originalwahrscheinlichkeiten. Alle Filmtitel und Berechnungen sind eigenständig. Alte Schema-1-Spielstände bleiben gültig; das neue optionale Feld wird validiert und in Rückspul-Snapshots gespeichert. Die automatische Test-Suite enthält vollständigen Produktionsablauf, Fehlbedienung, Alter, Haft, Finanzgrenzen, Zeitablauf, Rückspulen und manipulierte Spielstände.
