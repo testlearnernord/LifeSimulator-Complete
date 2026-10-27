@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.11.0 (2026-10-27).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.12.0 (2026-10-28).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -68,7 +68,7 @@
 | Finanzen | Zoo Expansion Pack | W | O | Zoo-Geschäft fehlt |
 | Finanzen | Casino Expansion Pack | C | ? | Weitere Primärquellen/Plattformabgleich nötig |
 | Finanzen | Outdoor Pack Collection | W | ? | Pack-Bezeichnung in Wiki, Inhalt unvollständig |
-| Finanzen | Movie Director Expansion Pack (2026) | A,N | O | Filme drehen, Preise, Filmfestivals erwähnt |
+| Film | Movie Director Expansion Pack (2026) | A,N | P | Eigenes Regiestudio: Filmkurse, Genres, Budget, Casting, Dreh, Premiere, Einspielergebnis, Filmografie und Preise; keine Originalformeln oder Filmfestivals |
 | Gesundheit | Arztbesuche | A | P | Gesundheit erhöht, Krankheiten fehlen |
 | Gesundheit | Fitnessstudio | A | S | Gesundheits-/Aussehenswirkung |
 | Gesundheit | Krankheiten / Therapien | A | O | Kein spezifischer Krankheitskatalog |
@@ -137,7 +137,8 @@ Die offizielle Hilfe und der App Store haben höhere Aussagekraft als Community-
 | Hollywood Star | **P** | Bekanntheit in einigen Jobs und als Unternehmer |
 | God Mode, Bitizenship, Boss Mode | **P** | Nur vereinzelte Teilfunktionen, nicht komplette Originalpakete |
 | Investor Expansion Pack | **P** | Fiktives Depot mit fünf Klassen, Kauf/Verkauf, Marktänderungen, Dividenden und Finanzberater |
-| Cult, Black Market, Zoo, Casino, Secret Agent, Movie Director, Ultimate Fighter | **O** | Kein vollständiges spielbares Pack |
+| Cult, Black Market, Zoo, Casino, Secret Agent, Ultimate Fighter | **O** | Kein vollständiges spielbares Pack |
+| Movie Director | **P** | Eigenständige Filmproduktion mit Budget, Casting, Dreh, Kinoerlösen und Auszeichnungen; keine Originaltreue |
 
 **Kein 1:1-Anspruch:** Alle fünf Mechaniken sind eigene Umsetzung bekannter Grundfunktionen. Proprietäre Parameter und viele zugehörige Inhalte fehlen. Die übrigen Kaufangebote sind nicht „kostenlos freigeschaltet“, sondern noch nicht programmiert.
 
@@ -189,7 +190,7 @@ Vollständige Einordnung und Quellen: [MUSICIAN_CAREER.md](MUSICIAN_CAREER.md). 
 |---|---|---|
 | Actor Job Pack | **P – teilweise spielbar** | Schauspielunterricht, Komparsenarbeit, Agent, Casting, Film- und Fernsehrollen, Gagen, Auszeichnungen und Filmografie |
 | Hollywood Star | **P – eigene Sonderfunktion** | Bei aktiver Schauspielrolle sofortige Bekanntheit |
-| Movie Director | **O – offen** | Regie- und Produktionskarriere noch nicht umgesetzt |
+| Movie Director | **P – teilweise spielbar** | Filmkurse, eigene Genres und Budgets, Besetzung, Drehentscheidungen, Premieren, Einspielergebnisse, Auszeichnungen, Filmografie; Festivals und Branchenbeziehungen fehlen |
 
 Schauspielerkarriere enthält mehrere Staffeljahre, agentenvermittelte Castingvorschläge und konkrete Konsequenzen für Geld, Ruf und Bekanntheit. Es fehlen generierte Filmproduktionen, Agentenbeziehungen, Vertragsverhandlungen, dramatische Drehsituationen, vollständige Preise und Interaktionen. [Details und Quellen](ACTOR_CAREER.md).
 

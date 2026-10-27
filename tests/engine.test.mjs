@@ -875,3 +875,63 @@ test('crime save fields reject malformed contacts and progress while legacy save
  assert.equal(isSaveGame({...s,person:{...s.person,crimeCareer:{...c,network:[{id:'evil',name:'test',origin:'Haft',trust:105,influence:20,lastMetAge:0,active:true}]}}}),false);
  const old=structuredClone(s);delete old.person.crimeCareer;assert.equal(isSaveGame(old),true);
 });
+
+
+test('director pipeline finances casting, shooting, release and keeps a filmography',()=>{
+ let s=advance(born(),25);s.person.cash=300000;
+ s=applyAction(s,{type:'DIRECTOR',key:'study'});
+ assert.ok(s.person.directorCareer.skill>0);
+ s=applyAction(s,{type:'DIRECTOR',key:'start',genre:'Drama',budget:'mittel'});
+ assert.equal(s.person.cash,259750);
+ assert.equal(s.person.directorCareer.current.phase,'casting');
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'release'}),/Dreharbeiten/);
+ s=applyAction(s,{type:'DIRECTOR',key:'cast',choice:'stars'});
+ assert.equal(s.person.directorCareer.current.phase,'shooting');
+ s=applyAction(s,{type:'DIRECTOR',key:'shoot',choice:'careful'});
+ assert.equal(s.person.directorCareer.current.phase,'release');
+ const before=s.person.cash;
+ s=applyAction(s,{type:'DIRECTOR',key:'release'});
+ assert.equal(s.person.directorCareer.current,null);
+ assert.equal(s.person.directorCareer.films.length,1);
+ assert.ok(s.person.directorCareer.films[0].boxOffice>=0);
+ assert.ok(s.person.cash>before);
+ assert.ok(isSaveGame(s));
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'start',genre:'Drama',budget:'kurz'}),/dieses Jahr/);
+});
+test('director rejects invalid paths, enforces age, custody and film budgets',()=>{
+ let s=born();
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'study'}),/14/);
+ s=advance(s,18);s.person.cash=20000;
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'start',genre:'Drama',budget:'gross'}),/Startkapital/);
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'start',genre:'Horror',budget:'kurz'}),/Ungültiges/);
+ s=applyAction(s,{type:'DIRECTOR',key:'start',genre:'Thriller',budget:'kurz'});
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'cast',choice:'stars'}),/Budget/);
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'shoot',choice:'quick'}),/Ensemble besetzen/);
+ s=applyAction(s,{type:'DIRECTOR',key:'cast',choice:'newcomers'});
+ s=applyAction(s,{type:'DIRECTOR',key:'cancel'});
+ assert.equal(s.person.directorCareer.current,null);
+ assert.ok(s.person.cash<20000);
+ s.person.prisonYears=2;
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'study'}),/Haft/);
+});
+test('director project ages, expires after three years, and rewind restores its snapshot',()=>{
+ let s=advance(born(),25);s.person.cash=100000;
+ s=applyAction(s,{type:'DIRECTOR',key:'start',genre:'Komödie',budget:'mittel'});
+ const original=s.person.directorCareer.current.spent;
+ s=advance(s,1);
+ assert.ok(s.person.directorCareer.current.spent>original);
+ s=applyAction(s,{type:'REWIND',years:1});
+ assert.equal(s.person.directorCareer.current.spent,original);
+ s=advance(s,3);
+ assert.equal(s.person.directorCareer.current,null);
+ assert.ok(isSaveGame(s));
+});
+test('director save validation rejects tampering and accepts old saves',()=>{
+ const s=born();
+ assert.equal(isSaveGame(s),true);
+ const old=structuredClone(s);delete old.person.directorCareer;assert.equal(isSaveGame(old),true);
+ const c={skill:20,reputation:30,awards:0,films:[],current:null};
+ assert.equal(isSaveGame({...s,person:{...s.person,directorCareer:{...c,skill:Infinity}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,directorCareer:{...c,current:{title:'Test',genre:'Drama',budget:8000,spent:9000,script:40,cast:20,footage:10,phase:'release',startAge:18}}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,directorCareer:{...c,films:[{title:'Film',genre:'Drama',age:30,budget:8000,boxOffice:-1,rating:50,award:false}]}}}),false);
+});
