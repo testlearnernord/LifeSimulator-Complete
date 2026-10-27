@@ -130,8 +130,8 @@ function renderCareer(p:Person){
  ${renderSchoolPanel(p)}
  ${renderMusic(p)}
  ${renderActor(p)}
- ${heading('Beruf',p.jobId?'Beschäftigt':'Arbeitssuchend')}
- <div class='info-card'><b>${html(careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr`:'Ohne regelmäßiges Einkommen'}</p>
+ ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)?'Aktive Karriere':'Arbeitssuchend')}
+ <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
