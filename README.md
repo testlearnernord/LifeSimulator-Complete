@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.9.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.10.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -122,3 +122,11 @@ Unter **Beruf → Musikerkarriere** oder **Aktivitäten → Musik** kannst du ab
 Das System ist **für alle kostenlos** und funktioniert ohne Konto, Internet oder Lizenzkauf. Die Berechnungen, Plattenfirmen, Texte und Titel sind eigenständig entworfen. Es handelt sich ausdrücklich **noch nicht um das vollständige originale Musician Job Pack**.
 
 [Quellen, Mechaniken und offene Funktionen](docs/MUSICIAN_CAREER.md).
+
+## Lebenslinien 0.10.0 – Schauspielkarriere
+
+Die kostenlose, eigenständige **Schauspielkarriere** ist in **Beruf → Schauspielkarriere** und **Aktivitäten → Schauspiel** verfügbar: Schauspielunterricht ab acht Jahren, Komparsenjobs, Talentagenten, Film- und Serien-Castings mit Rollen- und Altersanforderungen, mehrjährige Serienverträge, Produktionsgagen, Kritikerwertungen, Auszeichnungen und eine bleibende Filmografie. Ruhm und Branchenruf verändern sich mit den Aufträgen; eine feste Rolle verträgt sich nicht mit anderen Vollzeitkarrieren.
+
+**Nicht vollständig:** Eigene Drehbuch-/Regieentscheidungen, dynamische Produktionen, Vertragsverhandlungen, Filmteams und komplexe Awards fehlen weiterhin. Alle Titel, Zahlen, Grafiken und Spielregeln sind unabhängig gestaltet, ohne BitLife-Dateien oder fremde Kauf-Lizenzen.
+
+[Recherche und technische Dokumentation](docs/ACTOR_CAREER.md).
