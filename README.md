@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.7.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.8.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -106,3 +106,11 @@ Alle neuen Eigenschaften bleiben mit alten Speicherständen und der Time Machine
 
 [Technische Umsetzung und offene Punkte](docs/SCHOOL_HEALTH_DESIGN.md)
 
+
+## Version 0.8.0: Familie und Beziehungen
+
+Unter **Beziehungen** kannst du jetzt aktiv Freundschaften schließen, gemeinsame Familientage verbringen, dich entschuldigen, bei nahestehenden Personen um finanzielle Unterstützung bitten, den Kontakt abbrechen oder eine Versöhnung versuchen. Für Kinder existieren jetzt ein gespeicherter Entwicklungswert und kostenpflichtige Förderung. Verheiratete Paare können sich scheiden lassen; eine Trennung erzeugt einen lebenden **Ex-Partner**, statt die Person aus dem Leben zu löschen. Vertrauen und längere Kontaktpausen haben dauerhafte Folgen.
+
+Die Lebenssimulation berücksichtigt nun den Unterhalt minderjähriger Kinder. Beim Generationswechsel können Förderung, Wertpapiere und Schulden den Nachfolger beeinflussen. Sämtliche Mechaniken sind **eigenständige Näherungen**, nicht BitLife-Originalcode. Alte Spielstände bleiben kompatibel.
+
+[Details, Grenzen und Umsetzungsnotizen](docs/FAMILY_RELATIONSHIPS.md).
