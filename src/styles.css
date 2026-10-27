@@ -179,3 +179,19 @@ html,body,#app{background:#e3e9f1}
 .family-entry .list-text small{white-space:normal}
 .person-detail .prison-warning{padding:9px 11px;font-size:12px;margin-top:10px}
 @media(max-width:390px){.family-trust{font-size:11px}.family-entry .list-emoji{font-size:29px}}
+
+
+/* v0.9: original musician career cards and touch-first skill gauges */
+.music-skill{display:grid;grid-template-columns:minmax(90px,1fr) minmax(65px,1fr) auto;gap:7px;align-items:center;padding:9px 1px;border-bottom:1px solid #dce7f0}
+.music-skill>div:first-child{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#0a6094}
+.music-skill>div:first-child strong{color:#4e7592;font-size:11px}
+.music-skill .meter{height:12px}
+.music-skill .smallbtn{min-height:38px;padding:8px 10px}
+.music-audition{padding:13px 12px;border-bottom:1px solid #adbecb;background:#fff}
+.music-audition>b{display:block;color:#0c6598;font-size:13px;margin-bottom:9px}
+.music-audition>.row{gap:10px}
+.music-audition .smallbtn{flex:1;min-height:42px}
+.music-release{display:flex;flex-direction:column;background:white;padding:12px 14px;border-bottom:1px solid #bccbd7;gap:5px}
+.music-release>b{font-size:14px;color:#0c6598}
+.music-release>small{font-size:12px;color:#708190;line-height:1.4}
+@media(max-width:390px){.music-skill{grid-template-columns:minmax(66px,1fr) minmax(55px,1fr) auto;gap:6px}.music-audition .smallbtn{font-size:11px;padding:8px 7px}}
