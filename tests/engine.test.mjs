@@ -567,3 +567,23 @@ test('invalid new relationship fields are rejected while legacy records still lo
  for(const r of legacy.person.relationships){delete r.lastContactAge;delete r.trust;delete r.estranged;}
  assert.ok(isSaveGame(legacy));
 });
+
+
+test('family inheritance includes investments, deducts debt, and upbringing affects successor',()=>{
+ let s=advance(born(),27);s.person.cash=150000;
+ s=applyAction(s,{type:'INVEST',key:'buy',assetId:'bond',quantity:100});
+ s=applyAction(s,{type:'ACTIVITY',key:'date'});
+ s=applyAction(s,{type:'BIRTH',count:1,gender:'männlich',talent:'keines'});
+ const child=s.person.relationships.find(r=>r.kind==='Kind');
+ child.development=100;child.age=9;
+ s.person.loanBalance=8000;
+ const estate=netWorth(s.person);
+ assert.ok(estate>100000);
+ s.person.age=116;s.person.stats.health=0;
+ s=applyAction(s,{type:'AGE'});
+ assert.equal(s.person.alive,false);
+ const next=applyAction(s,{type:'NEW_GENERATION',id:child.id});
+ assert.ok(next.person.cash>=Math.floor(estate*.8)-10000);
+ assert.ok(next.person.stats.smarts>=95);
+ assert.ok(isSaveGame(next));
+});
