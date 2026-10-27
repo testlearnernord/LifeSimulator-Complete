@@ -170,3 +170,12 @@ html,body,#app{background:#e3e9f1}
 .school-actions{gap:6px}
 .school-actions .smallbtn{white-space:normal;min-height:40px}
 @media(max-width:390px){.school-metrics>div{grid-template-columns:74px minmax(0,1fr) 34px}.school-actions .smallbtn{font-size:11px}}
+
+
+/* v0.8: trust and relationship detail without protected UI artwork */
+.family-trust{display:flex;align-items:center;gap:10px;margin:9px auto 5px;font-size:12px;color:#26668d;max-width:280px}
+.family-trust>.relationship-meter{flex:1;min-width:45px}
+.family-entry .family-role{font-weight:450;font-size:12px;color:#67839a}
+.family-entry .list-text small{white-space:normal}
+.person-detail .prison-warning{padding:9px 11px;font-size:12px;margin-top:10px}
+@media(max-width:390px){.family-trust{font-size:11px}.family-entry .list-emoji{font-size:29px}}
