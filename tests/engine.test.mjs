@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createLife,applyAction,isSaveGame,netWorth} from '../dist/app/engine/simulation.js';
+import {crimeRisk} from '../dist/app/engine/crime.js';
 const born=()=>createLife({name:'Testfigur',gender:'divers',country:'Deutschland',seed:123456});
 function advance(s,n){for(let i=0;i<n;i++){if(!s.person.alive)break;if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});return s;}
 test('deterministic initial stats and independent snapshots',()=>{const a=born(),b=born();assert.deepEqual(a.person.stats,b.person.stats);const c=applyAction(a,{type:'ACTIVITY',key:'read'});assert.notEqual(c.person.stats.smarts,a.person.stats.smarts);assert.equal(a.person.age,0);});
@@ -794,4 +795,83 @@ test('actor save schema protects from fabricated film roles while preserving old
  assert.equal(isSaveGame({...s,person:{...s.person,actorCareer:{...state,current:{offerId:'indie-film',title:'Invented',kind:'Film',role:'Nebenrolle',quality:62,payPerUnit:15000,episodes:1,yearsLeft:1}}}}),false);
  const old=structuredClone(s);delete old.person.actingSkill;delete old.person.actorCareer;
  assert.ok(isSaveGame(old));
+});
+
+
+test('crime success and arrests both increase skill while experience lowers later capture risk',()=>{
+ let s=advance(born(),18);
+ const initial=crimeRisk(s.person,'shoplift');
+ s=applyAction(s,{type:'CRIME',key:'shoplift'});
+ assert.ok((s.person.crimeCareer.skills.shoplift??0)>=2);
+ s.person.prisonYears=0;
+ const improved=structuredClone(s.person);improved.record=false;improved.crimeCareer.heat=0;
+ assert.ok(crimeRisk(improved,'shoplift')<initial+0.1);
+ improved.crimeCareer.skills.shoplift=100;
+ assert.ok(crimeRisk(improved,'shoplift')<crimeRisk({...improved,crimeCareer:{...improved.crimeCareer,skills:{shoplift:0}}},'shoplift'));
+ assert.ok(isSaveGame(s));
+});
+test('inmates meet unique contacts and learn from mentors behind bars',()=>{
+ let s=advance(born(),18);
+ s.person.prisonYears=3;s.seed=1;
+ s=applyAction(s,{type:'CRIME',key:'meet'});
+ assert.equal(s.person.crimeCareer.network.length,1);
+ const contact=s.person.crimeCareer.network[0];
+ assert.equal(contact.origin,'Haft');
+ const before=contact.trust;
+ s=applyAction(s,{type:'CRIME',key:'mentor',contactId:contact.id,skill:'burglary'});
+ assert.ok(s.person.crimeCareer.skills.burglary>=4);
+ assert.ok(s.person.crimeCareer.network[0].trust>before);
+ s=applyAction(s,{type:'CRIME',key:'mentor',contactId:contact.id,skill:'pickpocket'});
+ assert.throws(()=>applyAction(s,{type:'CRIME',key:'mentor',contactId:contact.id,skill:'shoplift'}),/dieses Jahr/);
+ assert.throws(()=>applyAction(s,{type:'CRIME',key:'crew-job'}),/Haft/);
+ assert.ok(isSaveGame(s));
+});
+test('release preserves prison contacts, starts probation and limits prison-year living expenses',()=>{
+ let s=advance(born(),23);
+ s.person.prisonYears=1;s.person.cash=5000;s.seed=1;
+ s=applyAction(s,{type:'CRIME',key:'meet'});
+ const id=s.person.crimeCareer.network[0].id;
+ s=advance(s,1);
+ assert.equal(s.person.prisonYears,0);
+ assert.equal(s.person.crimeCareer.probationYears,2);
+ assert.ok(s.person.crimeCareer.network.some(x=>x.id===id));
+ assert.equal(s.person.cash,4400);
+ s=applyAction(s,{type:'CRIME',key:'build-trust',contactId:id});
+ assert.ok(isSaveGame(s));
+});
+test('criminal ranks require trusted contacts, respect and successfully completed actions',()=>{
+ let s=advance(born(),24);
+ assert.throws(()=>applyAction(s,{type:'CRIME',key:'join'}),/Respekt|Kontakt|brauchst/);
+ s.person.crimeCareer={skills:{},heat:15,respect:75,network:[{id:'test-contact',name:'Sam Muster',origin:'Haft',trust:82,influence:55,lastMetAge:24,active:true}],rank:0,successes:7,failures:1,probationYears:0};
+ s=applyAction(s,{type:'CRIME',key:'join'});
+ assert.equal(s.person.crimeCareer.rank,1);
+ s=applyAction(s,{type:'CRIME',key:'promote'});
+ assert.equal(s.person.crimeCareer.rank,2);
+ assert.throws(()=>applyAction(s,{type:'CRIME',key:'promote'}),/dieses Jahr/);
+ s=advance(s,1);
+ s=applyAction(s,{type:'CRIME',key:'promote'});
+ assert.equal(s.person.crimeCareer.rank,3);
+ const before=s.person.crimeCareer.successes+s.person.crimeCareer.failures;
+ s=applyAction(s,{type:'CRIME',key:'crew-job'});
+ assert.equal(s.person.crimeCareer.successes+s.person.crimeCareer.failures,before+1);
+ assert.ok(isSaveGame(s));
+});
+test('rehabilitation lowers heat and time away from contacts can reduce trust',()=>{
+ let s=advance(born(),30);
+ s.person.crimeCareer={skills:{},heat:82,respect:40,network:[{id:'friend-1',name:'Robin Test',origin:'Straße',trust:35,influence:40,lastMetAge:20,active:true}],rank:1,successes:4,failures:1,probationYears:2};
+ s=applyAction(s,{type:'CRIME',key:'rehabilitate'});
+ assert.equal(s.person.crimeCareer.heat,64);
+ assert.equal(s.person.crimeCareer.probationYears,1);
+ s=advance(s,1);
+ assert.ok(s.person.crimeCareer.heat<64);
+ assert.ok(s.person.crimeCareer.network[0].trust<=35);
+ assert.ok(isSaveGame(s));
+});
+test('crime save fields reject malformed contacts and progress while legacy saves remain supported',()=>{
+ let s=born();assert.equal(isSaveGame(s),true);
+ const c={skills:{shoplift:20},heat:20,respect:10,network:[],rank:0,successes:1,failures:0,probationYears:0};
+ assert.equal(isSaveGame({...s,person:{...s.person,crimeCareer:{...c,skills:{shoplift:Infinity}}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,crimeCareer:{...c,rank:5}}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,crimeCareer:{...c,network:[{id:'evil',name:'test',origin:'Haft',trust:105,influence:20,lastMetAge:0,active:true}]}}}),false);
+ const old=structuredClone(s);delete old.person.crimeCareer;assert.equal(isSaveGame(old),true);
 });
