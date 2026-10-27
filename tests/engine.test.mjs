@@ -906,7 +906,7 @@ test('director rejects invalid paths, enforces age, custody and film budgets',()
  assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'start',genre:'Horror',budget:'kurz'}),/Ungültiges/);
  s=applyAction(s,{type:'DIRECTOR',key:'start',genre:'Thriller',budget:'kurz'});
  assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'cast',choice:'stars'}),/Budget/);
- assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'shoot',choice:'quick'}),/Casting/);
+ assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'shoot',choice:'quick'}),/Ensemble besetzen/);
  s=applyAction(s,{type:'DIRECTOR',key:'cast',choice:'newcomers'});
  s=applyAction(s,{type:'DIRECTOR',key:'cancel'});
  assert.equal(s.person.directorCareer.current,null);
