@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0 – 2026-10-27 (Familie, Freundschaften, Versöhnung, Konsequenzen)
+
+- Freundschaften aktiv suchen und Beziehungen mit eigenem Vertrauenswert und Kontakthistorie führen.
+- Familientage, Entschuldigungen, finanzielle Unterstützung durch Eltern/Freunde, Kontaktabbrüche und Versöhnungsversuche.
+- Neue Kinderförderung mit gespeichertem Entwicklungswert, laufendem Unterhalt und Einfluss auf den nächsten Charakter nach Generationswechsel.
+- Scheidungen mit modellierter Vermögensaufteilung. Trennungen erzeugen lebende ehemalige Partner statt Personen irrtümlich als verstorben zu markieren.
+- Finanzielle Bewertung und Erbschaft berücksichtigen jetzt Wertpapiere und vorhandene Kreditschulden.
+- Mobile Beziehungseinträge und zusätzliche Interaktionen samt Vertrauen, ehemaliger Partnerschaft und Entwicklungsstand.
+- Automatisierte Regressionstests sowie dokumentierte Unterschiede zum Original in docs/FAMILY_RELATIONSHIPS.md.
+
+
+
 ## 0.7.0 – 2026-10-27 (Schule, Zeugnisse, Erkrankungen)
 
 - School report card from age 6 to 17: graded performance, attendance, discipline and activities.
