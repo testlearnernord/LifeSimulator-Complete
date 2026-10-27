@@ -62,8 +62,9 @@ export function crimeAction(s:SaveGame,key:'shoplift'|'pickpocket'|'burglary'|'m
   }else{
    const tier={shoplift:1,pickpocket:2,burglary:3}[type];
    const reward=Math.round((120+Math.floor(h.random()*450)) * tier *(1+skill(c,type)/180));
-   p.cash+=reward;c.successes++;c.respect=limit(c.respect+2+tier);increaseSkill(c,type,5+Math.floor(h.random()*6));
-   h.stat('happiness',2);h.log('Der '+CRIME_LABELS[type]+' brachte '+fmt(reward)+' ein. Erfahrung +','good');
+   p.cash+=reward;c.successes++;c.respect=limit(c.respect+2+tier);
+   const experience=5+Math.floor(h.random()*6);increaseSkill(c,type,experience);
+   h.stat('happiness',2);h.log('Der '+CRIME_LABELS[type]+' brachte '+fmt(reward)+' ein. Erfahrung +'+experience+'.','good');
   }
   p.reputation=limit((p.reputation??50)-({shoplift:4,pickpocket:6,burglary:9}[type]));
   return;
