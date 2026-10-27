@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0 – 2026-10-27 (Screenshot-Vergleich: Profile, Menüs und echtes Alltags-Gameplay)
+
+- Character creation now generates a country-appropriate birthplace, birthday, zodiac sign, parent household and parental occupation.
+- Own BitLife-inspired menu architecture: full-screen blue activity/asset/relationship screens with grey section bars, close-to-life interaction and age restrictions.
+- Personal profile popup with current stats, identity, birthplace and birthday.
+- Actual adoption and fertility-clinic actions, driving licence test, personal credits with amortization and annual interest, basic casino visit, identity update and accessories.
+- Relationship index grouped by parents, partners, children and friends.
+- Original avatar icons, text and CSS; no protected original art, logos, audio, texts or ad assets reproduced.
+- Extended save validator and deterministic engine tests with mobile Chromium smoke checks.
+- Screen-by-screen remaining gap analysis: docs/SCREENSHOT_GAP_ANALYSIS.md.
+
+
+
 ## 0.5.0 – 2026-10-26 (Premium-Inventar und spielbare Sonderfunktionen)
 
 - Investor subset: five fictional asset classes, annual prices, share purchases and sales, portfolio valuation, dividends, advisor decisions, insolvency risk through broader game economics.
