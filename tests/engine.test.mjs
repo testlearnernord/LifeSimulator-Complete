@@ -313,3 +313,79 @@ test('investment portfolio and price corruption cannot pass save validation',()=
  assert.equal(isSaveGame({...s,person:{...s.person,investments:[{assetId:'equity',quantity:0,costBasis:100}]}}),false);
  assert.equal(isSaveGame({...s,person:{...s.person,financialAdvisor:'yes'}}),false);
 });
+
+
+test('birth biography contains a city, date, sign, parent occupation and consistent family relations',()=>{
+ const a=born(),b=born();
+ assert.equal(a.person.birthCity,b.person.birthCity);
+ assert.match(a.person.birthStory,/Geburtstag/);
+ assert.ok(a.person.birthday&&a.person.zodiac);
+ assert.equal(a.person.relationships[0].kind,'Mutter');
+ assert.ok(a.person.relationships[0].occupation);
+ assert.ok(a.person.history.some(x=>x.text.includes(a.person.name)));
+ assert.ok(isSaveGame(a));
+});
+test('driver license is age gated, charges a fee and never duplicates on success',()=>{
+ let s=born();
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'license'}),/16/);
+ s=advance(s,18);if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=1500;
+ const before=s.person.cash;
+ s=applyAction(s,{type:'LIFESTYLE',key:'license'});
+ assert.equal(s.person.cash,before-220);
+ assert.ok(typeof s.person.license==='boolean'||s.person.license===undefined);
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'license'}));
+ assert.ok(isSaveGame(s));
+});
+test('loans need a job and repayments plus annual interest are accounted for',()=>{
+ let s=advance(born(),21);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'loan',value:'10000'}),/Einkommen/);
+ s=applyAction(s,{type:'JOB',id:'retail'});
+ const cash=s.person.cash;
+ s=applyAction(s,{type:'LIFESTYLE',key:'loan',value:'10000'});
+ assert.equal(s.person.loanBalance,10000);
+ assert.equal(s.person.cash,cash+10000);
+ const before=s.person.loanBalance;
+ s=advance(s,1);
+ assert.ok(s.person.loanBalance<before);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=9000;
+ s=applyAction(s,{type:'LIFESTYLE',key:'repay',value:'5000'});
+ assert.ok(s.person.loanBalance<5000);
+ assert.ok(isSaveGame(s));
+});
+test('adoption and fertility have costs, outcomes and yearly quotas',()=>{
+ let s=advance(born(),22);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=30000;
+ const original=s.person.cash;
+ s=applyAction(s,{type:'LIFESTYLE',key:'adopt'});
+ assert.equal(s.person.cash,original-3000);
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'adopt'}),/dieses Jahr/);
+ s=applyAction(s,{type:'LIFESTYLE',key:'fertility'});
+ assert.equal(s.person.cash,original-4500);
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'fertility'}),/dieses Jahr/);
+ assert.ok(isSaveGame(s));
+});
+test('identity updates the person and accessory gives lasting presentation improvements',()=>{
+ let s=advance(born(),18);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=500;
+ s=applyAction(s,{type:'LIFESTYLE',key:'identity',value:'weiblich'});
+ assert.equal(s.person.gender,'weiblich');
+ assert.throws(()=>applyAction(s,{type:'LIFESTYLE',key:'identity',value:'männlich'}),/dieses Jahr/);
+ s=applyAction(s,{type:'LIFESTYLE',key:'accessory',value:'Sonnenbrille'});
+ assert.equal(s.person.accessory,'Sonnenbrille');
+ assert.ok(isSaveGame(s));
+});
+test('corrupt extended biographies, debts and relationships are rejected; legacy data remains valid',()=>{
+ const s=born();
+ assert.equal(isSaveGame(s),true);
+ assert.equal(isSaveGame({...s,person:{...s.person,loanBalance:NaN}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,birthStory:'x'.repeat(1000)}}),false);
+ assert.equal(isSaveGame({...s,person:{...s.person,license:'yes'}}),false);
+ const copy=structuredClone(s);
+ delete copy.person.birthCity;delete copy.person.birthday;delete copy.person.zodiac;delete copy.person.birthStory;
+ assert.equal(isSaveGame(copy),true);
+});
