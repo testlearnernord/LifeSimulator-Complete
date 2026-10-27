@@ -34,6 +34,12 @@ with sync_playwright() as playwright:
     page.locator('nav [data-action="tab"][data-id="people"]').click()
     expect(page.get_by_text('Eltern', exact=True)).to_be_visible()
     assert page.locator('.family-entry').count() >= 1
+    expect(page.locator('[data-action="family"][data-id="meet"]')).to_be_disabled()
+    page.locator('.family-entry').first.click()
+    expect(page.get_by_text('Vertrauen:', exact=False)).to_be_visible()
+    page.locator('[data-action="relview"][data-id=""]').click()
+    page.locator('[data-action="family"][data-id="family-day"]').click()
+    expect(page.locator('.family-entry').first).to_be_visible()
     page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     expect(page.get_by_text('Adoption')).to_be_visible()
@@ -74,6 +80,10 @@ with sync_playwright() as playwright:
             page.locator('[data-action="event"]').first.click()
             expect(page.locator('.overlay')).to_have_count(0)
     expect(page.locator('.year-group h2').last).to_contain_text('Alter: 13 Jahre')
+    page.locator('nav [data-action="tab"][data-id="people"]').click()
+    page.locator('[data-action="family"][data-id="meet"]').click()
+    expect(page.get_by_text('Kontakte pflegen')).to_be_visible()
+    page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
     # Education drill-down: age-appropriate transcript and persistent extracurricular.
     page.locator('nav [data-action="tab"][data-id="career"]').click()
     expect(page.get_by_text('Dein Zeugnis')).to_be_visible()
@@ -113,6 +123,6 @@ with sync_playwright() as playwright:
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.7 school club, medical care, screenshot-style menus, time rewind and offline: PASSED')
+    print('v0.8 family ties, school, health, saves, time rewind and offline: PASSED')
     context.close()
     browser.close()
