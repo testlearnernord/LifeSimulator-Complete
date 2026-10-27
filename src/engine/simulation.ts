@@ -3,6 +3,7 @@ import type {Action,Entry,NewLife,Pending,Person,Relationship,SaveGame,Stat} fro
 import {advanceExpansions,businessAction,rentalAction,socialAction,validExtensions} from './expansions.js';
 import {advanceInvestments,investAction,portfolioValue,validInvestments} from './investments.js';
 import {advanceLifestyle,lifestyleAction,validLifestyle} from './lifestyle.js';
+import {educationAction,educationYear,medicalAction,healthYear,validSchoolHealth} from './schoolHealth.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -52,6 +53,13 @@ export function createLife(input:NewLife):SaveGame{
 function yearlyEvent(s:SaveGame){const p=s.person;
  if(p.prisonYears>0){if(chance(s,.27))event(s,'Ein Tag hinter Gittern','Ein Mitgefangener fragt, ob du ihm beim Sortieren der Bibliotheksbücher helfen willst.',[{label:'Helfen',kind:'prisonHelp'},{label:'Ablehnen',kind:'ignore'}]);return;}
  const roll=rng(s);
+ if(p.age>=6&&p.age<18&&roll<.14){
+   event(s,'Ein Konflikt in der Schule','Ein Mitschüler verhält sich dir gegenüber unfair. Wie möchtest du reagieren?',[
+    {label:'Lehrkraft um Hilfe bitten',kind:'schoolHelp'},
+    {label:'Ruhig bleiben',kind:'schoolCalm'},
+    {label:'Zurückschimpfen',kind:'schoolFight'}
+   ]);return;
+ }
  if(roll<.13&&p.age>6){event(s,'Ein neuer Freund?',`Jemand aus deinem Umfeld möchte mehr Zeit mit dir verbringen.`,[{label:'Freundschaft schließen',kind:'friend'},{label:'Lieber nicht',kind:'ignore'}]);}
  else if(roll<.25&&p.age>=12){event(s,'Eine schwierige Entscheidung',`Ein Bekannter schlägt dir eine riskante Mutprobe vor.`,[{label:'Ablehnen',kind:'decline'},{label:'Mitmachen',kind:'risk'}]);}
  else if(roll<.38){event(s,'Ein anstrengendes Jahr',`Eine Menge Stress hat sich angestaut. Wie reagierst du?`,[{label:'Erholung suchen',kind:'rest'},{label:'Weiter durchziehen',kind:'work'}]);}
@@ -71,7 +79,9 @@ function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=sc
  advanceLifestyle(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
- if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
+ educationYear(s,expansionHooks(s));
+  healthYear(s,expansionHooks(s));
+  if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
  stat(p,'health',p.age>60? -2:chance(s,.2)?-1:0);
  if(p.age>30&&chance(s,.11))stat(p,'looks',-1);
  if(chance(s,.16))stat(p,'happiness',-4);
@@ -88,9 +98,9 @@ function activity(s:SaveGame,key:string){const p=s.person;
  switch(key){
  case 'read':stat(p,'smarts',2+Math.floor(rng(s)*4));log(s,'Du hast ein Buch gelesen. Dein Wissen wächst.','good');break;
  case 'gym':useAnnual(p,'gym');if(p.age<12)throw Error('Fitnessstudio erst ab 12 Jahren.');if(p.cash<50)throw Error('Für das Fitnessstudio fehlen 50 €.');p.cash-=50;stat(p,'health',5);stat(p,'looks',2);log(s,'Du warst im Fitnessstudio.','good');break;
- case 'doctor':useAnnual(p,'doctor',2);if(p.cash<150)throw Error('Für den Arztbesuch fehlen 150 €.');p.cash-=150;stat(p,'health',12+Math.floor(rng(s)*12));log(s,'Du bist beim Arzt gewesen.','good');break;
+ case 'doctor':if(p.illness){medicalAction(s,p.illness.diagnosed?'treat':'checkup',expansionHooks(s));break;}useAnnual(p,'doctor',2);if(p.cash<150)throw Error('Für den Arztbesuch fehlen 150 €.');p.cash-=150;stat(p,'health',12+Math.floor(rng(s)*12));log(s,'Du bist beim Arzt gewesen.','good');break;
  case 'meditate':useAnnual(p,'meditate',2);stat(p,'happiness',7);stat(p,'health',2);log(s,'Du hast meditiert und dich erholt.','good');break;
- case 'study':useAnnual(p,'study');if(p.age<6||p.age>24||p.school==='Abgeschlossen')throw Error('Du bist derzeit nicht in der Schule.');stat(p,'smarts',5);stat(p,'happiness',-1);log(s,'Du hast fleißig gelernt.','good');break;
+ case 'study':if(p.age>=6&&p.age<18){educationAction(s,'study',undefined,expansionHooks(s));break;}useAnnual(p,'study');if(p.age<6||p.age>24||p.school==='Abgeschlossen')throw Error('Du bist derzeit nicht in der Schule.');stat(p,'smarts',5);stat(p,'happiness',-1);log(s,'Du hast fleißig gelernt.','good');break;
  case 'date':useAnnual(p,'date');if(p.age<16)throw Error('Dating ist erst ab 16 möglich.');if(p.relationships.some(r=>r.kind==='Partner'&&r.alive))throw Error('Du bist bereits in einer Beziehung.');{const r=relation(s,'Partner',Math.max(16,p.age+Math.floor(rng(s)*7)-3));p.relationships.push(r);log(s,`Du bist jetzt mit ${r.name} zusammen.`,'good');}break;
  case 'crime':
  case 'crime:pickpocket':
@@ -134,7 +144,11 @@ function interact(s:SaveGame,id:string,key:string){const p=s.person;const r=p.re
  else throw Error('Unbekannte Interaktion.');
 }
 function resolve(s:SaveGame,kind:string){const p=s.person;const pending=p.pending;if(!pending||!pending.options.some(o=>o.kind===kind))throw Error('Keine passende Entscheidung vorhanden.');p.pending=null;
- switch(kind){case 'prisonHelp':stat(p,'happiness',5);stat(p,'smarts',2);log(s,'Du hast einem Mitgefangenen geholfen.','good');break;
+ switch(kind){
+  case 'schoolHelp':p.schoolRecord&&(p.schoolRecord.discipline=clamp(p.schoolRecord.discipline+6));stat(p,'happiness',3);log(s,'Deine Lehrkraft hat dir geholfen, den Konflikt zu lösen.','good');break;
+  case 'schoolCalm':stat(p,'happiness',2);log(s,'Du hast dich nicht provozieren lassen.');break;
+  case 'schoolFight':p.schoolRecord&&(p.schoolRecord.discipline=clamp(p.schoolRecord.discipline-18));stat(p,'happiness',-7);log(s,'Du hast dich auf den Streit eingelassen und eine schulische Verwarnung erhalten.','bad');break;
+  case 'prisonHelp':stat(p,'happiness',5);stat(p,'smarts',2);log(s,'Du hast einem Mitgefangenen geholfen.','good');break;
  case 'friend':{const r=relation(s,'Freund',p.age);p.relationships.push(r);log(s,`Du hast dich mit ${r.name} angefreundet.`,'good');break;}
  case 'risk':if(chance(s,.45)){stat(p,'health',-17);log(s,'Die Mutprobe ging schief. Du hast dich verletzt.','bad');}else {stat(p,'happiness',8);log(s,'Du hattest Spaß bei der Mutprobe.','good');}break;
  case 'decline':stat(p,'smarts',2);log(s,'Du bist kein unnötiges Risiko eingegangen.');break;
@@ -215,7 +229,9 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
- case 'LIFESTYLE':lifestyleAction(s,action.key,action.value,expansionHooks(s),()=>{
+ case 'EDUCATION':educationAction(s,action.key,action.club,expansionHooks(s));break;
+  case 'MEDICAL':medicalAction(s,action.key,expansionHooks(s));break;
+  case 'LIFESTYLE':lifestyleAction(s,action.key,action.value,expansionHooks(s),()=>{
     const child=relation(s,'Kind',0);child.bond=82;s.person.relationships.push(child);
    });break;
  case 'INVEST':investAction(s,action.key,action.assetId,action.quantity,expansionHooks(s));break;
@@ -226,7 +242,9 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  case 'ACTIVITY':activity(s,action.key);break;
  case 'RELATION':interact(s,action.id,action.key);break;
  case 'EVENT':resolve(s,action.kind);break;
- case 'STUDY':if(p.age<18||p.age>40||p.universityYears>0||p.degree||p.prisonYears>0)throw Error('Ein Studienbeginn ist gerade nicht möglich.');if(p.stats.smarts<55)throw Error('Für die Universität brauchst du mehr Intelligenz (mindestens 55).');p.universityYears=4;p.school='Universität';p.jobId=null;log(s,'Du hast ein vierjähriges Universitätsstudium begonnen.','good');break;
+ case 'STUDY':if(p.age<18||p.age>40||p.universityYears>0||p.degree||p.prisonYears>0)throw Error('Ein Studienbeginn ist gerade nicht möglich.');if(p.stats.smarts<55)throw Error('Für die Universität brauchst du mehr Intelligenz (mindestens 55).');p.universityYears=4;p.school='Universität';p.jobId=null;
+   if((p.grades??0)>=85){p.cash+=3000;log(s,'Wegen deiner hervorragenden Schulnoten hast du ein Stipendium von 3.000 € erhalten.','good');}
+   log(s,'Du hast ein vierjähriges Universitätsstudium begonnen.','good');break;
  case 'JOB':{requireFree(p);const job=CAREERS.find(j=>j.id===action.id);if(!job)throw Error('Unbekannte Stelle.');if(p.age<job.minAge||p.stats.smarts<job.minSmarts||(job.requiresDegree&&!p.degree)||p.prisonYears>0)throw Error('Du erfüllst die Voraussetzungen noch nicht.');p.jobId=job.id;p.jobYears=0;p.salaryBonus=0;p.careerPerformance=50;log(s,`Du arbeitest jetzt als ${job.title}.`,'good');break;}
  case 'BUY':{requireFree(p);const item=ITEMS.find(i=>i.id===action.id);if(!item)throw Error('Unbekannter Gegenstand.');if(p.age<18||p.cash<item.price)throw Error('Kauf derzeit nicht möglich.');p.cash-=item.price;p.assets.push({id:uid(s),name:item.name,kind:item.kind,value:item.price,annualCost:item.annualCost});log(s,`Du hast ${item.name} für ${money(item.price)} gekauft.`,'good');break;}
  case 'SELL':{requireFree(p);const item=p.assets.find(i=>i.id===action.id);if(!item)throw Error('Gegenstand nicht vorhanden.');const sale=Math.floor(item.value*.85);p.cash+=sale;p.assets=p.assets.filter(i=>i.id!==item.id);log(s,`Du hast ${item.name} für ${money(sale)} verkauft.`,'good');break;}
@@ -248,7 +266,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
