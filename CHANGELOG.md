@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0 – 2026-10-27 (Musician Special Career)
+
+- Musician job pack partially implemented: four learnable music skills from childhood, three lessons per role/year, and meaningful music talent acceleration.
+- Solo and band auditions with age, skill, annual attempt limits and multiple fictional labels, genre, contract term and royalties.
+- Release singles and albums with production costs, sales, royalties, popularity, fame and catalog history.
+- Concerts, multi-city tours, promotion campaigns and recording-contract exit with annual costs, risks and limits.
+- Old recordings continue earning discounted annual royalties, while fame and contract lengths change with elapsed years.
+- Music careers block incompatible normal full-time jobs; optional save fields preserve old saves and Time Machine checkpoints.
+- Dedicated career and activities interface, mobile touch layout, engine + E2E regression checks.
+- **Not equivalent to BitLife's complete Musician DLC:** missing role variety, contracts negotiations, bands with individual members, charts, certifications, awards and music-producer integrations.
+
+
+
 ## 0.8.0 – 2026-10-27 (Familie, Freundschaften, Versöhnung, Konsequenzen)
 
 - Freundschaften aktiv suchen und Beziehungen mit eigenem Vertrauenswert und Kontakthistorie führen.
