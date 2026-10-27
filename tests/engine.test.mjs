@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createLife,applyAction,isSaveGame,netWorth} from '../dist/app/engine/simulation.js';
 const born=()=>createLife({name:'Testfigur',gender:'divers',country:'Deutschland',seed:123456});
-function advance(s,n){for(let i=0;i<n;i++){if(!s.person.alive)break;if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}return s;}
+function advance(s,n){for(let i=0;i<n;i++){if(!s.person.alive)break;if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});return s;}
 test('deterministic initial stats and independent snapshots',()=>{const a=born(),b=born();assert.deepEqual(a.person.stats,b.person.stats);const c=applyAction(a,{type:'ACTIVITY',key:'read'});assert.notEqual(c.person.stats.smarts,a.person.stats.smarts);assert.equal(a.person.age,0);});
 test('a newborn cannot take adult-only actions',()=>{const s=born();assert.throws(()=>applyAction(s,{type:'JOB',id:'engineer'}));assert.throws(()=>applyAction(s,{type:'ACTIVITY',key:'crime'}));});
 test('age progression, education, and annual finances',()=>{let s=advance(born(),18);assert.equal(s.person.age,18);assert.equal(s.person.school,'Abgeschlossen');s=applyAction(s,{type:'JOB',id:'retail'});s=advance(s,1);assert.ok(s.person.cash>0);assert.equal(s.person.jobYears,1);});
