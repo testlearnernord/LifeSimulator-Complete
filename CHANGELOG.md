@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.7.0 – 2026-10-27 (Schule, Zeugnisse, Erkrankungen)
+
+- School report card from age 6 to 17: graded performance, attendance, discipline and activities.
+- Meaningful study actions, tutoring, classroom discussions, truancy and four extracurricular clubs.
+- Yearly grade dynamics, school conflicts with three decisions, graduation evaluation, small academic scholarship for excellent grades.
+- Optional persistent short-term illness state; new doctor appointment, treatment, therapy and rest interactions.
+- Visual school report card, activity submenus and accessible health interaction screen.
+- Optional fields preserve schema-1 compatibility with prior saves, with strict validation and time-rewind support.
+- Additional engine and mobile browser regression tests; documented mechanics in docs/SCHOOL_HEALTH_DESIGN.md.
+- Original gameplay tuning, schools, healthcare and graphics remain proprietary; these mechanics are an independent design.
+
+
+
 ## 0.6.0 – 2026-10-27 (Screenshot-Vergleich: Profile, Menüs und echtes Alltags-Gameplay)
 
 - Character creation now generates a country-appropriate birthplace, birthday, zodiac sign, parent household and parental occupation.
