@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.0 – 2026-10-28 (Eigenständige Filmregie)
+
+- Filmkurse ab 14, eigene Filmprojekte ab 18 in drei Genres und drei Budgetgrößen.
+- Casting mit Nachwuchs- oder Starbesetzung, zwei Drehstrategien, Premieren, Kinoumsätzen, Verleiheranteil, Ruf und Bekanntheit.
+- Laufende Produktionen verursachen Verzögerungskosten und werden nach drei Jahren eingestellt; nicht ausgegebene Budgets fließen zurück.
+- Filmografie und Auszeichnungen, vollständige mobile Aktionsmenüs, Schema-1-Save-Validierung und Rückspul-Snapshots.
+- Vier neue Engine-Tests und mobile Browser-Navigation; keine Behauptung vollständiger Originaltreue.
+- Grenzen und offizielle Quellen: docs/DIRECTOR_CAREER.md.
+
+
 ## 0.11.0 – 2026-10-27 (Progressive crime and prison contacts)
 
 - Three separately trainable crime skills, with experience from success or failure.
