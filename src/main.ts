@@ -9,17 +9,18 @@ import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/data
 
 type Tab='life'|'career'|'people'|'assets'|'activities'|'menu';
 const root=document.querySelector<HTMLDivElement>('#app')!;
-let current:SaveGame|null=null;let games:SaveGame[]=[];let tab:Tab='life';let modal:'new'|'edit'|'saves'|'delete'|'baby'|'diploma'|null=null;let deleteTarget:string|null=null;let toastMessage='';let toastPositive=false;let updateReady=false;let activitySection:string|null=null;let relationFocus:string|null=null;let historyExpanded=false;let premiumOpen=false;
+let current:SaveGame|null=null;let games:SaveGame[]=[];let tab:Tab='life';let modal:'new'|'edit'|'saves'|'delete'|'baby'|'diploma'|'profile'|null=null;let deleteTarget:string|null=null;let toastMessage='';let toastPositive=false;let updateReady=false;let activitySection:string|null=null;let assetsSection:string|null=null;let relationFocus:string|null=null;let historyExpanded=false;let premiumOpen=false;
 const html=(str:unknown):string=>String(str).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
 const opt=(items:string[],selected:string)=>items.map(i=>`<option value="${html(i)}" ${i===selected?'selected':''}>${html(i)}</option>`).join('');
 const button=(text:string,action:string,id='',extra='secondary',disabled=false)=>`<button class="button ${extra}" data-action="${html(action)}" data-id="${html(id)}" ${disabled?'disabled':''}>${text}</button>`;
 const card=(icon:string,title:string,subtitle:string,action?:string,id?:string,label='Öffnen',disabled=false)=>`<article class="tile"><div class="emoji">${icon}</div><div class="tile-main"><div class="tile-title">${title}</div><div class="tile-desc">${subtitle}</div></div>${action?button(label,action,id,'smallbtn',disabled):''}</article>`;
+const menuRow=(symbol:string,title:string,description:string,action:string,id='',disabled=false)=>`<button class="list-entry menu-entry" data-action="${html(action)}" data-id="${html(id)}" ${disabled?'disabled':''}><span class="list-emoji">${symbol}</span><span class="list-text"><b>${html(title)}</b><small>${html(description)}</small></span><span class="chevron">${disabled?'':'›'}</span></button>`;
 const heading=(text:string,right='')=>`<div class="section-head"><span>${text}</span><span class="small">${right}</span></div>`;
 const formatAge=(age:number)=>`${age} ${age===1?'Jahr':'Jahre'}`;
 const badges=(p:Person)=>`<div class="row"><span class="pill">Generation ${p.generation}</span><span class="pill">${html(p.country)}</span>${p.prisonYears>0?'<span class="pill">In Haft</span>':''}${!p.alive?'<span class="pill">Verstorben</span>':''}</div>`;
 function lifeStage(p:Person){if(!p.alive)return 'Verstorben';if(p.prisonYears>0)return 'In Haft';if(p.age<3)return 'Kleinkind';if(p.age<13)return 'Kind';if(p.age<18)return 'Jugendliche/r';if(p.jobId)return careerName(p);if(p.universityYears>0)return 'Student/in';if(p.age>=65)return 'Senior/in';return 'Erwachsen';}
 function avatar(p:Person){if(!p.alive)return '🕊️';if(p.age<4)return '👶';if(p.age<13)return p.gender==='weiblich'?'👧':'👦';if(p.age>=65)return p.gender==='weiblich'?'👵':'👴';return p.gender==='weiblich'?'👩':p.gender==='männlich'?'👨':'🧑';}
-function renderProfile(p:Person){return `<section class="profilebar"><button class="profile-person" data-action="tab" data-id="life" aria-label="Lebenslauf öffnen"><span class="avatar">${avatar(p)}</span><span class="profile-name-wrap"><span class="profile-name">${html(p.name)} <span class="profile-info">i</span></span><span class="profile-detail">🌍 ${html(p.country)} · ${html(lifeStage(p))} · ${formatAge(p.age)}</span></span></button><div class="profile-balance"><strong>${money(p.cash)}</strong><span>Kontostand</span></div></section>`;}
+function renderProfile(p:Person){return `<section class="profilebar"><button class="profile-person" data-action="open" data-id="profile" aria-label="Charakterprofil öffnen"><span class="avatar">${avatar(p)}</span><span class="profile-name-wrap"><span class="profile-name">${html(p.name)} <span class="profile-info">i</span></span><span class="profile-detail">🌐 ${html(p.birthCity||p.country)} · ${html(lifeStage(p))}</span></span></button><div class="profile-balance"><strong>${money(p.cash)}</strong><span>Kontostand</span></div></section>`;}
 function renderStats(p:Person){const names:{key:keyof Person['stats'];label:string;icon:string}[]=[{key:'happiness',label:'Glück',icon:'😊'},{key:'health',label:'Gesundheit',icon:'❤️'},{key:'smarts',label:'Intelligenz',icon:'💡'},{key:'looks',label:'Aussehen',icon:'✨'}];return `<section class="metrics" aria-label="Charakterwerte">${names.map(n=>`<div class="metric stat-${n.key}"><span class="stat-icon" aria-hidden="true">${n.icon}</span><span class="stat-label">${n.label}</span><div class="meter" role="progressbar" aria-label="${n.label}" aria-valuenow="${p.stats[n.key]}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p.stats[n.key]}%"></div></div><span class="stat-value">${p.stats[n.key]}%</span></div>`).join('')}</section>`;}
 function renderTimeline(p:Person){
  const chronological=p.history.slice().reverse();
@@ -95,20 +96,57 @@ function renderInvestments(p:Person){
   ${button('Verkaufen','investment','sell|'+a.id,'smallbtn',p.age<18||p.prisonYears>0||shares===0)}
   </div></article>`;}).join('')}</div>`;
 }
-function renderAssets(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>${renderInvestments(p)}`;}
+function renderAssetsDetail(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>`;}
+function renderAssets(p:Person){
+ if(assetsSection==='invest')return `<button class='screen-back' data-action='assetback'>‹ Besitz</button>${renderInvestments(p)}`;
+ if(assetsSection==='estate')return `<button class='screen-back' data-action='assetback'>‹ Besitz</button>${renderAssetsDetail(p)}`;
+ return `${heading('Finanzen')}<div class='stack'>
+ ${menuRow('💰','Finanzen',`Kontostand ${money(p.cash)} · Restschuld ${money(p.loanBalance||0)}`,'assetview','invest')}
+ ${menuRow('📈','Investments',`Depots und Wertpapiere · ${money(portfolioValue(p))}`,'assetview','invest',p.age<18)}
+ ${menuRow('💎','Luxusleben','Premium-Luxusgüter · aktuell noch offen','assetview','',true)}
+ </div>${heading('Premium-Besitz')}<div class='stack'>
+ ${menuRow('⚒️','Auktionshäuser','Sammlerstücke ersteigern · noch offen','assetview','',true)}
+ ${menuRow('🎲','Casino','Eigenes Casino betreiben · noch offen','assetview','',true)}
+ ${menuRow('🏛️','Museum','Sammlerstücke ausstellen · noch offen','assetview','',true)}
+ ${menuRow('🏎️','Rennwagen-Garage','Rennwagen sammeln · noch offen','assetview','',true)}
+ ${menuRow('🦁','Zoo','Eigenen Tierpark führen · noch offen','assetview','',true)}
+ </div>${heading('Eigentum')}<div class='stack'>
+ ${menuRow('🏡','Immobilien und Fahrzeuge',`${p.assets.length} Gegenstände · Kaufen, verkaufen, vermieten`,'assetview','estate')}
+ ${menuRow('📱','Social Media','Online-Profile und Reichweite','tab','activities')}
+ </div>`;
+}
 function renderActivities(p:Person){
  const jailed=p.prisonYears>0;
  if(jailed){return `<div class='panel-intro'><span class='panel-emoji'>🔒</span><div><h2>Gefängnis</h2><span>Reststrafe: ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'}</span></div></div><div class='prison-warning'>Arbeiten, Reisen, Einkaufen und weitere Straftaten sind während der Haft gesperrt.</div>${heading('Haftalltag')}<div class='stack'>${card('📚','Gefängnisbibliothek','Wissen aufbauen','activity','prison:library','Lesen')}${card('🏃','Hofgang','Fitness und Stimmung verbessern','activity','prison:yard','Trainieren')}${card('🧘','Meditation in der Zelle','Stress abbauen','activity','prison:meditate','Meditieren')}${card('🧹','Gefängnisarbeit','80 € für erledigte Aufgaben','activity','prison:job','Arbeiten')}</div>`;}
  const option=(emoji:string,title:string,description:string,id:string)=>`<button class='list-entry category-row' data-action='category' data-id='${id}'><span class='list-emoji'>${emoji}</span><span class='list-text'><b>${title}</b><small>${description}</small></span><span class='chevron'>›</span></button>`;
- if(!activitySection){return `<div class='panel-intro'><span class='panel-emoji'>✨</span><div><h2>Aktivitäten</h2><span>Gestalte dein Leben</span></div></div><div class='stack'>
- ${option('🧠','Körper & Geist','Fitnessstudio, Bibliothek, Meditation, Arzt','mind')}
- ${option('❤️','Liebe','Partner kennenlernen und Familie gründen','love')}
- ${option('⚖️','Kriminalität','Taschendiebstahl, Ladendiebstahl, Einbruch','crime')}
- ${option('📱','Social Media','Follower, Bekanntheit und Werbepartner','social')}
- ${option('✈️','Reisen','Urlaub und Auswanderung','travel')}
- ${option('🎟️','Freizeit','Spazieren, Helfen und Lotterie','leisure')}
+ if(!activitySection){return `<div class='screen-welcome'>Wähle eine Aktivität. Mit jedem Lebensjahr ändern sich die verfügbaren Möglichkeiten.</div>
+ ${heading('Besondere Aktivitäten')}<div class='stack'>
+ ${menuRow('🎬','Filmregie','Filmproduktionen leiten · Erweiterung noch offen','premiumopen','',true)}
+ ${menuRow('🧛','Vampir-Modus','Spezialmodus · noch nicht verfügbar','premiumopen','',true)}
+ ${menuRow('🌲','Outdoor-Leben','Zusätzliche Outdoor-Erlebnisse · geplant','premiumopen','',true)}
+ </div>${heading('Alle Aktivitäten')}<div class='stack'>
+ ${menuRow('🎩','Accessoires','Kleidung und persönliche Gegenstände','category','accessories',p.age<8)}
+ ${menuRow('🧸','Adoption','Ein Kind aufnehmen · ab 21 Jahren','lifestyle','adopt',p.age<21||p.prisonYears>0||p.cash<3000)}
+ ${menuRow('🦊','Kriminalität','Taschendiebstahl, Ladendiebstahl und Einbruch','category','crime',p.age<12)}
+ ${menuRow('🩺','Arzt','Arztbesuche und Behandlungen','category','mind',p.prisonYears>0)}
+ ${menuRow('🌐','Auswandern','In ein anderes Land ziehen','category','travel',p.age<18||p.prisonYears>0)}
+ ${menuRow('🧬','Fruchtbarkeitsklinik','Medizinische Behandlung für 1.500 €','lifestyle','fertility',p.age<18||p.age>55||p.prisonYears>0||p.cash<1500)}
+ ${menuRow('🎲','Glücksspiel','Im Casino spielen','lifestyle','gamble',p.age<18||p.prisonYears>0||p.cash<100)}
+ ${menuRow('🪪','Identität','Deine persönliche Identität festlegen','category','identity',p.age<16)}
+ ${menuRow('⚖️','Rechtsstreit','Rechtsstreitigkeiten · weiterer Ausbau offen','category','legal',true)}
+ ${menuRow('🚗','Führerschein','Theorie- und Fahrprüfung','lifestyle','license',p.age<16||p.license||p.prisonYears>0||p.cash<220)}
+ ${menuRow('🏦','Kredit','Bankdarlehen beantragen oder tilgen','category','loans',p.age<18||p.prisonYears>0)}
+ ${menuRow('💸','Lotterie','Ein Los für 20 € kaufen','activity','lottery',p.age<18||p.cash<20)}
+ ${menuRow('🧠','Körper & Geist','Fitnessstudio, Bibliothek und Meditation','category','mind',p.prisonYears>0)}
+ ${menuRow('❤️','Liebe und Familie','Partnerschaft, Nachwuchs und Kontakte','category','love',p.age<16)}
+ ${menuRow('📱','Social Media','Reichweite und Werbepartner','category','social',p.age<13)}
+ ${menuRow('✈️','Reisen','Urlaub und weitere Länder','category','travel',p.age<18)}
+ ${menuRow('🎟️','Freizeit','Spaziergänge, Ehrenamt, Lotterie','category','leisure')}
  </div>`;}
  const back=`<button class='screen-back' data-action='category' data-id=''>‹ Alle Aktivitäten</button>`;
+ if(activitySection==='accessories')return `${back}${heading('Accessoires')}<div class='stack'>${['Sonnenbrille','Mütze','Armbanduhr','Hut','Schal'].map((name,i)=>menuRow(['🕶️','🧢','⌚','🎩','🧣'][i]!,name,'75 € · Aussehen und Glück verbessern','lifestyle','accessory|'+name,p.cash<75)).join('')}</div><div class='info-card'>Aktuell: ${html(p.accessory||'Kein Accessoire')}</div>`;
+ if(activitySection==='identity')return `${back}${heading('Identität')}<div class='info-card'>Aktuelle Angabe: <b>${html(p.gender)}</b><p class='small'>Ab 16 Jahren kannst du die Angabe ändern.</p><div class='stack'>${['weiblich','männlich','divers'].map(g=>menuRow('🪪',g,'Persönliche Angabe aktualisieren','lifestyle','identity|'+g,g===p.gender)).join('')}</div></div>`;
+ if(activitySection==='loans')return `${back}${heading('Finanzen & Kredite')}<div class='info-card'>Offene Restschuld: <b>${money(p.loanBalance||0)}</b></div><div class='stack'>${[10000,25000,50000].map(q=>menuRow('💶','Kredit '+money(q),'6,5 % Zinsen jährlich · laufende Tilgung','lifestyle','loan|'+q,!!p.loanBalance||(!p.jobId&&!p.business)||p.record)).join('')}${[1000,5000,10000].map(q=>menuRow('📤','Tilgen: '+money(q),'Sondertilgung aus deinem Kontostand','lifestyle','repay|'+q,!p.loanBalance||p.cash<Math.min(p.loanBalance||0,q))).join('')}</div>`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
  if(activitySection==='love')return `${back}${heading('Liebe und Familie')}<div class='stack'>${card('💕','Partnersuche','Neue Beziehung beginnen','activity','date','Suchen',p.age<16||p.relationships.some(r=>r.kind==='Partner'&&r.alive))}${card('👶','Nachwuchs','Versucht, Eltern zu werden','activity','child','Versuchen',p.age<18||p.age>55||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}</div>`;
  if(activitySection==='crime')return `${back}<div class='prison-warning'>⚠️ Straftaten können zu Geldstrafen, Vorstrafen und Gefängnis führen. Maximal zwei Versuche je Lebensjahr.</div>${heading('Straftaten')}<div class='stack'>${card('👜','Taschendiebstahl','Mittleres Risiko, kleiner Gewinn','activity','crime:pickpocket','Versuchen',p.age<12)}${card('🛍️','Ladendiebstahl','Geringeres Risiko und geringere Beute','activity','crime:shoplift','Versuchen',p.age<12)}${card('🏠','Einbruch','Hohes Risiko und höhere Beute','activity','crime:burglary','Versuchen',p.age<12)}</div>`;
@@ -135,7 +173,7 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.5.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.6.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -168,14 +206,15 @@ root.addEventListener('submit',async e=>{const target=e.target;if(!(target insta
 root.addEventListener('input',e=>{const t=e.target;if(!(t instanceof HTMLInputElement)||t.type!=='range')return;const output=t.closest('.range-field')?.querySelector('output');if(output)output.textContent=t.value+'%';});
 root.addEventListener('change',async e=>{const target=e.target;if(!(target instanceof HTMLInputElement)||target.id!=='import-file'||!target.files?.[0])return;try{const imported=await importGame(target.files[0]);current=imported;games=await listGames();tab='life';modal=null;notify('Spielstand erfolgreich importiert.',true);}catch(error){notify(error instanceof Error?error.message:'Import fehlgeschlagen.');}});
 root.addEventListener('click',async e=>{const target=e.target;if(!(target instanceof Element))return;const control=target.closest<HTMLElement>('[data-action]');if(!control||control instanceof HTMLButtonElement&&control.disabled)return;const kind=control.dataset.action||'';const id=control.dataset.id||'';
- if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='category'){activitySection=id||null;render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
+ if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
  if(kind==='load'){try{current=await (await import('./storage/database.js')).getGame(id);tab='life';modal=null;render();}catch{notify('Spielstand konnte nicht geladen werden.');}return;}
  if(kind==='deleteprompt'){deleteTarget=id;modal='delete';render();return;}
  if(kind==='deleteconfirm'){await deleteGame(id);games=await listGames();if(current?.id===id)current=games[0]||null;modal='saves';render();return;}
  if(kind==='export'){if(current)exportGame(current);return;}
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
- else if(kind==='activity'){playSound('tap');await action({type:'ACTIVITY',key:id});}
+ else if(kind==='lifestyle'){const separator=id.indexOf('|');await action({type:'LIFESTYLE',key:(separator>=0?id.slice(0,separator):id) as 'adopt'|'fertility'|'license'|'loan'|'repay'|'accessory'|'gamble'|'identity',value:separator>=0?id.slice(separator+1):undefined});}
+  else if(kind==='activity'){playSound('tap');await action({type:'ACTIVITY',key:id});}
  else if(kind==='social'){const sep=id.lastIndexOf('|');await action({type:'SOCIAL',platform:id.slice(0,sep) as import('./engine/types.js').SocialPlatform,key:id.slice(sep+1) as 'join'|'post'|'sponsor'|'delete'});}
   else if(kind==='business'){const sep=id.indexOf('|');await action({type:'BUSINESS',key:(sep<0?id:id.slice(0,sep)) as 'open'|'develop'|'market'|'hire'|'fire'|'sell'|'invest'|'withdraw',sector:sep<0?undefined:id.slice(sep+1) as import('./engine/types.js').BusinessSector});}
   else if(kind==='rental'){const sep=id.lastIndexOf('|');await action({type:'RENTAL',id:id.slice(0,sep),key:id.slice(sep+1) as 'advertise'|'repair'|'vacate'});}
