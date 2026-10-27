@@ -478,6 +478,7 @@ test('breakup preserves the person as a living ex-partner instead of killing the
  assert.equal(ex.alive,true);
  assert.equal(ex.estranged,true);
  assert.throws(()=>applyAction(s,{type:'RELATION',id:ex.id,key:'talk'}),/Kontakt/);
+ s=advance(s,1);
  s=applyAction(s,{type:'ACTIVITY',key:'date'});
  assert.equal(s.person.relationships.filter(r=>r.kind==='Partner'&&r.alive).length,1);
  assert.ok(isSaveGame(s));
@@ -536,6 +537,7 @@ test('divorce preserves ex and charges settlement, allowing future partners',()=
  const ex=s.person.relationships.find(r=>r.id===partner.id);
  assert.equal(ex.kind,'Ex-Partner');
  assert.equal(ex.alive,true);
+ s=advance(s,1);
  s=applyAction(s,{type:'ACTIVITY',key:'date'});
  assert.equal(s.person.relationships.filter(r=>r.kind==='Partner').length,1);
  assert.ok(isSaveGame(s));
