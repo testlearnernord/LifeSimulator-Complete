@@ -204,3 +204,21 @@ html,body,#app{background:#e3e9f1}
 .acting-credit b{font-size:14px;color:#0b639b}
 .acting-credit small{font-size:12px;color:#687e8d;line-height:1.5}
 @media(max-width:390px){.acting-summary .row{gap:7px;flex-wrap:wrap}.acting-summary .smallbtn{min-height:40px}}
+
+
+/* Progressive crime career: fictional game indicators, not operational instructions */
+.crime-dashboard{padding:13px;background:#fff;border-bottom:1px solid #bed0dd}
+.crime-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding-bottom:9px}
+.crime-summary>div{display:flex;flex-direction:column;gap:6px;align-items:center;padding:10px 3px;background:#f1f5f9;border:1px solid #d5e0e7;border-radius:5px;text-align:center}
+.crime-summary small{font-size:10px;color:#657b8c}
+.crime-summary b{font-size:12px;color:#155f91}
+.crime-skill{display:grid;gap:6px;margin:9px 0}
+.crime-skill>div:first-child{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#1c618d}
+.crime-skill .meter{height:11px}
+.crime-contact{padding:12px 13px;background:white;border-bottom:1px solid #bdcddb}
+.crime-contact-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.crime-contact-head b{font-size:13px;color:#0e6597}
+.crime-contact-head span{font-size:11px;color:#688292}
+.crime-contact .row{gap:6px;flex-wrap:wrap}
+.crime-contact .smallbtn{min-height:40px}
+@media(max-width:390px){.crime-summary b{font-size:11px}.crime-contact .smallbtn{font-size:11px;padding:7px}}
