@@ -6,6 +6,7 @@ import {PREMIUM_CATALOG,PREMIUM_GROUPS} from './engine/premium-catalog.js';
 import {FINANCIAL_ASSETS,getMarketPrice,portfolioValue} from './engine/investments.js';
 import {MUSIC_ROLES,musicSkill,musicActive} from './engine/music.js';
 import {ACTING_OFFERS,actingActive,actingOffersFor} from './engine/acting.js';
+import {CRIME_TYPES,CRIME_LABELS,CRIME_RANKS,crimeRisk,criminal} from './engine/crime.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -195,9 +196,39 @@ function renderAssets(p:Person){
  ${menuRow('📱','Social Media','Online-Profile und Reichweite','tab','activities')}
  </div>`;
 }
+
+function renderCrime(p:Person,jailed=false){
+ const c=criminal(p);
+ const contacts=c.network.filter(x=>x.active);
+ const history=CRIME_TYPES.map(type=>`<div class="crime-skill"><div><b>${html(CRIME_LABELS[type])}</b><span>${c.skills[type]||0}%</span></div><div class="meter"><div style="width:${c.skills[type]||0}%"></div></div></div>`).join('');
+ const contactRows=contacts.map(x=>`<div class="crime-contact"><div class="crime-contact-head"><b>🕶️ ${html(x.name)}</b><span>${html(x.origin)} · Vertrauen ${x.trust}%</span></div><p class="small">Einfluss ${x.influence}% · Zuletzt gesehen mit ${x.lastMetAge} Jahren</p>
+ <div class="row">${button('Vertrauen aufbauen','crime','build-trust|'+x.id,'smallbtn')}
+ ${jailed&&x.origin==='Haft'?button('Von Erfahrung lernen','crime','mentor|'+x.id+'|pickpocket','smallbtn'):''}</div>
+ ${jailed&&x.origin==='Haft'?button('Einbruch-Erfahrungen','crime','mentor|'+x.id+'|burglary','ghost smallbtn'):''}
+ </div>`).join('');
+ return `${heading('Unterwelt und Erfahrung')}<div class="crime-dashboard">
+ <div class="crime-summary"><div><small>Rang</small><b>${CRIME_RANKS[c.rank]}</b></div><div><small>Respekt</small><b>${c.respect}%</b></div><div><small>Fahndungsdruck</small><b>${c.heat}%</b></div></div>
+ <p class="small">${c.successes} erfolgreiche Aktionen · ${c.failures} Festnahmen · ${c.probationYears} Jahre Bewährung · ${contacts.length} Kontakte</p>
+ <p class="small">Fertigkeiten wachsen mit Erfahrung. Kontakte können fördern, enttäuschen oder abreißen.</p>
+ ${history}</div>
+ ${heading(jailed?'Bekanntschaften in der Haft':'Kontakte aufbauen')}
+ <div class="stack">
+ ${menuRow('🤝',jailed?'Mitgefangenen kennenlernen':'Neue Szene-Bekanntschaft','Ein neuer Kontakt kann spätere Wege eröffnen','crime','meet',p.age<16)}
+ ${contacts.length?contactRows:'<div class="info-card">Du hast noch keine Kontakte.</div>'}</div>
+ ${jailed?`${heading('Gefängnisalltag')}<div class="well">Mitgefangene können deine Spielfertigkeiten beeinflussen. Sie bieten keine Garantie für eine erfolgreiche kriminelle Laufbahn.</div>`:
+ `${heading('Straftaten')}<div class="well">Zwei Versuche pro Jahr. Alter, Erfahrung, Vorstrafen, Fahndungsdruck, Intelligenz und Kontakte verändern die Entdeckungswahrscheinlichkeit.</div><div class="stack">
+ ${CRIME_TYPES.map((type,i)=>menuRow(['🛍️','👜','🏠'][i],CRIME_LABELS[type],'Entdeckungsrisiko derzeit: '+Math.round(crimeRisk(p,type)*100)+'%','crime',type,p.age<12)).join('')}</div>
+ ${heading('Kriminelles Netzwerk')}<div class="stack">
+ ${menuRow('🕸️','Ins Netzwerk aufgenommen werden','Erfordert 15 Respekt und einen vertrauenswürdigen Kontakt','crime','join',p.age<18||c.rank>0||c.respect<15||!contacts.some(x=>x.trust>=35))}
+ ${menuRow('📦','Gemeinsamer Auftrag','Ein abstrakter Auftrag mit Gewinn- und Haftchancen','crime','crew-job',p.age<18||c.rank===0||!contacts.some(x=>x.trust>=35))}
+ ${menuRow('🏅','Aufsteigen','Neue Verantwortung durch Respekt und Erfahrung','crime','promote',p.age<18||c.rank===0||c.rank>=3||c.respect<(c.rank===1?38:68)||c.successes<(c.rank===1?2:5))}
+ ${menuRow('🚪','Netzwerk verlassen','Mit der bisherigen Laufbahn brechen','crime','leave',c.rank===0)}
+ ${menuRow('🌱','Neustart','Bewährung und Fahndungsdruck verbessern','crime','rehabilitate',p.age<18)}</div>`}
+ `;
+}
 function renderActivities(p:Person){
  const jailed=p.prisonYears>0;
- if(jailed){return `<div class='panel-intro'><span class='panel-emoji'>🔒</span><div><h2>Gefängnis</h2><span>Reststrafe: ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'}</span></div></div><div class='prison-warning'>Arbeiten, Reisen, Einkaufen und weitere Straftaten sind während der Haft gesperrt.</div>${heading('Haftalltag')}<div class='stack'>${card('📚','Gefängnisbibliothek','Wissen aufbauen','activity','prison:library','Lesen')}${card('🏃','Hofgang','Fitness und Stimmung verbessern','activity','prison:yard','Trainieren')}${card('🧘','Meditation in der Zelle','Stress abbauen','activity','prison:meditate','Meditieren')}${card('🧹','Gefängnisarbeit','80 € für erledigte Aufgaben','activity','prison:job','Arbeiten')}</div>`;}
+ if(jailed){return `<div class='panel-intro'><span class='panel-emoji'>🔒</span><div><h2>Gefängnis</h2><span>Reststrafe: ${p.prisonYears} ${p.prisonYears===1?'Jahr':'Jahre'}</span></div></div><div class='prison-warning'>Arbeiten, Reisen, Einkaufen und weitere Straftaten sind während der Haft gesperrt.</div>${renderCrime(p,true)}${heading('Haftalltag')}<div class='stack'>${card('📚','Gefängnisbibliothek','Wissen aufbauen','activity','prison:library','Lesen')}${card('🏃','Hofgang','Fitness und Stimmung verbessern','activity','prison:yard','Trainieren')}${card('🧘','Meditation in der Zelle','Stress abbauen','activity','prison:meditate','Meditieren')}${card('🧹','Gefängnisarbeit','80 € für erledigte Aufgaben','activity','prison:job','Arbeiten')}</div>`;}
  const option=(emoji:string,title:string,description:string,id:string)=>`<button class='list-entry category-row' data-action='category' data-id='${id}'><span class='list-emoji'>${emoji}</span><span class='list-text'><b>${title}</b><small>${description}</small></span><span class='chevron'>›</span></button>`;
  if(!activitySection){return `<div class='screen-welcome'>Wähle eine Aktivität. Mit jedem Lebensjahr ändern sich die verfügbaren Möglichkeiten.</div>
  ${heading('Besondere Aktivitäten')}<div class='stack'>
@@ -244,7 +275,7 @@ function renderActivities(p:Person){
  if(activitySection==='music')return `${back}${renderMusic(p)}`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
  if(activitySection==='love')return `${back}${heading('Liebe und Familie')}<div class='stack'>${card('💕','Partnersuche','Neue Beziehung beginnen','activity','date','Suchen',p.age<16||p.relationships.some(r=>r.kind==='Partner'&&r.alive))}${card('👶','Nachwuchs','Versucht, Eltern zu werden','activity','child','Versuchen',p.age<18||p.age>55||!p.relationships.some(r=>r.kind==='Partner'&&r.alive))}</div>`;
- if(activitySection==='crime')return `${back}<div class='prison-warning'>⚠️ Straftaten können zu Geldstrafen, Vorstrafen und Gefängnis führen. Maximal zwei Versuche je Lebensjahr.</div>${heading('Straftaten')}<div class='stack'>${card('👜','Taschendiebstahl','Mittleres Risiko, kleiner Gewinn','activity','crime:pickpocket','Versuchen',p.age<12)}${card('🛍️','Ladendiebstahl','Geringeres Risiko und geringere Beute','activity','crime:shoplift','Versuchen',p.age<12)}${card('🏠','Einbruch','Hohes Risiko und höhere Beute','activity','crime:burglary','Versuchen',p.age<12)}</div>`;
+ if(activitySection==='crime')return `${back}${renderCrime(p)}`;
  if(activitySection==='social')return `${back}<div class='panel-intro'><span class='panel-emoji'>📱</span><div><h2>Social Media</h2><span>Berühmt werden und Werbepartner finden</span></div></div><div class='info-card'>Bekanntheit: <b>${p.fame??0}%</b> · Reichweite: <b>${Object.values(p.social||{}).reduce((sum,profile)=>sum+(profile?.followers||0),0).toLocaleString('de-DE')} Follower</b><p class='small'>Beiträge sind auf drei pro Plattform und Jahr begrenzt. Ab 10.000 Followern sind Werbedeals möglich.</p></div><div class='stack'>${SOCIAL_PLATFORMS.map(platform=>{const profile=p.social?.[platform];return `<article class='social-card'><h3>📣 ${html(platform)}</h3><p>${profile?profile.followers.toLocaleString('de-DE')+' Follower · '+profile.posts+' Beiträge':'Du hast noch kein Profil.'}</p><div class='row'>${!profile?button('Profil anlegen','social',platform+'|join','smallbtn',p.age<13):button('Beitrag veröffentlichen','social',platform+'|post','smallbtn')}${profile?button('Werbedeal','social',platform+'|sponsor','smallbtn',profile.followers<10000):''}${profile?button('Konto löschen','social',platform+'|delete','ghost smallbtn'):''}</div></article>`;}).join('')}</div>`;
  if(activitySection==='travel')return `${back}${heading('Reisen und Wohnen')}<div class='stack'>${card('🌴','Urlaub machen','2.000 € · Glück verbessern','activity','vacation','Buchen',p.age<18||p.cash<2000)}</div>${heading('Auswandern')}<div class='info-card'><label class='field'>Zielland<select id='country-select'>${opt(COUNTRIES.filter(x=>x!==p.country),COUNTRIES.find(x=>x!==p.country)||'')}</select></label><p class='small'>3.500 € für den Umzug. Bestehende Anstellung endet.</p>${button('Auswandern','emigrate','','button-wide',p.age<18||p.cash<3500)}</div>`;
  if(activitySection==='leisure')return `${back}${heading('Freizeit')}<div class='stack'>${card('🚶','Spazieren gehen','Mehr Gesundheit und Zufriedenheit','activity','walk','Gehen')}${card('🤝','Freiwilligenarbeit','Ruf und Wohlbefinden verbessern, ab 14','activity','volunteer','Helfen',p.age<14)}${card('🎟️','Lotterielos','20 € je Los · seltene hohe Gewinne','activity','lottery','Spielen',p.age<18||p.cash<20)}</div>`;
@@ -318,6 +349,7 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='export'){if(current)exportGame(current);return;}
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
+ else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
  else if(kind==='actor'){const sep=id.indexOf('|');await action({type:'ACTOR',key:(sep>=0?id.slice(0,sep):id) as 'lesson'|'extra'|'hire-agent'|'fire-agent'|'agent-search'|'audition'|'rehearse'|'quit',offerId:sep>=0?id.slice(sep+1):undefined});}
  else if(kind==='music'){const args=id.split('|');await action({type:'MUSIC',key:args[0] as 'practice'|'audition'|'single'|'album'|'concert'|'tour'|'promote'|'quit',mode:args[0]==='audition'?args[1] as 'Solo'|'Band':undefined,role:(args[0]==='practice'?args[1]:args[0]==='audition'?args[2]:undefined) as import('./engine/types.js').MusicRole|undefined});}
    else if(kind==='family'){const sep=id.indexOf('|');await action({type:'FAMILY',key:(sep>=0?id.slice(0,sep):id) as 'meet'|'family-day'|'apologize'|'assist'|'teach-child'|'reconcile'|'divorce'|'distance',id:sep>=0?id.slice(sep+1):undefined});}
