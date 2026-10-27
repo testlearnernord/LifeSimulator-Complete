@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.6.0 (2026-10-27).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.7.0 (2026-10-27).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -148,3 +148,15 @@ Details in [SCREENSHOT_GAP_ANALYSIS.md](SCREENSHOT_GAP_ANALYSIS.md).
 Neu: Geburtsstadt, Sternzeichen, Elternberuf, persönliche Profilkarte, blaue Vollbild-Untermenüs, gruppierte Beziehungen, screenshotbasierte Besitz-/Activity-Listen. Neu spielbar: Adoption, Fruchtbarkeitsbehandlung, Führerschein, Kredite mit Zins und Tilgung, Identität, Accessoires und vereinfachtes Casino. Weiter offen: Museum, Auktionen, Casino-Besitz, Zoo, Racing, Vampire, Outdoor und viele Activity-Einträge.
 
 **Wichtig:** Die Original-BitLife-Mechaniken für diese Aktivitäten sind nicht öffentlich vollständig dokumentiert. Implementierte Wahrscheinlichkeiten, Gebühren und Einschränkungen sind ein eigenes, getestetes Modell.
+
+## Entwicklungsstand 0.7.0
+
+| Bereich | Status | Tatsächlich spielbar |
+|---|---|---|
+| Schule und Zeugnis | Teilweise | Leistung, Anwesenheit, Disziplin, Lehrer, Schülerkontakte, Nachhilfe, Schwänzen und vier AGs |
+| Schulabschluss | Teilweise | Abschluss mit Leistungsbewertung, modelliertes Stipendium bei Studium mit sehr guten Noten |
+| Konflikte mit Mitschülern | Teilweise | Entscheidung Lehrkraft, Deeskalation oder Gegenangriff mit Folgen |
+| Krankheiten | Teilweise | Erkältung, Grippe, Erschöpfung mit begrenzten jährlichen Wirkungen und Genesung |
+| Arzt, Behandlung und Therapie | Teilweise | Diagnose, Behandlung, Gespräch und Erholung; noch keine komplexen Diagnosen, OPs oder Versicherungen |
+
+Details und verbleibende Lücken: [SCHOOL_HEALTH_DESIGN.md](SCHOOL_HEALTH_DESIGN.md).
