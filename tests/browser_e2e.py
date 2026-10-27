@@ -28,7 +28,7 @@ with sync_playwright() as playwright:
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     expect(page.get_by_text('Fitnessstudio')).to_be_visible()
     expect(page.locator('[data-action="category"][data-id="social"]')).to_be_disabled()
-    page.locator('[data-action="category"][data-id="mind"]').click()
+    page.locator('[data-action="category"][data-id="mind"]').first.click()
     expect(page.get_by_text('Fitnessstudio', exact=True)).to_be_visible()
     page.locator('[data-action="category"][data-id=""]').click()
     page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
