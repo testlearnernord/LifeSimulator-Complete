@@ -389,3 +389,79 @@ test('corrupt extended biographies, debts and relationships are rejected; legacy
  delete copy.person.birthCity;delete copy.person.birthday;delete copy.person.zodiac;delete copy.person.birthStory;
  assert.equal(isSaveGame(copy),true);
 });
+
+
+test('school report appears at six and changes through study and attendance',()=>{
+ let s=advance(born(),6);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ assert.ok(s.person.schoolRecord);
+ const first=s.person.grades;
+ s=applyAction(s,{type:'EDUCATION',key:'study'});
+ assert.ok(s.person.grades>first);
+ assert.equal(s.person.grades,s.person.schoolRecord.performance);
+ s=applyAction(s,{type:'EDUCATION',key:'study'});
+ assert.throws(()=>applyAction(s,{type:'EDUCATION',key:'study'}),/dieses Jahr/);
+ assert.ok(isSaveGame(s));
+});
+test('school life actions have consequences, annual limits, and age restrictions',()=>{
+ let s=advance(born(),12);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.cash=500;
+ s=applyAction(s,{type:'EDUCATION',key:'club',club:'technik'});
+ assert.equal(s.person.schoolRecord.club,'technik');
+ assert.throws(()=>applyAction(s,{type:'EDUCATION',key:'club',club:'musik'}),/dieses Jahr/);
+ const initial=s.person.schoolRecord.attendance;
+ s=applyAction(s,{type:'EDUCATION',key:'skip'});
+ assert.ok(s.person.schoolRecord.attendance<initial);
+ s=applyAction(s,{type:'EDUCATION',key:'tutor'});
+ assert.equal(s.person.cash,350);
+ assert.ok(isSaveGame(s));
+ assert.throws(()=>applyAction(born(),{type:'EDUCATION',key:'study'}),/Schulzeit/);
+});
+test('school conflicts can be resolved and affect discipline',()=>{
+ let s=advance(born(),12);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.pending={id:'school-issue',heading:'Schulkonflikt',detail:'Streit',options:[{label:'Lehrer',kind:'schoolHelp'},{label:'Streit',kind:'schoolFight'}]};
+ const before=s.person.schoolRecord.discipline;
+ s=applyAction(s,{type:'EVENT',kind:'schoolFight'});
+ assert.ok(s.person.schoolRecord.discipline<before);
+ assert.equal(s.person.pending,null);
+ assert.ok(isSaveGame(s));
+});
+test('annual school attendance recovers, grades remain bounded, graduation persists',()=>{
+ let s=advance(born(),12);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.schoolRecord.attendance=25;
+ s.person.schoolRecord.performance=32;s.person.grades=32;
+ s=advance(s,6);
+ assert.equal(s.person.age,18);
+ assert.ok(s.person.grades>=0&&s.person.grades<=100);
+ assert.ok(s.person.history.some(x=>x.text.includes('Schulzeit')));
+ assert.ok(isSaveGame(s));
+});
+test('illness checkups, therapies and treatment have medical and financial consequences',()=>{
+ let s=advance(born(),18);
+ if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+ s.person.illness={kind:'Grippe',severity:80,years:0,diagnosed:false};
+ s.person.cash=3000;
+ assert.throws(()=>applyAction(s,{type:'MEDICAL',key:'treat'}),/untersuchen/);
+ s=applyAction(s,{type:'MEDICAL',key:'checkup'});
+ assert.equal(s.person.illness.diagnosed,true);
+ s=applyAction(s,{type:'MEDICAL',key:'treat'});
+ assert.ok(s.person.illness===null||s.person.illness.severity<80);
+ assert.equal(s.person.cash,2550);
+ s=applyAction(s,{type:'MEDICAL',key:'therapy'});
+ assert.equal(s.person.cash,2330);
+ assert.ok(isSaveGame(s));
+});
+test('school and health save fields reject malformed payloads but preserve legacy saves',()=>{
+ const original=born();
+ const legacy=structuredClone(original);
+ delete legacy.person.grades;
+ delete legacy.person.schoolRecord;
+ delete legacy.person.illness;
+ assert.ok(isSaveGame(legacy));
+ assert.equal(isSaveGame({...original,person:{...original.person,schoolRecord:{performance:120,attendance:95,discipline:60,club:'sport'}}}),false);
+ assert.equal(isSaveGame({...original,person:{...original.person,illness:{kind:'Grippe',severity:-1,years:0,diagnosed:true}}}),false);
+ assert.equal(isSaveGame({...original,person:{...original.person,illness:{kind:'Wrong',severity:30,years:0,diagnosed:true}}}),false);
+});
