@@ -217,7 +217,7 @@ function renderCrime(p:Person,jailed=false){
  ${contacts.length?contactRows:'<div class="info-card">Du hast noch keine Kontakte.</div>'}</div>
  ${jailed?`${heading('Gefängnisalltag')}<div class="well">Mitgefangene können deine Spielfertigkeiten beeinflussen. Sie bieten keine Garantie für eine erfolgreiche kriminelle Laufbahn.</div>`:
  `${heading('Straftaten')}<div class="well">Zwei Versuche pro Jahr. Alter, Erfahrung, Vorstrafen, Fahndungsdruck, Intelligenz und Kontakte verändern die Entdeckungswahrscheinlichkeit.</div><div class="stack">
- ${CRIME_TYPES.map((type,i)=>menuRow(['🛍️','👜','🏠'][i],CRIME_LABELS[type],'Entdeckungsrisiko derzeit: '+Math.round(crimeRisk(p,type)*100)+'%','crime',type,p.age<12)).join('')}</div>
+ ${CRIME_TYPES.map((type,i)=>menuRow(['🛍️','👜','🏠'][i]!,CRIME_LABELS[type],'Entdeckungsrisiko derzeit: '+Math.round(crimeRisk(p,type)*100)+'%','crime',type,p.age<12)).join('')}</div>
  ${heading('Kriminelles Netzwerk')}<div class="stack">
  ${menuRow('🕸️','Ins Netzwerk aufgenommen werden','Erfordert 15 Respekt und einen vertrauenswürdigen Kontakt','crime','join',p.age<18||c.rank>0||c.respect<15||!contacts.some(x=>x.trust>=35))}
  ${menuRow('📦','Gemeinsamer Auftrag','Ein abstrakter Auftrag mit Gewinn- und Haftchancen','crime','crew-job',p.age<18||c.rank===0||!contacts.some(x=>x.trust>=35))}
