@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.10.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.11.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -130,3 +130,13 @@ Die kostenlose, eigenständige **Schauspielkarriere** ist in **Beruf → Schausp
 **Nicht vollständig:** Eigene Drehbuch-/Regieentscheidungen, dynamische Produktionen, Vertragsverhandlungen, Filmteams und komplexe Awards fehlen weiterhin. Alle Titel, Zahlen, Grafiken und Spielregeln sind unabhängig gestaltet, ohne BitLife-Dateien oder fremde Kauf-Lizenzen.
 
 [Recherche und technische Dokumentation](docs/ACTOR_CAREER.md).
+
+## Lebenslinien 0.11.0: Kriminalität mit Fortschritt und Kontakten
+
+Die bisher starre Wahrscheinlichkeit wurde durch ein eigenes **Kriminalitäts-, Kontakt- und Unterweltkarrieresystem** ersetzt. Jetzt bestimmen Deliktart, Erfahrung, Intelligenz, Vorstrafen, Fahndungsdruck, Kontakte und eine mögliche Bewährungszeit deine Erfolgschancen. Die drei Verbrechensarten haben getrennte Fähigkeiten, die durch Versuche und Erfahrungen steigen.
+
+Besonderer Schwerpunkt: **Mitgefangene kennenlernen, Vertrauen aufbauen, von ihren Erfahrungen lernen und die Kontakte nach der Freilassung behalten.** Mit Respekt und Kontakten werden Unterweltaufträge und Karrierestufen möglich, inklusive Verrat und Kontaktverlust. Wer aussteigen möchte, kann das Netzwerk verlassen und einen Neustart versuchen.
+
+Während eines Haftjahres entstehen nur noch **600 € Lebenshaltungskosten** statt 6.500/9.500 €. Alte Schulden werden nicht rückwirkend verändert.
+
+Alle neuen Aktionen sind eigene, fiktive Gameplaymechaniken unter **Aktivitäten → Kriminalität** und in den **Gefängnisaktivitäten**. Das komplette Mafia Job Pack ist noch **nicht** implementiert. [Regeln und technische Details](docs/CRIME_CAREER.md).
