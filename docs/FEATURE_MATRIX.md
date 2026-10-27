@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.7.0 (2026-10-27).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.8.0 (2026-10-27).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -160,3 +160,15 @@ Neu: Geburtsstadt, Sternzeichen, Elternberuf, persönliche Profilkarte, blaue Vo
 | Arzt, Behandlung und Therapie | Teilweise | Diagnose, Behandlung, Gespräch und Erholung; noch keine komplexen Diagnosen, OPs oder Versicherungen |
 
 Details und verbleibende Lücken: [SCHOOL_HEALTH_DESIGN.md](SCHOOL_HEALTH_DESIGN.md).
+
+## Beziehungen und Familie: Version 0.8.0
+
+| System | Stand | Spielbare Wirkung |
+|---|---|---|
+| Freundschaften | Teilweise | Neue Freunde finden, Kontakt pflegen, Vertrauen und Bindung |
+| Eltern und Familie | Teilweise | Familientag, Entschuldigen, Finanzhilfe, Kontaktabbruch und Versöhnung |
+| Kinder | Teilweise | Entwicklungswert, gezielte Förderung, jährlicher Unterhalt und Einfluss auf den Generationswechsel |
+| Partnerschaft | Teilweise | Trennung als lebender Ex-Partner, Versöhnung, Hochzeit und modellierte Scheidung |
+| Langfristige Konsequenzen | Teilweise | Kontaktpausen, schwindende Bindung, Unterhaltskosten, Familie bei der Erbschaft |
+
+[Ausführliche technische Dokumentation](FAMILY_RELATIONSHIPS.md). Es handelt sich um eine eigenständige Simulation mit eigenen Wahrscheinlichkeiten und vereinfachten Regeln, nicht um eine vollständige Nachbildung aller BitLife-Partnerschaftsfunktionen.
