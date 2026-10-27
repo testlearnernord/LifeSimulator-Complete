@@ -2,6 +2,7 @@ import {CAREERS,COUNTRIES,ITEMS,LAST_NAMES,NAMES} from './catalog.js';
 import type {Action,Entry,NewLife,Pending,Person,Relationship,SaveGame,Stat} from './types.js';
 import {advanceExpansions,businessAction,rentalAction,socialAction,validExtensions} from './expansions.js';
 import {advanceInvestments,investAction,portfolioValue,validInvestments} from './investments.js';
+import {advanceLifestyle,lifestyleAction,validLifestyle} from './lifestyle.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -19,6 +20,10 @@ const expansionHooks=(s:SaveGame):ExpansionHooks=>({
 });
 const lockedUp=(p:Person)=>p.prisonYears>0;
 const requireFree=(p:Person)=>{if(lockedUp(p))throw Error('Während der Haft ist diese Aktivität nicht möglich. Öffne die Gefängnisaktivitäten.');};
+const CITIES:Record<string,string[]>={Deutschland:['Hamburg','Berlin','Köln','Kiel'],USA:['New York','Miami','Chicago'],Großbritannien:['London','Manchester'],Brasilien:['São Paulo','Rio de Janeiro'],Portugal:['Lissabon','Porto'],Frankreich:['Paris','Lyon'],Japan:['Tokio','Osaka'],Kanada:['Toronto','Vancouver'],Australien:['Sydney','Melbourne'],Indien:['Mumbai','Delhi']};
+const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const ZODIAC=['Steinbock','Wassermann','Fische','Widder','Stier','Zwillinge','Krebs','Löwe','Jungfrau','Waage','Skorpion','Schütze'];
+const OCCUPATIONS=['Verwaltungsangestellte/r','Elektriker/in','Pflegekraft','Lehrer/in','Büroangestellte/r','Koch/Köchin','Techniker/in'];
 const relation=(s:SaveGame,kind:Relationship['kind'],age:number):Relationship=>({id:uid(s),name:`${pick(s,NAMES)} ${pick(s,LAST_NAMES)}`,kind,gender:kind==='Mutter'?'weiblich':kind==='Vater'?'männlich':chance(s,.5)?'weiblich':'männlich',age,bond:clamp(35+rng(s)*50),alive:true});
 const event=(s:SaveGame,heading:string,detail:string,options:Pending['options'])=>{s.person.pending={id:uid(s),heading,detail,options};};
 function schoolFor(age:number,uniYears:number,degree:boolean):Person['school']{if(age<6)return 'Kindergarten';if(age<11)return 'Grundschule';if(age<18)return 'Weiterführende Schule';if(uniYears>0)return 'Universität';return 'Abgeschlossen';}
@@ -29,8 +34,19 @@ export function createLife(input:NewLife):SaveGame{
  const s:SaveGame={schema:1,id:`life-${seed.toString(16)}-${Date.now()}`,title:name,updated:Date.now(),seed,person:p,ancestry:[],adminFullAccess:true};
  p.stats.smarts=clamp(30+rng(s)*60);p.stats.looks=clamp(30+rng(s)*60);
  if(input.stats){for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=input.stats[key];if(value===undefined)continue;if(!Number.isFinite(value)||!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');p.stats[key]=value;}}
- p.relationships.push(relation(s,'Mutter',22+Math.floor(rng(s)*18)),relation(s,'Vater',22+Math.floor(rng(s)*18)));
- log(s,`Du wurdest in ${p.country} geboren. Deine Geschichte beginnt.`,'good');
+ const month=Math.floor(rng(s)*12),day=1+Math.floor(rng(s)*28);
+ const starMonth=month+1; const z=starMonth===12&&day>=22?0:starMonth===1&&day>=20?1:starMonth===2&&day>=19?2:starMonth===3&&day>=21?3:starMonth===4&&day>=20?4:starMonth===5&&day>=21?5:starMonth===6&&day>=21?6:starMonth===7&&day>=23?7:starMonth===8&&day>=23?8:starMonth===9&&day>=23?9:starMonth===10&&day>=23?10:starMonth===11&&day>=22?11:Math.max(0,month===0?0:month);
+ p.birthday=`${day}. ${MONTHS[month]}`;p.zodiac=ZODIAC[z];p.birthCity=pick(s,CITIES[p.country]||['Eine Stadt']);
+ const mother=relation(s,'Mutter',22+Math.floor(rng(s)*19));mother.occupation=pick(s,OCCUPATIONS);p.relationships.push(mother);
+ const bothParents=chance(s,.72);
+ if(bothParents){const father=relation(s,'Vater',23+Math.floor(rng(s)*20));father.occupation=pick(s,OCCUPATIONS);p.relationships.push(father);}
+ const origin=bothParents?'Du wächst bei deinen Eltern auf.':'Deine Mutter zieht dich allein groß.';
+ p.birthStory=`Du wurdest in ${p.birthCity}, ${p.country} geboren. ${origin} Dein Geburtstag ist der ${p.birthday} und dein Sternzeichen ist ${p.zodiac}.`;
+ log(s,p.birthStory);
+ log(s,`Du heißt ${p.name}.`);
+ log(s,`Deine Mutter heißt ${mother.name} und arbeitet als ${mother.occupation} (${mother.age} Jahre).`);
+ const father=p.relationships.find(r=>r.kind==='Vater');
+ if(father)log(s,`Dein Vater heißt ${father.name} und arbeitet als ${father.occupation} (${father.age} Jahre).`);
  return s;
 }
 function yearlyEvent(s:SaveGame){const p=s.person;
@@ -52,6 +68,7 @@ function age(s:SaveGame){const p=s.person;p.age++;p.yearlyActions={};p.school=sc
  p.cash-=expense+assetExpense;
  advanceExpansions(s,expansionHooks(s));
  advanceInvestments(s,expansionHooks(s));
+ advanceLifestyle(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
  if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
@@ -198,6 +215,9 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
+ case 'LIFESTYLE':lifestyleAction(s,action.key,action.value,expansionHooks(s),()=>{
+    const child=relation(s,'Kind',0);child.bond=82;s.person.relationships.push(child);
+   });break;
  case 'INVEST':investAction(s,action.key,action.assetId,action.quantity,expansionHooks(s));break;
  case 'SOCIAL':socialAction(s,action.key,action.platform,expansionHooks(s));break;
   case 'BUSINESS':businessAction(s,action.key,action.sector,expansionHooks(s));break;
@@ -228,7 +248,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
