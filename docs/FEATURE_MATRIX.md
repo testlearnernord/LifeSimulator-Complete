@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.8.0 (2026-10-27).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.9.0 (2026-10-27).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -172,3 +172,13 @@ Details und verbleibende Lücken: [SCHOOL_HEALTH_DESIGN.md](SCHOOL_HEALTH_DESIGN
 | Langfristige Konsequenzen | Teilweise | Kontaktpausen, schwindende Bindung, Unterhaltskosten, Familie bei der Erbschaft |
 
 [Ausführliche technische Dokumentation](FAMILY_RELATIONSHIPS.md). Es handelt sich um eine eigenständige Simulation mit eigenen Wahrscheinlichkeiten und vereinfachten Regeln, nicht um eine vollständige Nachbildung aller BitLife-Partnerschaftsfunktionen.
+
+## Zusatzinhalte – neuer Stand 0.9.0
+
+| Kaufbares Original-Feature | Status in Lebenslinien | Umgesetzte Funktionen |
+|---|---|---|
+| Musician Job Pack | **P – teilweise spielbar** | Gesang, Instrumente, Solo/Band-Vorspiele, Verträge, Pop/Rock/Hip-Hop/Country/Electronic, Singles/Alben, Diskografie, Konzerte, Tourneen, Tantiemen und eigene Popularität |
+| Music Producer Job Pack | **O – offen** | Keine Produzentenkarriere, Künstlerverträge, Kollaborationen oder eigene Musiklabels |
+| Actor, Astronaut, Mafia, Model, Politician, Pro Athlete, Street Hustler | **O – offen** | Karriere-Packs sind noch nicht im erforderlichen Umfang implementiert |
+
+Vollständige Einordnung und Quellen: [MUSICIAN_CAREER.md](MUSICIAN_CAREER.md). Mechaniken und Erfolgswahrscheinlichkeiten sind eigene Modelle.
