@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.13.0 (2026-10-28).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.14.0 (2026-10-28).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -31,14 +31,14 @@
 | Familie | Fruchtbarkeit / medizinische Betreuung | H | O | Keine differenzierten Systeme |
 | Familie | Golden Pacifier (Kinderzahl, Geschlecht, Talente) | H | O | Kaufitem nur als Referenz |
 | Beziehungen | Interaktion / Kompliment / Streit | A,H | S | Beziehungspunkte, Geschenke, gemeinsame Zeit, detaillierte Personenmenüs |
-| Beziehungen | Beziehungen zu Boss/Lehrern | H | O | Noch kein NPC-Arbeits-/Schulnetz |
+| Beziehungen | Beziehungen zu Boss/Lehrern | H | P | Eigenes Arbeitsnetz mit Chef und Kollegen; Lehrerbeziehungen weiterhin nur teilweise |
 | Beziehungen | Freundschaft | A | P | Ereignisbasiert und Interaktionen |
 | Schule | Schule / Schulpflicht | A | P | Altersstufen und Lernaktion |
 | Schule | Universität | H,C | S | Vierjährige Ausbildung, Abschluss-Flag |
 | Schule | Weitere Studienrichtungen / akademische Titel | H,C | O | Noch keine vollständigen Ausbildungspfade |
-| Karriere | Klassischer Vollzeitberuf | H,C | S | Acht eigene Karriereprofile |
-| Karriere | Bewerbung / Gehalt / Beschäftigung | H,C | P | Voraussetzungen und Jahresverdienst, kein Interview |
-| Karriere | Beförderung und Karriereleiter | H,C | P | Leistungswert, Gehaltsverhandlung, Bonus durch Beförderung; noch keine vollständigen Jobränge |
+| Karriere | Klassischer Vollzeitberuf | H,C | S | Zwölf eigene Karriereprofile |
+| Karriere | Bewerbung / Gehalt / Beschäftigung | H,C | P | Vorstellungsgespräch mit Absagechance, Voraussetzungen und Jahresverdienst; eigene Regeln |
+| Karriere | Beförderung und Karriereleiter | H,C | P | Leistung, vier interne Stufen, Chefbeziehung, Bonus, Abmahnungen und Kündigung; keine Originalränge |
 | Karriere | Teilzeitjobs | W | O | Noch nicht integriert |
 | Karriere | Militär | W | O | Keine Einsätze, Laufbahnen oder Minenfelder |
 | Karriere | Fame / Berühmtheit | H | O | Kein Fame-System |
@@ -54,7 +54,7 @@
 | Karriere | Model Job Pack | W | O | Nicht implementiert |
 | Karriere | Dealer Job Pack | W | O | Nicht implementiert |
 | Karriere | Music Producer Job Pack (2026) | A | O | Offiziell im Januar 2026 erwähnt |
-| Spezialmodus | Ultimate Fighter Mode (2026) | A,N | O | Kampfstil, Fighting League, 100+ Moves laut Store |
+| Spezialmodus | Ultimate Fighter Mode (2026) | A,N | O | Kampfstil, Fighting League, 200+ Moves laut offizieller Ankündigung vom 11.06.2026 |
 | Finanzen | Einkommen und Ausgaben | A | S | Jährliche Gehälter und Unterhalt, modellierte Werte |
 | Finanzen | Schulden / negative Liquidität | A | P | Negativsaldo möglich, keine Kreditverträge |
 | Finanzen | Loans / Kredite (2026) | A | O | Offiziell April 2026 erwähnt |
@@ -108,6 +108,14 @@
 - Fußball, Basketball und Handball ab 8 Jahren trainieren; ab 18 sind Probetrainings in zwei fiktiven Ligen möglich. Gehaltsverhandlungen, Sponsoring, Saisonresultate, Meisterschaften, Verletzungen, Rehabilitation und Rücktritt haben Spielstandswirkungen.
 - Vertragsgehälter werden beim Jahreswechsel netto gezahlt, ältere Spielstände ohne `sportCareer` bleiben gültig. Zeitreise erfasst den neuen Zustand.
 - Referenz für die Existenz der **Pro Athlete**-Karriere: [offizielles BitLife-Help-Center](https://bitlifeapp.com/help/). Ligen, Vereine, Zahlen und Wahrscheinlichkeiten sind **eigene Entwürfe**. Kein Anspruch auf Vollständigkeit, kein echtes Lizenzpaket.
+
+### 0.14.0: Arbeitswelt mit Vorstellungsgesprächen und Teambeziehungen
+
+- Bewerbungen für zwölf reguläre Berufsprofile mit maximal drei Gesprächen jährlich, Zusagen und Absagen. Das vorherige Arbeitsverhältnis bleibt bei einer Absage bestehen.
+- Chef und zwei Kollegen mit Bindung und Fachkompetenz; Gespräche, Teamarbeit, Konflikte, vier Karrierestufen, Gehaltsaufschläge, jährliche Leistungsbeurteilung, Abmahnungen und Kündigung.
+- Bestehende Saves mit `schema: 1` bleiben gültig, da `workplace` optional ist. Neue Zustände werden geprüft und beim Rückspulen als Snapshot gespeichert.
+- **Referenzgrenze:** Der [offizielle App Store](https://apps.apple.com/de/app/bitlife-life-simulator/id1374403536) bestätigt Karriere und Entscheidungen als Spielbestandteil, aber nicht die konkreten Interview-/Teamformeln. Sämtliche Zahlen und Charaktere sind eigene Entwürfe. Technische Details: [WORKPLACE.md](WORKPLACE.md).
+- Die [offizielle UFM-Ankündigung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode) nennt inzwischen **200+ Moves**, nicht 100+. Das UFM-System bleibt offen.
 
 ## Offene Fragen zur Originaltreue
 

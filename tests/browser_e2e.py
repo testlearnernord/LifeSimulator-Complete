@@ -164,7 +164,33 @@ with sync_playwright() as playwright:
     import os
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
+    # Work career: real mobile UI, application, colleagues, save/reload.
+    page.evaluate("""async () => {
+        const {createLife, applyAction} = await import('/app/engine/simulation.js');
+        const {putGame} = await import('/app/storage/database.js');
+        let s = createLife({name:'Arbeitswelt E2E',gender:'divers',country:'Deutschland',seed:424242,
+          stats:{health:100,happiness:90,smarts:100,looks:100}});
+        while(s.person.age < 20){
+          if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+          s=applyAction(s,{type:'AGE'});
+        }
+        if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+        s.updated=Date.now()+100000;
+        await putGame(s);
+    }""")
+    page.reload(wait_until='networkidle')
+    expect(page.locator('.profile-name')).to_contain_text('Arbeitswelt E2E')
+    page.locator('nav [data-action="tab"][data-id="career"]').click()
+    page.locator('[data-action="job"][data-id="retail"]').click()
+    expect(page.get_by_text('Arbeitsumfeld', exact=True)).to_be_visible()
+    expect(page.get_by_text('Karrierestufe 1 von 4')).to_be_visible()
+    assert page.locator('[data-action="work"][data-id^="talk|"]').count() == 3
+    page.locator('[data-action="work"][data-id^="teamwork|"]').first.click()
+    page.reload(wait_until='networkidle')
+    page.locator('nav [data-action="tab"][data-id="career"]').click()
+    expect(page.get_by_text('Arbeitsumfeld', exact=True)).to_be_visible()
+    assert page.locator('[data-action="work"][data-id^="talk|"]').count() == 3
     assert not errors, f'Browser errors: {errors}'
-    print('v0.13 athlete, director, crime, acting, school, saves and offline: PASSED')
+    print('v0.14 workplace, athlete, director, crime, acting, school, saves and offline: PASSED')
     context.close()
     browser.close()

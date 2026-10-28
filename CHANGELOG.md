@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.0 – 2026-10-28 (Arbeitswelt)
+
+- Vorstellungsgespräche für reguläre Jobs, maximal drei Bewerbungen pro Jahr; Absagen erhalten bestehende Anstellungen.
+- Persistente Chef- und Kollegenkontakte, Gespräch, Teamarbeit, Streit, Leistungsbeurteilungen und vier Karrierestufen.
+- Gehaltsaufschläge, Abmahnungen und mögliche Entlassung; fiktive Namen und eigene Wahrscheinlichkeiten.
+- Optionaler `workplace`-Spielstandzustand mit Validierung, Legacy-Kompatibilität und Time-Machine-Snapshots.
+- Mobile Berufsoberfläche und automatisierte Tests für Bewerbungen, Kontakte, Beförderungen, Kündigung und Saves.
+
+
 ## 0.13.0 – 2026-10-28 (Eigenständige Profisport-Karriere)
 
 - Drei Sportarten, Jugendtraining und Profi-Probetrainings in zwei fiktiven Ligen.
