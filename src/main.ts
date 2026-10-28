@@ -159,6 +159,22 @@ function renderSport(p:Person){
  const archive=c?.seasons.length?heading('Saisonchronik')+'<div class="info-card">'+c.seasons.length+' Spielzeiten · '+c.titles+' Meistertitel</div>'+c.seasons.slice(-15).reverse().map(y=>'<div class="acting-credit"><b>Alter '+y.age+' · '+html(y.club)+(y.title?' 🏆':'')+'</b><small>'+html(y.league)+'liga · '+y.victories+' Siege · '+y.performance+' % Leistung · '+money(y.earnings)+' netto</small></div>').join(''):'';
  return intro+practice+recovery+career+archive;
 }
+function renderWorkplace(p:Person){
+ if(!p.jobId)return '';
+ const w=p.workplace;
+ if(!w||w.jobId!==p.jobId)return heading('Arbeitsumfeld')+
+  '<div class="info-card"><p>Dein früherer Spielstand hat noch kein Arbeitsteam.</p>'+
+  button('Team kennenlernen','work','introduce','button-wide',p.prisonYears>0)+'</div>';
+ const people=[w.boss,...w.coworkers];
+ return heading('Arbeitsumfeld','Karrierestufe '+(w.rank+1)+' von 4')+
+  '<div class="info-card"><b>Jahresbeurteilungen: '+w.reviews+'</b><p class="small">Abmahnungen: '+w.warnings+' von 3 · Beförderung nach zwei Berufsjahren möglich. Gute Beziehungen und Leistung helfen.</p>'+
+  button('Beförderung anfragen','work','promotion','button-wide',p.prisonYears>0||p.jobYears<2||w.rank>=3)+'</div>'+
+  '<div class="stack">'+people.map(c=>'<article class="social-card"><h3>🤝 '+html(c.name)+'</h3><p>'+html(c.role)+' · Beziehung '+c.bond+'% · Fachkenntnis '+c.competence+'%</p>'+
+   '<div class="relationship-meter"><span style="width:'+c.bond+'%"></span></div>'+
+   '<div class="row">'+button('Reden','work','talk|'+c.id,'smallbtn',p.prisonYears>0)+
+    button('Zusammenarbeiten','work','teamwork|'+c.id,'smallbtn',p.prisonYears>0)+
+    button('Streiten','work','conflict|'+c.id,'smallbtn danger',p.prisonYears>0)+'</div></article>').join('')+'</div>';
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -174,7 +190,8 @@ function renderCareer(p:Person){
  ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)||sportActive(p)?'Aktive Karriere':'Arbeitssuchend')}
  <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:sportActive(p)?'Sportprofi · '+p.sportCareer!.contract!.club:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':sportActive(p)?'Sportvertrag · Saisonabrechnung beim Altern':'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
- ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
+ ${renderWorkplace(p)}
+  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
 function renderPeople(p:Person){
  const living=p.relationships.filter(r=>r.alive);
@@ -393,7 +410,8 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
  else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
- else if(kind==='sport'){const [key,value]=id.split('|');await action({type:'SPORT',key:key as 'train'|'tryout'|'recover'|'negotiate'|'sponsor'|'retire',sport:key==='train'?value as import('./engine/types.js').SportKind:undefined,league:key==='tryout'?value as import('./engine/types.js').SportLeague:undefined});}
+ else if(kind==='work'){const [key,contactId]=id.split('|');await action({type:'WORK',key:key as 'introduce'|'talk'|'teamwork'|'conflict'|'promotion',id:contactId});}
+  else if(kind==='sport'){const [key,value]=id.split('|');await action({type:'SPORT',key:key as 'train'|'tryout'|'recover'|'negotiate'|'sponsor'|'retire',sport:key==='train'?value as import('./engine/types.js').SportKind:undefined,league:key==='tryout'?value as import('./engine/types.js').SportLeague:undefined});}
   else if(kind==='director'){const [key,choice,budget]=id.split('|');await action({type:'DIRECTOR',key:key as 'study'|'start'|'cast'|'shoot'|'release'|'cancel',genre:key==='start'?choice as import('./engine/types.js').DirectorGenre:undefined,budget:key==='start'?budget as 'kurz'|'mittel'|'gross':undefined,choice:key==='cast'||key==='shoot'?choice as 'newcomers'|'stars'|'careful'|'quick':undefined});}
  else if(kind==='actor'){const sep=id.indexOf('|');await action({type:'ACTOR',key:(sep>=0?id.slice(0,sep):id) as 'lesson'|'extra'|'hire-agent'|'fire-agent'|'agent-search'|'audition'|'rehearse'|'quit',offerId:sep>=0?id.slice(sep+1):undefined});}
  else if(kind==='music'){const args=id.split('|');await action({type:'MUSIC',key:args[0] as 'practice'|'audition'|'single'|'album'|'concert'|'tour'|'promote'|'quit',mode:args[0]==='audition'?args[1] as 'Solo'|'Band':undefined,role:(args[0]==='practice'?args[1]:args[0]==='audition'?args[2]:undefined) as import('./engine/types.js').MusicRole|undefined});}
@@ -412,7 +430,7 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
   else if(kind==='premiumitem'){await action({type:'PREMIUM',key:id as 'jail-card'|'golden-diploma'|'hollywood-star'});}
   else if(kind==='premiumrewind'){const y=id==='selected'?Number(document.querySelector<HTMLSelectElement>('#rewind-years')?.value||1):Number(id);await action({type:'REWIND',years:y as 1|2|3|4|5});}
   else if(kind==='study')await action({type:'STUDY'});
- else if(kind==='job')await action({type:'JOB',id});
+ else if(kind==='job')await action({type:'WORK',key:'apply',id});
  else if(kind==='buy')await action({type:'BUY',id});
  else if(kind==='sell')await action({type:'SELL',id});
  else if(kind==='relation'){const delim=id.lastIndexOf('|');await action({type:'RELATION',id:id.slice(0,delim),key:id.slice(delim+1)});}
