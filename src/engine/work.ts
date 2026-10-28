@@ -42,10 +42,11 @@ export function applyForWork(s:SaveGame,id:string,h:ExpansionHooks){
  startWork(s,h);
  h.log('Du überzeugst im Bewerbungsgespräch und beginnst als '+job.title+'.','good');
 }
-export function workAction(s:SaveGame,key:'talk'|'teamwork'|'conflict'|'promotion',id:string|undefined,h:ExpansionHooks){
+export function workAction(s:SaveGame,key:'introduce'|'talk'|'teamwork'|'conflict'|'promotion',id:string|undefined,h:ExpansionHooks){
  const p=s.person;
  if(p.prisonYears>0)throw Error('Während der Haft kannst du nicht zur Arbeit gehen.');
  const office=ensureWork(s,h);
+ if(key==='introduce'){h.log('Du lernst deine Führungskraft und zwei Kolleginnen oder Kollegen kennen.');return;}
  if(key==='promotion'){
   if(p.jobYears<2)throw Error('Für eine Beförderung brauchst du mindestens zwei Berufsjahre.');
   if(office.rank>=3)throw Error('Du hast die höchste Stufe deiner Laufbahn erreicht.');
