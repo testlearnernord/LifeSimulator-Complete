@@ -52,7 +52,7 @@ export function workAction(s:SaveGame,key:'introduce'|'talk'|'teamwork'|'conflic
   if(office.rank>=3)throw Error('Du hast die höchste Stufe deiner Laufbahn erreicht.');
   h.annual('work:promotion');
   const good=(p.careerPerformance??50)>=70&&office.boss.bond>=60;
-  if(good&&h.random()<Math.min(.95,.55+((p.careerPerformance??50)-70)/100)){
+  if(good&&h.random()<Math.min(1,.55+((p.careerPerformance??50)-70)/100+(office.boss.bond-60)/100)){
    office.rank++;
    const base=CAREERS.find(c=>c.id===p.jobId)?.salary||30000;
    p.salaryBonus=(p.salaryBonus||0)+Math.round(base*.08);
