@@ -91,12 +91,17 @@
 | Sonderfunktionen | Assassin's Blade | H | O | Sonderitem fehlt |
 | Sonderfunktionen | Aura Ring (2026) | A | O | Beziehungs-Item offiziell im März 2026 erwähnt |
 | Sonderfunktionen | Time Machine | H,A | O | In-Game-Rücksprung fehlt |
-| Meta | Season, BitPass, Daily Adventures, Bits | A | O | Liveseason-Infrastruktur fehlt |
+| Meta | Season / BitPass (historisch) | N | O | Offiziell am 14.08.2026 eingestellt; keine Priorität für eine neue Live-Season-Infrastruktur |
 | Meta | Achievements, Heirlooms, Ribbons | H | O | Kein Meta-Fortschritt |
 | Meta | Mehrere gespeicherte Leben | H | S | Pro Leben ein lokaler IndexedDB-Datensatz |
 | Meta | Speicherung / Wiederaufnahme | H | S | Auto-Save nach jeder Aktion |
 | Meta | Sprache/Internationalisierung | H,A | P | UI derzeit deutsch, keine Lokalisierung |
 | Meta | Monetarisierung / Ad Removal | H | S | Keine Werbung, keine In-App-Käufe |
+
+## Aktualisierung 28.10.2026
+
+- **Season/BitPass:** Die offizielle Meldung [End of Seasons](https://bitlifeapp.com/whats-new/end-of-seasons) vom 14.08.2026 bestätigt das Ende der Seasons. Dieser historische Funktionsumfang bleibt als Referenz dokumentiert, ist aber keine aktive Entwicklungspriorität.
+- **Profisport und Meta:** Das [offizielle Help Center](https://bitlifeapp.com/help/) bestätigt Pro Athlete als Job Pack sowie Achievements, Heirlooms und Ribbons. Diese bleiben offen, bis eigene spielbare Systeme samt UI, Save-Kompatibilität und Tests vorliegen.
 
 ## Offene Fragen zur Originaltreue
 
