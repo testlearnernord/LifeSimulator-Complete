@@ -98,6 +98,7 @@ export function sportAction(s:SaveGame,key:'train'|'tryout'|'recover'|'negotiate
 export function advanceSport(s:SaveGame,h:ExpansionHooks,jailedAtStart=false){
  const p=s.person,c=p.sportCareer;
  if(!c)return;
+ const injuredAtStart=c.injuryYears>0;
  if(c.injuryYears>0){c.injuryYears--;c.fitness=cap(c.fitness+8);if(c.injuryYears===0)h.log('Deine Sportverletzung ist ausgeheilt.','good');}
  if(!c.contract){c.fitness=cap(c.fitness-2);return;}
  if(jailedAtStart||p.age>=46){
@@ -107,7 +108,7 @@ export function advanceSport(s:SaveGame,h:ExpansionHooks,jailedAtStart=false){
   return;
  }
  const contract=c.contract;
- const injured=c.injuryYears>0;
+ const injured=injuredAtStart;
  const performance=cap(c.skill*.59+c.fitness*.31+c.reputation*.10+(h.random()-.5)*40-(injured?30:0));
  const victories=Math.min(30,Math.floor(performance/5+h.random()*6));
  const title=!injured&&performance>=69&&h.random()<(contract.league==='National'?.19:.27);
