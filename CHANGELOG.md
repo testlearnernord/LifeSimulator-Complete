@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.0 – 2026-10-28 (Eigenständige Profisport-Karriere)
+
+- Drei Sportarten, Jugendtraining und Profi-Probetrainings in zwei fiktiven Ligen.
+- Vereine, Verträge, Jahresgehälter, Saisons, Titel, Sponsoren, Gehaltsverhandlungen, Verletzungen und Rehabilitation.
+- Gleichzeitige Vollzeit-/Spezialverträge unterbunden; Haft, Auswanderung und Rücktritt beenden Verträge.
+- Mobile Berufs- und Aktivitätenmenüs, optionaler Spielstandzustand und Zeitreise-Unterstützung.
+- Engine- und Browser-Regressionstests hinzugefügt; keine originale Spielbalance oder Lizenzinhalte.
+
+
 ## 0.12.0 – 2026-10-28 (Eigenständige Filmregie)
 
 - Filmkurse ab 14, eigene Filmprojekte ab 18 in drei Genres und drei Budgetgrößen.
