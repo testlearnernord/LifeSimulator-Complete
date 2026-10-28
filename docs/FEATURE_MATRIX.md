@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.12.0 (2026-10-28).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.13.0 (2026-10-28).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -44,7 +44,7 @@
 | Karriere | Fame / Berühmtheit | H | O | Kein Fame-System |
 | Karriere | Social Media / SoundCloud | A | P | Fünf Plattformen, Reichweite, Beiträge, Sponsoring, Bekanntheit; kein SoundCloud-Katalog, Formeln eigener Entwurf |
 | Karriere | Mafia Job Pack | H,W | O | Nicht implementiert |
-| Karriere | Pro Athlete Job Pack | H,W | O | Nicht implementiert |
+| Karriere | Pro Athlete Job Pack | H,W | P | Eigene Sportlaufbahn mit drei Sportarten, Training, Probetraining, fiktiven Clubs, Verträgen, Saisons, Meisterschaften und Verletzungen; keine echten Sportligen oder Originalregeln |
 | Karriere | Musician Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Actor Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Politician Job Pack | H,W | O | Nicht implementiert |
@@ -102,6 +102,12 @@
 
 - **Season/BitPass:** Die offizielle Meldung [End of Seasons](https://bitlifeapp.com/whats-new/end-of-seasons) vom 14.08.2026 bestätigt das Ende der Seasons. Dieser historische Funktionsumfang bleibt als Referenz dokumentiert, ist aber keine aktive Entwicklungspriorität.
 - **Profisport und Meta:** Das [offizielle Help Center](https://bitlifeapp.com/help/) bestätigt Pro Athlete als Job Pack sowie Achievements, Heirlooms und Ribbons. Diese bleiben offen, bis eigene spielbare Systeme samt UI, Save-Kompatibilität und Tests vorliegen.
+
+### 0.13.0: Profisport als eigenständiges Teilmodell
+
+- Fußball, Basketball und Handball ab 8 Jahren trainieren; ab 18 sind Probetrainings in zwei fiktiven Ligen möglich. Gehaltsverhandlungen, Sponsoring, Saisonresultate, Meisterschaften, Verletzungen, Rehabilitation und Rücktritt haben Spielstandswirkungen.
+- Vertragsgehälter werden beim Jahreswechsel netto gezahlt, ältere Spielstände ohne `sportCareer` bleiben gültig. Zeitreise erfasst den neuen Zustand.
+- Referenz für die Existenz der **Pro Athlete**-Karriere: [offizielles BitLife-Help-Center](https://bitlifeapp.com/help/). Ligen, Vereine, Zahlen und Wahrscheinlichkeiten sind **eigene Entwürfe**. Kein Anspruch auf Vollständigkeit, kein echtes Lizenzpaket.
 
 ## Offene Fragen zur Originaltreue
 

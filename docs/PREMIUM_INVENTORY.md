@@ -1,6 +1,6 @@
 # Recherche: käufliche Zusatzinhalte von BitLife
 
-**Stand:** 26.10.2026. **Referenz:** internationale BitLife-App von Candywriter für iOS. **Projekt:** Lebenslinien 0.12.0, unabhängige PWA.
+**Stand:** 26.10.2026. **Referenz:** internationale BitLife-App von Candywriter für iOS. **Projekt:** Lebenslinien 0.13.0, unabhängige PWA.
 
 ## Wichtige Einschränkungen
 
@@ -52,3 +52,7 @@ Der App Store listet nur einen Teil der In-App-Käufe (die angezeigten Angebote 
 - Challenge Vault / Pack-Übersicht: https://www.escapistmagazine.com/best-bitlife-packs-amp-add-ons-to-buy/
 
 Die vorläufige Inventarliste muss periodisch mit dem **tatsächlichen Ingame-Shop auf aktuellem iOS** abgeglichen werden, weil bestimmte Angebote nicht vollständig öffentlich nachprüfbar sind. Unbelegte Details dürfen nicht als Originalmechanik bezeichnet werden.
+
+## Pro Athlete ab Lebenslinien 0.13.0
+
+Im eigenen Spiel **teilweise umgesetzt**: Fußball, Basketball, Handball, Training, fiktive Vereine, Verträge, Saisons, Verletzungen und Sponsoren. Dies bildet kein vollständiges Originalpaket ab. Verweis: [PRO_ATHLETE.md](PRO_ATHLETE.md).
