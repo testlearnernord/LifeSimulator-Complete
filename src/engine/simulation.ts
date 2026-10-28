@@ -238,7 +238,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  case 'SPORT':sportAction(s,action.key,action.sport,action.league,expansionHooks(s));break;
   case 'DIRECTOR':directorAction(s,action.key,action.genre,action.budget,action.choice,expansionHooks(s));break;
  case 'ACTOR':if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');actorAction(s,action.key,action.offerId,expansionHooks(s));break;
- case 'MUSIC':if(action.key==='audition'&&(actingActive(p)||sportActive(p)))throw Error('Beende zuerst deinen bestehenden Spezialvertrag.');musicAction(s,action.key,action.role,action.mode,expansionHooks(s));break;
+ case 'MUSIC':if(action.key==='audition'&&actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');musicAction(s,action.key,action.role,action.mode,expansionHooks(s));break;
  case 'FAMILY':familyAction(s,action.key,action.id,expansionHooks(s),()=>relation(s,'Freund',p.age));break;
   case 'EDUCATION':educationAction(s,action.key,action.club,expansionHooks(s));break;
   case 'MEDICAL':medicalAction(s,action.key,expansionHooks(s));break;
