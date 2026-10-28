@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.12.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.13.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -20,9 +20,10 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Ärzte, Fitnessstudio, Lesen, Meditation, Diebstahl, Gefängnis
 - Kaufen/Verkaufen von Häusern und Autos, Auswanderung
 - Filmregie mit Budget, Casting, Dreh, Kinopremiere, Filmografie und Auszeichnungen
+- Profisport mit drei Sportarten, Trainingsentwicklung, Probetrainings, fiktiven Vereinen, Verträgen, Saisons, Verletzungen und Sponsoren
 - Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
 
-**Teilweise spielbar:** Musik, Schauspiel, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
+**Teilweise spielbar:** Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
 
 ## Lokal installieren und starten
 
@@ -141,3 +142,11 @@ Besonderer Schwerpunkt: **Mitgefangene kennenlernen, Vertrauen aufbauen, von ihr
 Während eines Haftjahres entstehen nur noch **600 € Lebenshaltungskosten** statt 6.500/9.500 €. Alte Schulden werden nicht rückwirkend verändert.
 
 Alle neuen Aktionen sind eigene, fiktive Gameplaymechaniken unter **Aktivitäten → Kriminalität** und in den **Gefängnisaktivitäten**. Das komplette Mafia Job Pack ist noch **nicht** implementiert. [Regeln und technische Details](docs/CRIME_CAREER.md).
+
+## Lebenslinien 0.13.0: Profisport
+
+Unter **Beruf → Profisport** und **Aktivitäten → Profisport** kann die Spielfigur ab acht Jahren Fußball, Basketball oder Handball trainieren. Ab 18 sind Probetrainings für fiktive Regional- und Nationalligen möglich. Die Spielstärke, Fitness und Reputation beeinflussen Verträge, Gehaltsverhandlungen, Sponsoren, Saisons, Titel und Verletzungen. Sportkarrieren schließen zeitgleiche reguläre Vollzeitstellen und andere aktive Spezialverträge aus. Eine Verletzung kann die Jahressaison und die Einnahmen beeinträchtigen; Rehabilitation kostet 300 €. Verträge laufen automatisch aus, und bei Haft, Auswanderung oder Rücktritt endet die Beschäftigung.
+
+Die Spielregeln, Sportvereine und Gehälter sind eigenständig entworfen. Die [offizielle Referenz](https://bitlifeapp.com/help/) bestätigt die Existenz des Pro Athlete Job Packs, aber nicht die hier verwendeten Formeln oder einen vollständigen Funktionsabgleich. Der neue Speicherzweig ist optional (Schema 1), und Zeitreisen sichern seine Eigenschaften.
+
+[Details und Grenzen](docs/PRO_ATHLETE.md).
