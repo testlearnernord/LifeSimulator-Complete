@@ -9,9 +9,10 @@ cpSync('public','dist',{recursive:true});
 copyFileSync('index.html','dist/index.html');
 copyFileSync('src/styles.css','dist/styles.css');
 const hash=createHash('sha256');
-function walk(dir){for(const name of readdirSync(dir).sort()){const path=join(dir,name);if(statSync(path).isDirectory())walk(path);else if(name!=='sw.js'){hash.update(relative('dist',path));hash.update(readFileSync(path));}}}
+const precache=['./'];
+function walk(dir){for(const name of readdirSync(dir).sort()){const path=join(dir,name);if(statSync(path).isDirectory())walk(path);else if(name!=='sw.js'){const rel=relative('dist',path).replaceAll('\\','/');precache.push('./'+rel);hash.update(rel);hash.update(readFileSync(path));}}}
 walk('dist');
 const version=JSON.parse(readFileSync('package.json','utf8')).version;
-const worker=readFileSync('dist/sw.js','utf8').replace('__APP_VERSION__',`${version}-${hash.digest('hex').slice(0,12)}`);
+const worker=readFileSync('dist/sw.js','utf8').replace('__APP_VERSION__',`${version}-${hash.digest('hex').slice(0,12)}`).replace('__PRECACHE_ASSETS__',JSON.stringify(precache.sort()));
 writeFileSync('dist/sw.js',worker);
 console.log(`Production build: dist/ (cache ${version})`);
