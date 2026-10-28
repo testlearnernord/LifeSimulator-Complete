@@ -4,7 +4,7 @@ import {createLife,applyAction,isSaveGame} from '../dist/app/engine/simulation.j
 
 const born=()=>createLife({name:'Sporttest',gender:'divers',country:'Deutschland',seed:38192});
 function advance(s,n){for(let i=0;i<n;i++){if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}return s;}
-function pro(){let s=advance(born(),18);s.person.cash=500000;s=applyAction(s,{type:'SPORT',key:'train',sport:'Fußball'});s.person.sportCareer.skill=100;s.person.sportCareer.fitness=100;s.person.sportCareer.reputation=80;return applyAction(s,{type:'SPORT',key:'tryout',league:'National'});}
+function pro(){let s=advance(born(),18);if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s.person.cash=500000;s=applyAction(s,{type:'SPORT',key:'train',sport:'Fußball'});s.person.sportCareer.skill=100;s.person.sportCareer.fitness=100;s.person.sportCareer.reputation=80;return applyAction(s,{type:'SPORT',key:'tryout',league:'National'});}
 
 test('sports are age-gated, specialize at first lesson, and preserve old schema-1 saves',()=>{
  let s=born();
@@ -46,7 +46,7 @@ test('professional trials sign fictional clubs, seasons pay wages and record res
 test('sports contract excludes full-time careers, acting and recording contracts',()=>{
  const s=pro();
  assert.throws(()=>applyAction(s,{type:'JOB',id:'retail'}),/Sportvertrag/);
- assert.throws(()=>applyAction(s,{type:'MUSIC',key:'audition',mode:'Solo',role:'Gesang'}),/Spezialvertrag/);
+ assert.throws(()=>applyAction(s,{type:'MUSIC',key:'audition',mode:'Solo',role:'Gesang'}),/Sportvertrag/);
  assert.throws(()=>applyAction(s,{type:'ACTOR',key:'audition',offerId:'indie-film'}),/Sportvertrag/);
 });
 
