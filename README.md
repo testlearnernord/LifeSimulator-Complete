@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.14.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.15.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -21,9 +21,10 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Kaufen/Verkaufen von Häusern und Autos, Auswanderung
 - Filmregie mit Budget, Casting, Dreh, Kinopremiere, Filmografie und Auszeichnungen
 - Profisport mit drei Sportarten, Trainingsentwicklung, Probetrainings, fiktiven Vereinen, Verträgen, Saisons, Verletzungen und Sponsoren
+- Politikerkarriere mit Ehrenamt, Wahlkampfbudgets, vier Amtsebenen, Debatten, Wahlen, Zustimmungswerten und Amtsgehältern
 - Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
 
-**Teilweise spielbar:** Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
+**Teilweise spielbar:** Politik, Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
 
 ## Lokal installieren und starten
 
@@ -150,3 +151,9 @@ Unter **Beruf → Profisport** und **Aktivitäten → Profisport** kann die Spie
 Die Spielregeln, Sportvereine und Gehälter sind eigenständig entworfen. Die [offizielle Referenz](https://bitlifeapp.com/help/) bestätigt die Existenz des Pro Athlete Job Packs, aber nicht die hier verwendeten Formeln oder einen vollständigen Funktionsabgleich. Der neue Speicherzweig ist optional (Schema 1), und Zeitreisen sichern seine Eigenschaften.
 
 [Details und Grenzen](docs/PRO_ATHLETE.md).
+
+## Lebenslinien 0.15.0 – Politik
+
+Unter **Beruf → Politikerkarriere** beziehungsweise **Aktivitäten → Politik** kannst du ab 14 politische Erfahrung sammeln und später mit eigenem Budget eine Kandidatur für vier fiktive Amtsebenen finanzieren. Haustürgespräche, Debatten und Öffentlichkeitsarbeit verändern die Chancen; die Wahl endet mit einem protokollierten Ergebnis. Nach einem Sieg führen Bürgerversammlungen und eigene politische Vorhaben zu Zustimmungsänderungen. Amtsgehälter werden jährlich bezahlt, reguläre Arbeitsverträge enden beim Wahlsieg. Nach vier Jahren steht eine erneute Kandidatur offen. Alter, Erfahrung, frühere Siege, Vorstrafen und aktive Spezialverträge beeinflussen die Zulässigkeit.
+
+Die Mechaniken und Wahrscheinlichkeiten stammen aus eigener Entwicklung. Offiziell verifiziert ist nur die Existenz der Politiker-Spezialkarriere im [BitLife Help Center](https://bitlifeapp.com/help/), nicht die genaue Originalbalance oder Vollständigkeit. Bestehende Saves bleiben über ein optionales Feld kompatibel, Zeitreise-Snapshots speichern die neuen Zustände. [Technische Dokumentation](docs/POLITICS.md).
