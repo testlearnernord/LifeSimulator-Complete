@@ -29,7 +29,7 @@ export const PREMIUM_CATALOG:PremiumItem[]=[
  {id:'casino',name:'Casino',group:'Expansion-Packs',status:'offen',description:'Casino-Management',source:'community'},
  {id:'grand-prix',name:'Grand Prix / Racing',group:'Expansion-Packs',status:'offen',description:'Rennsport-Erweiterung, Shop-Status nicht abschließend verifiziert',source:'community'},
  {id:'outdoor',name:'Outdoor Lifestyle',group:'Expansion-Packs',status:'offen',description:'Outdooraktivitäten, Shop-Status nicht abschließend verifiziert',source:'community'},
- {id:'ultimate-fighter',name:'Ultimate Fighter Mode',group:'Weitere Käufe',status:'offen',description:'Kampfsportmodus, offiziell live, Kaufzuordnung noch zu verifizieren',source:'official'},
+ {id:'ultimate-fighter',name:'Ultimate Fighter Mode',group:'Weitere Käufe',status:'teilweise',description:'Eigene Stile, Coach, Straßen- und Ligakämpfe, Rivalen und Titel; Minispiel und 200+ Moves fehlen',source:'official'},
  {id:'time-machine',name:'Time Machine',group:'Weitere Käufe',status:'offen',description:'Vergangene Lebensjahre zurückspulen',source:'official'},
  {id:'challenge-vault',name:'Challenge Vault',group:'Weitere Käufe',status:'offen',description:'Frühere Herausforderungen spielen',source:'community'},
  {id:'bitpass',name:'BitPass / Seasons (historisch)',group:'Weitere Käufe',status:'offen',description:'Seasons wurde laut Entwickler am 14. August 2026 eingestellt',source:'official'},

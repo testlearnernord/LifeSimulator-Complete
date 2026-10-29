@@ -22,9 +22,10 @@ test('league qualification, rivalry, prize money, title fight and defense',()=>{
  const before=s.person.cash;s=applyAction(s,{type:'FIGHTER',key:'league'});
  assert.equal(s.person.fighterCareer.leagueWins,1);assert.ok(s.person.cash>before);
  s=applyAction(s,{type:'FIGHTER',key:'league'});
+ s.person.fighterCareer.injuryYears=0;s.person.fighterCareer.stamina=100;
  assert.throws(()=>applyAction(s,{type:'FIGHTER',key:'league'}),/dieses Jahr/);
  s=advance(s,1);s.person.fighterCareer.stamina=100;
- s=applyAction(s,{type:'FIGHTER',key:'league'});assert.equal(s.person.fighterCareer.leagueWins,3);
+ s=applyAction(s,{type:'FIGHTER',key:'league'});assert.equal(s.person.fighterCareer.leagueWins,3);s.person.fighterCareer.injuryYears=0;
  s.person.fighterCareer.stamina=100;s=applyAction(s,{type:'FIGHTER',key:'challenge'});
  assert.equal(s.person.fighterCareer.champion,true);assert.equal(s.person.fighterCareer.titles,1);assert.equal(isSaveGame(s),true);
  s=advance(s,1);s.person.fighterCareer.stamina=100;s=applyAction(s,{type:'FIGHTER',key:'defend'});
@@ -34,7 +35,7 @@ test('coaching, sparring and annual league stipend change persistent state',()=>
  let s=prepared();s=applyAction(s,{type:'FIGHTER',key:'coach'});
  assert.equal(s.person.fighterCareer.coach,true);
  assert.throws(()=>applyAction(s,{type:'FIGHTER',key:'coach'}),/bereits/);
- s=applyAction(s,{type:'FIGHTER',key:'spar'});
+ s=applyAction(s,{type:'FIGHTER',key:'spar'});s.person.fighterCareer.injuryYears=0;
  assert.equal(s.person.fighterCareer.bouts.length,1);assert.equal(s.person.fighterCareer.wins,5);
  s=applyAction(s,{type:'FIGHTER',key:'join'});const balance=s.person.cash;
  s=advance(s,1);assert.ok(s.person.cash>balance-9500);assert.equal(s.person.fighterCareer.league,true);

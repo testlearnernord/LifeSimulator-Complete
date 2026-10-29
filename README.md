@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.15.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.16.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -20,11 +20,12 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Ärzte, Fitnessstudio, Lesen, Meditation, Diebstahl, Gefängnis
 - Kaufen/Verkaufen von Häusern und Autos, Auswanderung
 - Filmregie mit Budget, Casting, Dreh, Kinopremiere, Filmografie und Auszeichnungen
+- Kampfsportmodus mit drei Stilen, Coach, Straßenkämpfen, Ligavertrag, Rivalen, Preisgeld und Titelverteidigung
 - Profisport mit drei Sportarten, Trainingsentwicklung, Probetrainings, fiktiven Vereinen, Verträgen, Saisons, Verletzungen und Sponsoren
 - Politikerkarriere mit Ehrenamt, Wahlkampfbudgets, vier Amtsebenen, Debatten, Wahlen, Zustimmungswerten und Amtsgehältern
 - Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
 
-**Teilweise spielbar:** Politik, Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
+**Teilweise spielbar:** Politik, Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, vollständiger Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
 
 ## Lokal installieren und starten
 
@@ -157,3 +158,7 @@ Die Spielregeln, Sportvereine und Gehälter sind eigenständig entworfen. Die [o
 Unter **Beruf → Politikerkarriere** beziehungsweise **Aktivitäten → Politik** kannst du ab 14 politische Erfahrung sammeln und später mit eigenem Budget eine Kandidatur für vier fiktive Amtsebenen finanzieren. Haustürgespräche, Debatten und Öffentlichkeitsarbeit verändern die Chancen; die Wahl endet mit einem protokollierten Ergebnis. Nach einem Sieg führen Bürgerversammlungen und eigene politische Vorhaben zu Zustimmungsänderungen. Amtsgehälter werden jährlich bezahlt, reguläre Arbeitsverträge enden beim Wahlsieg. Nach vier Jahren steht eine erneute Kandidatur offen. Alter, Erfahrung, frühere Siege, Vorstrafen und aktive Spezialverträge beeinflussen die Zulässigkeit.
 
 Die Mechaniken und Wahrscheinlichkeiten stammen aus eigener Entwicklung. Offiziell verifiziert ist nur die Existenz der Politiker-Spezialkarriere im [BitLife Help Center](https://bitlifeapp.com/help/), nicht die genaue Originalbalance oder Vollständigkeit. Bestehende Saves bleiben über ein optionales Feld kompatibel, Zeitreise-Snapshots speichern die neuen Zustände. [Technische Dokumentation](docs/POLITICS.md).
+
+## Lebenslinien 0.16.0: Eigenständiger Kampfsportmodus
+
+Unter **Aktivitäten → Kampfsport** bzw. **Beruf → Kampfsportmodus** kannst du ab 14 einen Stil trainieren, ab 16 sparren oder riskante Straßenkämpfe austragen und ab 18 über ein Ligaprobetraining zur Meisterschaft aufsteigen. Trainer, Verletzungen, Rehabilitation, Rivalen, Preisgeld, Jahresvergütung, Kampfchronik, Titelverteidigung und Ruhestand beeinflussen den Spielstand. Bestehende Saves behalten Schema 1; die Kampfkarriere ist optional und wird in Zeitreise-Snapshots erfasst. **Nicht implementiert:** interaktives MMA-Minispiel, 200+ Moves und die vollständige Originalkarriere. Quelle: [offizielle Ankündigung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode). [Technische Grenzen](docs/FIGHTER_MODE.md).
