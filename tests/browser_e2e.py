@@ -191,6 +191,7 @@ with sync_playwright() as playwright:
     expect(page.get_by_text('Arbeitsumfeld', exact=True)).to_be_visible()
     assert page.locator('[data-action="work"][data-id^="talk|"]').count() == 3
     # Political career: start an independently designed electoral path on mobile.
+    page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     page.locator('[data-action="category"][data-id="politics"]').click()
     expect(page.get_by_text('Politische Laufbahn')).to_be_visible()
