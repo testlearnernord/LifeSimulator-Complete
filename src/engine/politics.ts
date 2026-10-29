@@ -185,7 +185,7 @@ export function validPolitics(p:Person):boolean{
  }
  if(c.office!==null){
   const a=c.office;
-  if(!a||!POLITICAL_OFFICES.includes(a.role)||!POLITICAL_PARTIES.includes(a.party)||!POLITICAL_POLICIES.includes(a.policy)||!integer(a.approval,0,100)||!integer(a.yearsLeft,1,4)||a.salary!==POLITICAL_REQUIREMENTS[a.role].salary||p.jobId!==null||p.prisonYears>0||!!p.musicCareer?.contractYears||!!p.actorCareer?.current||!!p.sportCareer?.contract)return false;
+  if(!a||!POLITICAL_OFFICES.includes(a.role)||!POLITICAL_PARTIES.includes(a.party)||!POLITICAL_POLICIES.includes(a.policy)||!integer(a.approval,0,100)||!integer(a.yearsLeft,1,4)||a.salary!==POLITICAL_REQUIREMENTS[a.role].salary||p.jobId!==null||!!p.musicCareer?.contractYears||!!p.actorCareer?.current||!!p.sportCareer?.contract)return false;
  }
  return true;
 }
