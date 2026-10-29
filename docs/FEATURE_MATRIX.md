@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.14.0 (2026-10-28).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.15.0 (2026-10-29).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -47,7 +47,7 @@
 | Karriere | Pro Athlete Job Pack | H,W | P | Eigene Sportlaufbahn mit drei Sportarten, Training, Probetraining, fiktiven Clubs, Verträgen, Saisons, Meisterschaften und Verletzungen; keine echten Sportligen oder Originalregeln |
 | Karriere | Musician Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Actor Job Pack | H,W | O | Nicht implementiert |
-| Karriere | Politician Job Pack | H,W | O | Nicht implementiert |
+| Karriere | Politician Job Pack | H,W | P | Eigene Politikerkarriere mit fiktiven Parteien, vier Amtsebenen, Wahlkampagnen, Wahlen, Amtszeiten, Reden, politischen Vorhaben und Jahresgehältern; keine Originalformeln |
 | Karriere | Business Job Pack | W | O | Nicht implementiert |
 | Karriere | Street Hustler Job Pack | W | O | Nicht implementiert |
 | Karriere | Astronaut Job Pack | W | O | Nicht implementiert |
@@ -116,6 +116,13 @@
 - Bestehende Saves mit `schema: 1` bleiben gültig, da `workplace` optional ist. Neue Zustände werden geprüft und beim Rückspulen als Snapshot gespeichert.
 - **Referenzgrenze:** Der [offizielle App Store](https://apps.apple.com/de/app/bitlife-life-simulator/id1374403536) bestätigt Karriere und Entscheidungen als Spielbestandteil, aber nicht die konkreten Interview-/Teamformeln. Sämtliche Zahlen und Charaktere sind eigene Entwürfe. Technische Details: [WORKPLACE.md](WORKPLACE.md).
 - Die [offizielle UFM-Ankündigung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode) nennt inzwischen **200+ Moves**, nicht 100+. Das UFM-System bleibt offen.
+
+### Neu in 0.15.0: Politikerlaufbahn (eigenständig, teilweise umgesetzt)
+
+- Aus dem offiziell bestätigten Politiker-Job-Pack wurde ein eigener, offline spielbarer Wahlkampf- und Amtsablauf entwickelt. Das [BitLife Help Center](https://bitlifeapp.com/help/) bestätigt Politiker als Spezialkarriere, liefert aber keine belegbaren Wahlformeln oder vollständigen Amtsregeln.
+- Politisches Ehrenamt ab 14; vier fiktive Amtsstufen ab 18/21/30/40, politische Gruppierungen, Kampagnenbudget, Haustürgespräche, Debatten, Wahlentscheidungen, vierjährige Amtszeiten, Jahresgehälter und gespeicherte Wahlchronik.
+- Wahrung der Savegame-Kompatibilität mittels optionalem `politicalCareer`-Feld (Schema 1) und bestehenden Zeitreise-Snapshots; getrennte Engine-/UI-Tests.
+- **Lücken:** Original-Wahlkampfmechaniken, Regierungen je Zielland, komplexe Parteienlandschaft, Koalitionen, politische Gesetzgebung, Kampagnenspenden und Skandalketten sind nicht verifiziert bzw. noch nicht implementiert.
 
 ## Offene Fragen zur Originaltreue
 
