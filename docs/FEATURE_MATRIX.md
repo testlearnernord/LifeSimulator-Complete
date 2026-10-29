@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.15.0 (2026-10-29).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.16.0 (2026-10-29).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -54,7 +54,7 @@
 | Karriere | Model Job Pack | W | O | Nicht implementiert |
 | Karriere | Dealer Job Pack | W | O | Nicht implementiert |
 | Karriere | Music Producer Job Pack (2026) | A | O | Offiziell im Januar 2026 erwähnt |
-| Spezialmodus | Ultimate Fighter Mode (2026) | A,N | O | Kampfstil, Fighting League, 200+ Moves laut offizieller Ankündigung vom 11.06.2026 |
+| Spezialmodus | Ultimate Fighter Mode (2026) | N | P | Eigene Stile, Training, Coach, Straßenkämpfe, Ligakämpfe, Rivalen, Titel, Verletzungen und Kampfchronik; 200+ Moves und interaktives MMA-Minispiel fehlen |
 | Finanzen | Einkommen und Ausgaben | A | S | Jährliche Gehälter und Unterhalt, modellierte Werte |
 | Finanzen | Schulden / negative Liquidität | A | P | Negativsaldo möglich, keine Kreditverträge |
 | Finanzen | Loans / Kredite (2026) | A | O | Offiziell April 2026 erwähnt |
@@ -231,3 +231,9 @@ Schauspielerkarriere enthält mehrere Staffeljahre, agentenvermittelte Castingvo
 | Mafia Job Pack | Offen | Keine vollumfängliche Bandenkarriere, Hierarchien und Erzählketten |
 
 [Genauer Umfang und Grenzen](CRIME_CAREER.md). Alle Regeln sind eigene Modelle.
+
+### 0.16.0: Kampfsport (Teilumsetzung)
+
+- Offiziell belegt durch [Ultimate Fighter Mode, 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode): Straßenkämpfe, Coach, Ligen, Rivalen, Meistertitel, über 200 Moves, interaktives MMA-Minispiel.
+- Eigenständig umgesetzt: drei Kampfstile, altersabhängiges Training, Sparring, riskante Straßenkämpfe, Coach, Ligabewerbung, zwei Ligakämpfe jährlich, Rivalen, Titelkampf und Verteidigung, Preisgeld, Verletzungen, Rehabilitation, Ruhestand und persistente Kampfchronik. Alle Formeln, Gegner und Texte sind eigenständig.
+- **Offen:** interaktives Kampfsystem, mehr als 200 individuelle Moves, komplexe Rivalen-/Liga-Hierarchie, vollständiger Originalabgleich und iOS-Safari-Hardwaretest. Technische Details: [FIGHTER_MODE.md](FIGHTER_MODE.md).

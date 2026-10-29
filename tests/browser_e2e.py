@@ -235,7 +235,42 @@ with sync_playwright() as playwright:
     page.locator('[data-action="category"][data-id="politics"]').click()
     expect(page.get_by_text('Dein Amt')).to_be_visible()
     context.set_offline(False)
+    # Fighter mode: qualify, fight, persist and reload offline.
+    page.evaluate("""async () => {
+        const {createLife,applyAction}=await import('/app/engine/simulation.js');
+        const {putGame}=await import('/app/storage/database.js');
+        let s=createLife({name:'Kampfsport E2E',gender:'divers',country:'Deutschland',seed:919191,
+          stats:{health:100,happiness:100,smarts:100,looks:100}});
+        while(s.person.age<20){
+          if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+          s=applyAction(s,{type:'AGE'});
+        }
+        if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+        s.person.cash=150000;
+        s=applyAction(s,{type:'FIGHTER',key:'train',style:'Kickboxen'});
+        s.person.fighterCareer.skill=100;s.person.fighterCareer.stamina=100;
+        s.person.fighterCareer.reputation=100;s.person.fighterCareer.wins=5;
+        s.updated=Date.now()+400000;await putGame(s);
+    }""")
+    page.reload(wait_until='networkidle')
+    expect(page.locator('.profile-name')).to_contain_text('Kampfsport E2E')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="fighter"]').click()
+    expect(page.get_by_text('Kampfsportlaufbahn')).to_be_visible()
+    page.locator('[data-action="fighter"][data-id="join"]').click()
+    page.locator('[data-action="fighter"][data-id="league"]').click()
+    expect(page.get_by_text('Kampfchronik')).to_be_visible()
+    page.reload(wait_until='networkidle')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="fighter"]').click()
+    expect(page.get_by_text('Kampfchronik')).to_be_visible()
+    context.set_offline(True)
+    page.reload(wait_until='domcontentloaded')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="fighter"]').click()
+    expect(page.get_by_text('Kampfchronik')).to_be_visible()
+    context.set_offline(False)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.15 politics, workplace, athlete, director, saves and offline: PASSED')
+    print('v0.16 fighter, politics, workplace, athlete, director, saves and offline: PASSED')
     context.close()
     browser.close()

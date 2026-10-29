@@ -21,7 +21,7 @@ Der App Store listet nur einen Teil der In-App-Käufe (die angezeigten Angebote 
 | Job-Packs | Mafia, Profisport, Musiker, Schauspieler, Politiker, Astronaut, Model, Street Hustler, Dealer, Business, Music Producer | spezialisierte Karrieren | **Offen**, Business **teilweise** |
 | Expansion Packs | Landlord, Investor, C.U.L.T., Black Market, Movie Director, Secret Agent, Zoo, Casino, Grand Prix/Racing, Outdoor Lifestyle | Spielsysteme | Landlord, Investor und Movie Director **teilweise**, Rest **offen** |
 | Items | Golden Pacifier, Get Out of Jail Free Card, Hollywood Star, Assassin's Blade, Golden Passport, Promiscuity Potion, Golden Diploma, Golden Piggy Bank, Golden Resume, Friendship Bracelet | permanente/spezielle Gegenstände | **Eigene spielbare Funktionen:** Pacifier, Jail Card, Hollywood Star, Diploma. Rest **offen** |
-| Verschiedenes | Time Machine, Ultimate Fighter Mode, Challenge Vault, Luxury Lifestyle, BitPass/Seasons (historisch) | Modi und Sammlungen | Time Machine **spielbar**; weitere offen; Seasons offiziell eingestellt |
+| Verschiedenes | Time Machine, Ultimate Fighter Mode, Challenge Vault, Luxury Lifestyle, BitPass/Seasons (historisch) | Modi und Sammlungen | Time Machine **spielbar**; Fighter Mode **teilweise**; weitere offen; Seasons offiziell eingestellt |
 
 ## In dieser Version funktionsfähig
 
@@ -60,3 +60,7 @@ Im eigenen Spiel **teilweise umgesetzt**: Fußball, Basketball, Handball, Traini
 ## Politician ab Lebenslinien 0.15.0
 
 Das **offizielle Job Pack Politician** ist als Referenz nachgewiesen (BitLife Help Center). Im eigenen Projekt **teilweise umgesetzt**: fiktive Wahlkampagnen, Ämter, Gruppierungen, vierjährige Amtszeiten und jährliche Gehälter. Keine Originalparteien, Assets oder Formeln. Siehe [POLITICS.md](POLITICS.md).
+
+## Kampfsportmodus ab 0.16.0
+
+Die [offizielle Beschreibung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode) bestätigt Coach, Straßenkämpfe, Liga, Titel, Rivalen, über 200 Moves und MMA-Minispiel. Die eigene Version bietet nur Training, Sparring, Straßen- und Ligakämpfe, Rivalen, Preisgeld, Titel und Verletzungen. **Teilweise**, kein vollständiges Originalpaket. Siehe [FIGHTER_MODE.md](FIGHTER_MODE.md).
