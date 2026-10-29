@@ -27,9 +27,9 @@ test('political volunteering enforces age and annual quotas, older saves remain 
 test('campaign launch charges exact tier, validates input and retains current job until election',()=>{
  let s=ageTo(born(),18);s.person.cash=300000;
  assert.equal(politicalCampaignCost('Gemeinderat','mittel'),2400);
- assert.throws(()=>act(s,'launch',{office:'Prinz',party:'Unabhängig',policy:'Bildung',budget:'klein'}),/Ungültige/);
  assert.throws(()=>launch(s),/Sammle/);
- s=act(s,'volunteer');s=applyAction(s,{type:'JOB',id:'retail'});
+ s=act(s,'volunteer');
+ assert.throws(()=>act(s,'launch',{office:'Prinz',party:'Unabhängig',policy:'Bildung',budget:'klein'}),/Ungültige/);s=applyAction(s,{type:'JOB',id:'retail'});
  const before=s.person.cash;
  s=launch(s,'Gemeinderat','mittel');
  assert.equal(s.person.cash,before-2400);
