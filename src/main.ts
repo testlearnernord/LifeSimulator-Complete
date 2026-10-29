@@ -9,6 +9,7 @@ import {ACTING_OFFERS,actingActive,actingOffersFor} from './engine/acting.js';
 import {CRIME_TYPES,CRIME_LABELS,CRIME_RANKS,crimeRisk,criminal} from './engine/crime.js';
 import {DIRECTOR_GENRES,DIRECTOR_BUDGETS} from './engine/director.js';
 import {SPORTS,SPORT_LEAGUES,sportActive} from './engine/sport.js';
+import {POLITICAL_PARTIES,POLITICAL_POLICIES,POLITICAL_BUDGETS,POLITICAL_OFFICES,POLITICAL_REQUIREMENTS,politicsActive} from './engine/politics.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -175,6 +176,24 @@ function renderWorkplace(p:Person){
     button('Zusammenarbeiten','work','teamwork|'+c.id,'smallbtn',p.prisonYears>0)+
     button('Streiten','work','conflict|'+c.id,'smallbtn danger',p.prisonYears>0)+'</div></article>').join('')+'</div>';
 }
+function renderPolitics(p:Person){
+ const c=p.politicalCareer,a=c?.office,q=c?.campaign,jailed=p.prisonYears>0;
+ const stats=heading('Politische Laufbahn')+'<div class="info-card"><h3>🏛️ Politik</h3><p>Erfahrung: '+(c?.experience??0)+' % · Ansehen: '+(c?.reputation??20)+' % · Integrität: '+(c?.integrity??65)+' %</p><p class="small">'+(c?.wins??0)+' Wahlsiege · fiktive Parteien und eigene Wahlmodelle</p></div>';
+ const volunteer=menuRow('🤝','Ehrenamtlich engagieren','Ab 14 · Erfahrung sammeln, zwei Aktionen jährlich','politics','volunteer',jailed||p.age<14);
+ let content='';
+ if(q){
+  const cost=Math.round(POLITICAL_REQUIREMENTS[q.office].baseCost*.75);
+  content=heading('Laufender Wahlkampf')+'<div class="info-card"><b>'+html(q.office)+'</b><p>'+html(q.party)+' · '+html(q.policy)+'</p><p>Reichweite '+q.reach+' % · Debatte '+q.debate+' % · Ausgaben '+money(q.spent)+'</p><p class="small">Wahl vor dem nächsten Jahreswechsel durchführen!</p></div><div class="stack">'+menuRow('🚪','Haustürgespräche','Wähler überzeugen','politics','canvass',jailed)+menuRow('🎤','Wahldebatte','Öffentlich diskutieren','politics','debate',jailed)+menuRow('📣','Wahlwerbung',money(cost)+' zusätzlich ausgeben','politics','advertise',jailed||p.cash<cost)+menuRow('🗳️','Zur Wahl antreten','Ergebnis ermitteln','politics','election',jailed)+'</div>';
+ }else if(a){
+  content=heading('Dein Amt')+'<div class="info-card"><h3>'+html(a.role)+'</h3><p>'+html(a.party)+' · '+a.yearsLeft+' Jahre verbleibend · '+money(a.salary)+' brutto/Jahr</p><b>Zustimmung: '+a.approval+' %</b><div class="meter"><div style="width:'+a.approval+'%"></div></div><p>Schwerpunkt: '+html(a.policy)+'</p></div><div class="stack">'+menuRow('🎙️','Bürgerversammlung','Zustimmung gewinnen','politics','speech',jailed)+POLITICAL_POLICIES.map(x=>menuRow('📜','Vorhaben: '+x,'Politische Maßnahme vorschlagen','politics','policy|'+x,jailed)).join('')+menuRow('🚪','Rücktritt','Amt niederlegen','politics','resign',jailed)+'</div>';
+ }else{
+  const eligible=POLITICAL_OFFICES.filter(k=>{const x=POLITICAL_REQUIREMENTS[k];return p.age>=x.age&&(c?.experience??0)>=x.experience&&(c?.wins??0)>=x.wins;});
+  const options=(v:readonly string[])=>v.map(x=>'<option value="'+html(x)+'">'+html(x)+'</option>').join('');
+  content=heading('Kandidatur')+'<div class="info-card"><label class="field">Amt<select id="politics-office">'+options(eligible)+'</select></label><label class="field">Gruppierung<select id="politics-party">'+options(POLITICAL_PARTIES)+'</select></label><label class="field">Programm<select id="politics-policy">'+options(POLITICAL_POLICIES)+'</select></label><label class="field">Wahlkampfbudget<select id="politics-budget">'+options(POLITICAL_BUDGETS)+'</select></label>'+button('Wahlkampf starten','politics','launch','button-wide',jailed||!eligible.length||p.cash<1200||p.record||!!p.musicCareer?.contractYears||!!p.actorCareer?.current||!!p.sportCareer?.contract)+'</div>'+heading('Voraussetzungen')+'<div class="stack">'+POLITICAL_OFFICES.map(role=>{const x=POLITICAL_REQUIREMENTS[role];return '<div class="acting-credit"><b>'+html(role)+'</b><small>Alter '+x.age+' · Erfahrung '+x.experience+' % · '+x.wins+' Siege · ab '+money(x.baseCost)+'</small></div>';}).join('')+'</div>';
+ }
+ const archive=c?.elections.length?heading('Wahlchronik')+'<div class="stack">'+c.elections.slice(-12).reverse().map(e=>'<div class="acting-credit"><b>'+html(e.office)+' · Alter '+e.age+' · '+(e.won?'🏆 Wahlsieg':'Wahlniederlage')+'</b><small>'+e.votes+' % Stimmen · '+money(e.spent)+' Ausgaben</small></div>').join('')+'</div>':'';
+ return stats+heading('Mitmachen')+volunteer+content+archive;
+}
 function renderCareer(p:Person){
  if(!p.alive)return '<div class="empty">Diese Laufbahn ist beendet.</div>';
  const canStudy=p.age>=18&&p.age<=40&&!p.degree&&p.universityYears===0&&p.prisonYears===0;
@@ -186,12 +205,13 @@ function renderCareer(p:Person){
  ${renderMusic(p)}
  ${renderActor(p)}
  ${renderSport(p)}
+ ${heading('Politik')}${menuRow('🏛️','Politikerkarriere','Wahlkämpfe, Ämter und Zustimmung','category','politics')}
  ${heading('Filmregie')}${menuRow('🎬','Regiestudio','Drehbuch, Casting, Produktion und Filmografie','category','director')}
- ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)||sportActive(p)?'Aktive Karriere':'Arbeitssuchend')}
- <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:sportActive(p)?'Sportprofi · '+p.sportCareer!.contract!.club:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':sportActive(p)?'Sportvertrag · Saisonabrechnung beim Altern':'Ohne regelmäßiges Einkommen'}</p>
+ ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)||sportActive(p)||politicsActive(p)?'Aktive Karriere':'Arbeitssuchend')}
+ <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:sportActive(p)?'Sportprofi · '+p.sportCareer!.contract!.club:politicsActive(p)?'Politisches Amt · '+p.politicalCareer!.office!.role:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':sportActive(p)?'Sportvertrag · Saisonabrechnung beim Altern':politicsActive(p)?'Wahlamt · Jahresgehalt':'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
  ${renderWorkplace(p)}
-  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
+  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p)&&!politicsActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
 function renderPeople(p:Person){
  const living=p.relationships.filter(r=>r.alive);
@@ -290,6 +310,7 @@ function renderActivities(p:Person){
  if(!activitySection){return `<div class='screen-welcome'>Wähle eine Aktivität. Mit jedem Lebensjahr ändern sich die verfügbaren Möglichkeiten.</div>
  ${heading('Besondere Aktivitäten')}<div class='stack'>
  ${menuRow('🎬','Filmregie','Filme produzieren, besetzen und veröffentlichen','category','director')}
+  ${menuRow('🏛️','Politik','Wahlkampf und öffentliche Ämter','category','politics')}
   ${menuRow('🏅','Profisport','Sporttraining, Verträge und Meisterschaften','category','sport')}
  ${menuRow('🧛','Vampir-Modus','Spezialmodus · noch nicht verfügbar','premiumopen','',true)}
  ${menuRow('🌲','Outdoor-Leben','Zusätzliche Outdoor-Erlebnisse · geplant','premiumopen','',true)}
@@ -331,6 +352,7 @@ function renderActivities(p:Person){
  </div>`;
  if(activitySection==='director')return `${back}${renderDirector(p)}`;
   if(activitySection==='sport')return `${back}${renderSport(p)}`;
+ if(activitySection==='politics')return `${back}${renderPolitics(p)}`;
  if(activitySection==='acting')return `${back}${renderActor(p)}`;
  if(activitySection==='music')return `${back}${renderMusic(p)}`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
@@ -359,7 +381,7 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.13.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.15.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -402,7 +424,7 @@ root.addEventListener('submit',async e=>{const target=e.target;if(!(target insta
 root.addEventListener('input',e=>{const t=e.target;if(!(t instanceof HTMLInputElement)||t.type!=='range')return;const output=t.closest('.range-field')?.querySelector('output');if(output)output.textContent=t.value+'%';});
 root.addEventListener('change',async e=>{const target=e.target;if(!(target instanceof HTMLInputElement)||target.id!=='import-file'||!target.files?.[0])return;try{const imported=await importGame(target.files[0]);current=imported;games=await listGames();tab='life';modal=null;notify('Spielstand erfolgreich importiert.',true);}catch(error){notify(error instanceof Error?error.message:'Import fehlgeschlagen.');}});
 root.addEventListener('click',async e=>{const target=e.target;if(!(target instanceof Element))return;const control=target.closest<HTMLElement>('[data-action]');if(!control||control instanceof HTMLButtonElement&&control.disabled)return;const kind=control.dataset.action||'';const id=control.dataset.id||'';
- if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if((id==='school-clubs'||id==='director')&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
+ if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if((id==='school-clubs'||id==='director'||id==='politics')&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
  if(kind==='load'){try{current=await (await import('./storage/database.js')).getGame(id);tab='life';modal=null;render();}catch{notify('Spielstand konnte nicht geladen werden.');}return;}
  if(kind==='deleteprompt'){deleteTarget=id;modal='delete';render();return;}
  if(kind==='deleteconfirm'){await deleteGame(id);games=await listGames();if(current?.id===id)current=games[0]||null;modal='saves';render();return;}
@@ -411,6 +433,7 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
  else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
  else if(kind==='work'){const [key,contactId]=id.split('|');await action({type:'WORK',key:key as 'introduce'|'talk'|'teamwork'|'conflict'|'promotion',id:contactId});}
+  else if(kind==='politics'){const [key,value]=id.split('|');const get=(name:string)=>document.querySelector<HTMLSelectElement>('#politics-'+name)?.value;await action({type:'POLITICS',key:key as 'volunteer'|'launch'|'canvass'|'debate'|'advertise'|'election'|'speech'|'policy'|'resign',office:key==='launch'?get('office') as import('./engine/types.js').PoliticalOffice:undefined,party:key==='launch'?get('party') as import('./engine/types.js').PoliticalParty:undefined,policy:key==='launch'?get('policy') as import('./engine/types.js').PoliticalPolicy:key==='policy'?value as import('./engine/types.js').PoliticalPolicy:undefined,budget:key==='launch'?get('budget') as import('./engine/types.js').PoliticalBudget:undefined});}
   else if(kind==='sport'){const [key,value]=id.split('|');await action({type:'SPORT',key:key as 'train'|'tryout'|'recover'|'negotiate'|'sponsor'|'retire',sport:key==='train'?value as import('./engine/types.js').SportKind:undefined,league:key==='tryout'?value as import('./engine/types.js').SportLeague:undefined});}
   else if(kind==='director'){const [key,choice,budget]=id.split('|');await action({type:'DIRECTOR',key:key as 'study'|'start'|'cast'|'shoot'|'release'|'cancel',genre:key==='start'?choice as import('./engine/types.js').DirectorGenre:undefined,budget:key==='start'?budget as 'kurz'|'mittel'|'gross':undefined,choice:key==='cast'||key==='shoot'?choice as 'newcomers'|'stars'|'careful'|'quick':undefined});}
  else if(kind==='actor'){const sep=id.indexOf('|');await action({type:'ACTOR',key:(sep>=0?id.slice(0,sep):id) as 'lesson'|'extra'|'hire-agent'|'fire-agent'|'agent-search'|'audition'|'rehearse'|'quit',offerId:sep>=0?id.slice(sep+1):undefined});}

@@ -11,6 +11,7 @@ import {advanceCrime,crimeAction,crimeReleased,validCrime} from './crime.js';
 import {advanceDirector,directorAction,validDirector} from './director.js';
 import {advanceSport,sportAction,sportActive,validSport} from './sport.js';
 import {applyForWork,workAction,startWork,workYear,promoteWork,validWork} from './work.js';
+import {advancePolitics,politicalAction,politicsActive,validPolitics} from './politics.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -73,7 +74,7 @@ function yearlyEvent(s:SaveGame){const p=s.person;
  else if(roll<.47&&p.age>=18){event(s,'Eine Gelegenheit',`Ein Nebenverdienst bietet sich an.`,[{label:'Auftrag annehmen',kind:'sidejob'},{label:'Auslassen',kind:'ignore'}]);}
  else if(roll<.55&&p.age>=18){event(s,'Ein unerwarteter Fund',`Du findest eine fremde Geldbörse auf dem Weg nach Hause.`,[{label:'Zurückgeben',kind:'walletReturn'},{label:'Geld behalten',kind:'walletKeep'}]);}
 }
-function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;p.jobId=null;p.workplace=null;if(p.sportCareer)p.sportCareer.contract=null;log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
+function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;p.jobId=null;p.workplace=null;if(p.sportCareer)p.sportCareer.contract=null;if(p.politicalCareer){p.politicalCareer.office=null;p.politicalCareer.campaign=null;}log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
 function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.age++;const releasedThisYear=p.prisonYears===1;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
  for(const r of p.relationships){r.age++;if(r.alive&&chance(s,Math.max(.001,(r.age-68)*.006))) {r.alive=false;log(s,`${r.name} ist verstorben.`,'bad');}}
  if(p.prisonYears>0){p.prisonYears--;if(p.prisonYears===0)log(s,'Du wurdest aus dem Gefängnis entlassen.','good');}
@@ -90,6 +91,7 @@ function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.
  advanceActing(s,expansionHooks(s));
  advanceDirector(s,expansionHooks(s));
   advanceSport(s,expansionHooks(s),jailedAtStart);
+  advancePolitics(s,expansionHooks(s),jailedAtStart);
  advanceLifestyle(s,expansionHooks(s));
   familyYear(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
@@ -225,7 +227,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
     log(s,`Du hast sofort deinen Abschluss in ${degree} erhalten.`,'good');
    }else if(action.key==='hollywood-star'){
     const famousJobs=['writer','chef','reporter','app-developer','dj','magician','model','actor','singer','musician','politician','athlete'];
-    if(!famousJobs.includes(p.jobId||'')&&!p.business&&!actingActive(p)&&!p.musicCareer?.contractYears&&!sportActive(p))throw Error('Du benötigst einen Beruf mit Bekanntheitspotenzial oder ein Unternehmen.');
+    if(!famousJobs.includes(p.jobId||'')&&!p.business&&!actingActive(p)&&!p.musicCareer?.contractYears&&!sportActive(p)&&!(['Landesregierung','Staatsoberhaupt'].includes(p.politicalCareer?.office?.role||'')))throw Error('Du benötigst einen Beruf mit Bekanntheitspotenzial oder ein Unternehmen.');
     p.fame=Math.max(p.fame||0,80);
     stat(p,'happiness',5);
     log(s,'Du bist schlagartig bekannt geworden.','good');
@@ -237,10 +239,11 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
- case 'SPORT':sportAction(s,action.key,action.sport,action.league,expansionHooks(s));break;
+ case 'POLITICS':politicalAction(s,action.key,action.office,action.party,action.policy,action.budget,expansionHooks(s));break;
+  case 'SPORT':sportAction(s,action.key,action.sport,action.league,expansionHooks(s));break;
   case 'DIRECTOR':directorAction(s,action.key,action.genre,action.budget,action.choice,expansionHooks(s));break;
- case 'ACTOR':if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');actorAction(s,action.key,action.offerId,expansionHooks(s));break;
- case 'MUSIC':if(action.key==='audition'&&actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');musicAction(s,action.key,action.role,action.mode,expansionHooks(s));break;
+ case 'ACTOR':if(action.key==='audition'&&(politicsActive(p)||p.politicalCareer?.campaign))throw Error('Beende zuerst deine politische Laufbahn.');if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');actorAction(s,action.key,action.offerId,expansionHooks(s));break;
+ case 'MUSIC':if(action.key==='audition'&&(politicsActive(p)||p.politicalCareer?.campaign))throw Error('Beende zuerst deine politische Laufbahn.');if(action.key==='audition'&&actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(action.key==='audition'&&sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');musicAction(s,action.key,action.role,action.mode,expansionHooks(s));break;
  case 'FAMILY':familyAction(s,action.key,action.id,expansionHooks(s),()=>relation(s,'Freund',p.age));break;
   case 'EDUCATION':educationAction(s,action.key,action.club,expansionHooks(s));break;
   case 'MEDICAL':medicalAction(s,action.key,expansionHooks(s));break;
@@ -258,13 +261,13 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  case 'ACTIVITY':activity(s,action.key);break;
  case 'RELATION':interact(s,action.id,action.key);break;
  case 'EVENT':resolve(s,action.kind);break;
- case 'STUDY':if(p.age<18||p.age>40||p.universityYears>0||p.degree||p.prisonYears>0)throw Error('Ein Studienbeginn ist gerade nicht möglich.');if(p.stats.smarts<55)throw Error('Für die Universität brauchst du mehr Intelligenz (mindestens 55).');p.universityYears=4;p.school='Universität';p.jobId=null;p.workplace=null;
+ case 'STUDY':if(politicsActive(p))throw Error('Während deiner Amtszeit ist ein Vollzeitstudium nicht möglich.');if(p.age<18||p.age>40||p.universityYears>0||p.degree||p.prisonYears>0)throw Error('Ein Studienbeginn ist gerade nicht möglich.');if(p.stats.smarts<55)throw Error('Für die Universität brauchst du mehr Intelligenz (mindestens 55).');p.universityYears=4;p.school='Universität';p.jobId=null;p.workplace=null;
    if((p.grades??0)>=85){p.cash+=3000;log(s,'Wegen deiner hervorragenden Schulnoten hast du ein Stipendium von 3.000 € erhalten.','good');}
    log(s,'Du hast ein vierjähriges Universitätsstudium begonnen.','good');break;
- case 'JOB':{requireFree(p);if(p.musicCareer&&p.musicCareer.contractYears>0)throw Error('Beende zuerst deinen Musikvertrag.');if(actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');const job=CAREERS.find(j=>j.id===action.id);if(!job)throw Error('Unbekannte Stelle.');if(p.age<job.minAge||p.stats.smarts<job.minSmarts||(job.requiresDegree&&!p.degree)||p.prisonYears>0)throw Error('Du erfüllst die Voraussetzungen noch nicht.');p.jobId=job.id;p.jobYears=0;p.salaryBonus=0;p.careerPerformance=50;startWork(s,expansionHooks(s));log(s,`Du arbeitest jetzt als ${job.title}.`,'good');break;}
+ case 'JOB':{requireFree(p);if(politicsActive(p))throw Error('Beende zuerst dein politisches Amt.');if(p.musicCareer&&p.musicCareer.contractYears>0)throw Error('Beende zuerst deinen Musikvertrag.');if(actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');const job=CAREERS.find(j=>j.id===action.id);if(!job)throw Error('Unbekannte Stelle.');if(p.age<job.minAge||p.stats.smarts<job.minSmarts||(job.requiresDegree&&!p.degree)||p.prisonYears>0)throw Error('Du erfüllst die Voraussetzungen noch nicht.');p.jobId=job.id;p.jobYears=0;p.salaryBonus=0;p.careerPerformance=50;startWork(s,expansionHooks(s));log(s,`Du arbeitest jetzt als ${job.title}.`,'good');break;}
  case 'BUY':{requireFree(p);const item=ITEMS.find(i=>i.id===action.id);if(!item)throw Error('Unbekannter Gegenstand.');if(p.age<18||p.cash<item.price)throw Error('Kauf derzeit nicht möglich.');p.cash-=item.price;p.assets.push({id:uid(s),name:item.name,kind:item.kind,value:item.price,annualCost:item.annualCost});log(s,`Du hast ${item.name} für ${money(item.price)} gekauft.`,'good');break;}
  case 'SELL':{requireFree(p);const item=p.assets.find(i=>i.id===action.id);if(!item)throw Error('Gegenstand nicht vorhanden.');const sale=Math.floor(item.value*.85);p.cash+=sale;p.assets=p.assets.filter(i=>i.id!==item.id);log(s,`Du hast ${item.name} für ${money(sale)} verkauft.`,'good');break;}
- case 'EMIGRATE':if(p.age<18||p.prisonYears>0||!COUNTRIES.includes(action.country)||p.country===action.country)throw Error('Auswanderung nicht verfügbar.');if(p.cash<3500)throw Error('Die Auswanderung kostet 3.500 €.');p.cash-=3500;p.country=action.country;p.jobId=null;p.workplace=null;p.jobYears=0;if(p.sportCareer?.contract){p.sportCareer.contract=null;log(s,'Dein bisheriger Sportvertrag endet mit der Auswanderung.');}log(s,`Du bist nach ${action.country} ausgewandert.`,'good');break;
+ case 'EMIGRATE':if(p.age<18||p.prisonYears>0||!COUNTRIES.includes(action.country)||p.country===action.country)throw Error('Auswanderung nicht verfügbar.');if(p.cash<3500)throw Error('Die Auswanderung kostet 3.500 €.');p.cash-=3500;p.country=action.country;if(p.politicalCareer?.office||p.politicalCareer?.campaign){p.politicalCareer.office=null;p.politicalCareer.campaign=null;log(s,'Deine politische Laufbahn in diesem Land endet durch die Auswanderung.');}p.jobId=null;p.workplace=null;p.jobYears=0;if(p.sportCareer?.contract){p.sportCareer.contract=null;log(s,'Dein bisheriger Sportvertrag endet mit der Auswanderung.');}log(s,`Du bist nach ${action.country} ausgewandert.`,'good');break;
  }
  s.updated=Date.now();return s;
 }
@@ -282,7 +285,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validWork(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validWork(p)||!validPolitics(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;

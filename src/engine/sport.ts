@@ -53,7 +53,7 @@ export function sportAction(s:SaveGame,key:'train'|'tryout'|'recover'|'negotiate
   if(c.retired)throw Error('Du hast deine Sportkarriere bereits beendet.');
   if(c.injuryYears>0)throw Error('Mit einer Verletzung ist kein Probetraining möglich.');
   if(c.contract)throw Error('Du stehst bereits unter Vertrag.');
-  if(!!p.musicCareer?.contractYears||!!p.actorCareer?.current)throw Error('Beende zuerst die andere Spezialkarriere.');
+  if(!!p.musicCareer?.contractYears||!!p.actorCareer?.current||!!p.politicalCareer?.office||!!p.politicalCareer?.campaign)throw Error('Beende zuerst die andere Spezialkarriere.');
   const minSkill=league==='Regional'?35:70;
   if(c.skill<minSkill||c.fitness<35)throw Error('Deine Fähigkeiten reichen für dieses Probetraining noch nicht.');
   h.annual('sport:tryout',2);

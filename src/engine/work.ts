@@ -27,7 +27,7 @@ export function applyForWork(s:SaveGame,id:string,h:ExpansionHooks){
  const p=s.person,job=CAREERS.find(c=>c.id===id);
  if(!job)throw Error('Unbekannte Stelle.');
  if(p.prisonYears>0)throw Error('Während der Haft sind Bewerbungen nicht möglich.');
- if(p.musicCareer?.contractYears||p.actorCareer?.current||p.sportCareer?.contract)throw Error('Beende zuerst deine aktive Spezialkarriere.');
+ if(p.musicCareer?.contractYears||p.actorCareer?.current||p.sportCareer?.contract||p.politicalCareer?.office)throw Error('Beende zuerst deine aktive Spezialkarriere.');
  if(p.age<job.minAge||p.stats.smarts<job.minSmarts||(job.requiresDegree&&!p.degree))throw Error('Du erfüllst die Voraussetzungen noch nicht.');
  if(p.jobId===id)throw Error('Du arbeitest bereits in diesem Beruf.');
  h.annual('work:interview',3);

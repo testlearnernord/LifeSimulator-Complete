@@ -190,7 +190,52 @@ with sync_playwright() as playwright:
     page.locator('nav [data-action="tab"][data-id="career"]').click()
     expect(page.get_by_text('Arbeitsumfeld', exact=True)).to_be_visible()
     assert page.locator('[data-action="work"][data-id^="talk|"]').count() == 3
+    # Political career: start an independently designed electoral path on mobile.
+    page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="politics"]').click()
+    expect(page.get_by_text('Politische Laufbahn')).to_be_visible()
+    page.evaluate("""async () => {
+        const {createLife,applyAction}=await import('/app/engine/simulation.js');
+        const {putGame}=await import('/app/storage/database.js');
+        let s=createLife({name:'Politik E2E',gender:'divers',country:'Deutschland',seed:83838,
+            stats:{health:100,happiness:100,smarts:100,looks:100}});
+        while(s.person.age<25){
+            if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+            s=applyAction(s,{type:'AGE'});
+        }
+        if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+        s.person.cash=100000;
+        s=applyAction(s,{type:'POLITICS',key:'volunteer'});
+        s.person.politicalCareer.experience=100;
+        s.person.politicalCareer.reputation=100;
+        s.person.politicalCareer.integrity=100;
+        s.updated=Date.now()+200000;
+        await putGame(s);
+    }""")
+    page.reload(wait_until='networkidle')
+    expect(page.locator('.profile-name')).to_contain_text('Politik E2E')
+    page.locator('nav [data-action="tab"][data-id="career"]').click()
+    page.locator('[data-action="category"][data-id="politics"]').click()
+    expect(page.get_by_text('Politische Laufbahn')).to_be_visible()
+    page.locator('[data-action="politics"][data-id="launch"]').click()
+    expect(page.get_by_text('Laufender Wahlkampf')).to_be_visible()
+    page.locator('[data-action="politics"][data-id="canvass"]').click()
+    page.locator('[data-action="politics"][data-id="debate"]').click()
+    page.locator('[data-action="politics"][data-id="election"]').click()
+    expect(page.get_by_text('Dein Amt')).to_be_visible()
+    expect(page.get_by_text('Wahlchronik')).to_be_visible()
+    page.reload(wait_until='networkidle')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="politics"]').click()
+    expect(page.get_by_text('Dein Amt')).to_be_visible()
+    context.set_offline(True)
+    page.reload(wait_until='domcontentloaded')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="politics"]').click()
+    expect(page.get_by_text('Dein Amt')).to_be_visible()
+    context.set_offline(False)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.14 workplace, athlete, director, crime, acting, school, saves and offline: PASSED')
+    print('v0.15 politics, workplace, athlete, director, saves and offline: PASSED')
     context.close()
     browser.close()

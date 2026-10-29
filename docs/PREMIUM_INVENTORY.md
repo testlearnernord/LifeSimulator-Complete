@@ -56,3 +56,7 @@ Die vorläufige Inventarliste muss periodisch mit dem **tatsächlichen Ingame-Sh
 ## Pro Athlete ab Lebenslinien 0.13.0
 
 Im eigenen Spiel **teilweise umgesetzt**: Fußball, Basketball, Handball, Training, fiktive Vereine, Verträge, Saisons, Verletzungen und Sponsoren. Dies bildet kein vollständiges Originalpaket ab. Verweis: [PRO_ATHLETE.md](PRO_ATHLETE.md).
+
+## Politician ab Lebenslinien 0.15.0
+
+Das **offizielle Job Pack Politician** ist als Referenz nachgewiesen (BitLife Help Center). Im eigenen Projekt **teilweise umgesetzt**: fiktive Wahlkampagnen, Ämter, Gruppierungen, vierjährige Amtszeiten und jährliche Gehälter. Keine Originalparteien, Assets oder Formeln. Siehe [POLITICS.md](POLITICS.md).

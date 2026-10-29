@@ -143,7 +143,7 @@ export function validMusic(p:Person):boolean{
    if(!r||typeof r.title!=='string'||r.title.length>90||!['Single','Album'].includes(r.kind)||!Number.isInteger(r.year)||r.year<0||r.year>p.age)return false;
    if(!Number.isInteger(r.units)||!validMoney(r.units,1e9)||!Number.isInteger(r.quality)||r.quality<0||r.quality>100)return false;
   }
-  if(c.contractYears>0&&p.jobId!==null)return false;
+  if(c.contractYears>0&&(p.jobId!==null||!!p.politicalCareer?.office))return false;
  }
  return true;
 }
