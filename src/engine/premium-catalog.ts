@@ -12,7 +12,7 @@ export const PREMIUM_CATALOG:PremiumItem[]=[
  {id:'pro-athlete',name:'Pro Athlete',group:'Job-Packs',status:'teilweise',description:'Drei Sportarten, Training, Probetrainings, fiktive Vereine, Verträge, Saisons, Verletzungen und Sponsoren',source:'official'},
  {id:'musician',name:'Musician',group:'Job-Packs',status:'teilweise',description:'Unterricht, Vorspiele, Solo/Band, Verträge, Veröffentlichungen, Auftritte und Tantiemen',source:'official'},
  {id:'actor',name:'Actor',group:'Job-Packs',status:'teilweise',description:'Schauspielunterricht, Komparserie, Agenturen, Castings, Film- und Serienrollen, Gagen und Auszeichnungen',source:'official'},
- {id:'politician',name:'Politician',group:'Job-Packs',status:'offen',description:'Politische Laufbahn und Wahlen',source:'official'},
+ {id:'politician',name:'Politician',group:'Job-Packs',status:'teilweise',description:'Fiktive Wahlkämpfe, Parteien, Ämter, Wahlergebnisse, Amtszeiten und politische Maßnahmen',source:'official'},
  {id:'astronaut',name:'Astronaut',group:'Job-Packs',status:'offen',description:'Weltraumkarriere',source:'community'},
  {id:'model',name:'Model',group:'Job-Packs',status:'offen',description:'Modelagentur und Laufsteg',source:'community'},
  {id:'street-hustler',name:'Street Hustler',group:'Job-Packs',status:'offen',description:'Straßenauftritte und Hustles',source:'community'},
