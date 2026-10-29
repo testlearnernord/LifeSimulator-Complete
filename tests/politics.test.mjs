@@ -1,0 +1,161 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createLife,applyAction,isSaveGame} from '../dist/app/engine/simulation.js';
+import {politicalCampaignCost} from '../dist/app/engine/politics.js';
+
+const born=()=>createLife({name:'Politiktest',gender:'divers',country:'Deutschland',seed:7744,stats:{health:100,happiness:90,smarts:100,looks:100}});
+const act=(s,key,options={})=>applyAction(s,{type:'POLITICS',key,...options});
+function ageTo(s,age){while(s.person.age<age){if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});return s;}
+const launch=(s,office='Gemeinderat',budget='klein')=>act(s,'launch',{office,party:'Unabhängig',policy:'Bildung',budget});
+function expert(age=35){
+ let s=ageTo(born(),age);s.person.cash=1000000;
+ s=act(s,'volunteer');
+ s.person.politicalCareer.experience=100;s.person.politicalCareer.reputation=100;s.person.politicalCareer.integrity=100;s.person.politicalCareer.wins=3;
+ return s;
+}
+test('political volunteering enforces age and annual quotas, older saves remain valid',()=>{
+ let s=born();
+ assert.equal(isSaveGame(s),true);
+ assert.throws(()=>act(s,'volunteer'),/14/);
+ s=ageTo(s,14);s=act(s,'volunteer');s=act(s,'volunteer');
+ assert.ok(s.person.politicalCareer.experience>=14);
+ assert.throws(()=>act(s,'volunteer'),/dieses Jahr/);
+ assert.equal(isSaveGame(s),true);
+ const legacy=structuredClone(s);delete legacy.person.politicalCareer;
+ assert.equal(isSaveGame(legacy),true);
+});
+test('campaign launch charges exact tier, validates input and retains current job until election',()=>{
+ let s=ageTo(born(),18);s.person.cash=300000;
+ assert.equal(politicalCampaignCost('Gemeinderat','mittel'),2400);
+ assert.throws(()=>act(s,'launch',{office:'Prinz',party:'Unabhängig',policy:'Bildung',budget:'klein'}),/Ungültige/);
+ assert.throws(()=>launch(s),/Sammle/);
+ s=act(s,'volunteer');s=applyAction(s,{type:'JOB',id:'retail'});
+ const before=s.person.cash;
+ s=launch(s,'Gemeinderat','mittel');
+ assert.equal(s.person.cash,before-2400);
+ assert.equal(s.person.jobId,'retail');
+ assert.equal(s.person.politicalCareer.campaign.spent,2400);
+ assert.throws(()=>launch(s),/bereits/);
+ assert.equal(isSaveGame(s),true);
+});
+test('a prepared city election wins, saves votes and replaces old employment',()=>{
+ let s=expert(25);s.person.politicalCareer.wins=0;
+ s=applyAction(s,{type:'JOB',id:'retail'});
+ s=launch(s);
+ s=act(s,'canvass');
+ s=act(s,'debate');
+ s=act(s,'election');
+ const c=s.person.politicalCareer;
+ assert.equal(c.campaign,null);
+ assert.equal(c.elections.length,1);
+ assert.equal(c.elections[0].won,true);
+ assert.ok(c.elections[0].votes>=50);
+ assert.equal(c.office.role,'Gemeinderat');
+ assert.equal(c.office.yearsLeft,4);
+ assert.equal(s.person.jobId,null);
+ assert.equal(s.person.workplace,null);
+ assert.equal(isSaveGame(s),true);
+});
+test('electoral defeat records a loss and does not destroy regular work',()=>{
+ let s=ageTo(born(),18);s.person.cash=20000;
+ s=act(s,'volunteer');
+ s=applyAction(s,{type:'JOB',id:'retail'});
+ s.person.stats.smarts=0;s.person.stats.looks=0;
+ s.person.politicalCareer.experience=0;s.person.politicalCareer.reputation=0;s.person.politicalCareer.integrity=0;
+ s=launch(s);s=act(s,'election');
+ assert.equal(s.person.politicalCareer.elections[0].won,false);
+ assert.equal(s.person.politicalCareer.office,null);
+ assert.equal(s.person.jobId,'retail');
+});
+test('incumbents get tax-adjusted salary and their four-year term ends',()=>{
+ let s=expert(31);s=launch(s,'Landesregierung','gross');
+ s.person.politicalCareer.campaign.reach=100;s.person.politicalCareer.campaign.debate=100;
+ s=act(s,'election');
+ assert.equal(s.person.politicalCareer.office.role,'Landesregierung');
+ const before=s.person.cash;
+ s=ageTo(s,32);
+ assert.equal(s.person.politicalCareer.office.yearsLeft,3);
+ assert.ok(s.person.cash>before);
+ assert.equal(s.person.politicalCareer.elections.length,1);
+ s=ageTo(s,35);
+ assert.equal(s.person.politicalCareer.office,null);
+ assert.ok(isSaveGame(s));
+});
+test('mayor and higher ranks require electoral progression and experience',()=>{
+ let s=ageTo(born(),21);s.person.cash=1000000;
+ s=act(s,'volunteer');
+ assert.throws(()=>launch(s,'Bürgermeister'),/Voraussetzungen/);
+ s.person.politicalCareer.experience=99;
+ assert.throws(()=>launch(s,'Bürgermeister'),/Voraussetzungen/);
+ s.person.politicalCareer.wins=1;
+ s=launch(s,'Bürgermeister');
+ assert.equal(s.person.politicalCareer.campaign.office,'Bürgermeister');
+ assert.equal(isSaveGame(s),true);
+});
+test('campaign reach, debate, costs and office activities have lasting effects',()=>{
+ let s=expert(25);s=launch(s);
+ const before=s.person.cash;
+ s=act(s,'canvass');
+ assert.ok(s.person.politicalCareer.campaign.reach>9);
+ s=act(s,'debate');
+ assert.ok(s.person.politicalCareer.campaign.debate>0);
+ s=act(s,'advertise');
+ assert.ok(s.person.cash<before);
+ assert.throws(()=>act(s,'debate'),/dieses Jahr/);
+ s.person.politicalCareer.campaign.reach=100;s.person.politicalCareer.campaign.debate=100;
+ s=act(s,'election');
+ const approval=s.person.politicalCareer.office.approval;
+ s=act(s,'speech');
+ assert.ok(s.person.politicalCareer.office.approval>=approval);
+ s=act(s,'policy',{policy:'Gesundheit'});
+ assert.equal(s.person.politicalCareer.office.policy,'Gesundheit');
+ assert.throws(()=>act(s,'policy',{policy:'Bildung'}),/dieses Jahr/);
+ assert.equal(isSaveGame(s),true);
+});
+test('campaign expires when aging; rewind restores campaign state',()=>{
+ let s=ageTo(born(),20);s.person.cash=15000;s=act(s,'volunteer');
+ s=launch(s);const campaign=structuredClone(s.person.politicalCareer.campaign);
+ s=ageTo(s,21);
+ assert.equal(s.person.politicalCareer.campaign,null);
+ s=applyAction(s,{type:'REWIND',years:1});
+ assert.deepEqual(s.person.politicalCareer.campaign,campaign);
+ assert.equal(isSaveGame(s),true);
+});
+test('office duties block competing full-time work and terminate on emigration',()=>{
+ let s=expert(25);s=launch(s);
+ s.person.politicalCareer.campaign.reach=100;s.person.politicalCareer.campaign.debate=100;
+ s=act(s,'election');
+ assert.throws(()=>applyAction(s,{type:'JOB',id:'retail'}),/politisches Amt/);
+ assert.throws(()=>applyAction(s,{type:'WORK',key:'apply',id:'retail'}),/Spezialkarriere/);
+ assert.throws(()=>applyAction(s,{type:'ACTOR',key:'audition',offerId:'indie-film'}),/politische Laufbahn/);
+ s=applyAction(s,{type:'EMIGRATE',country:'Portugal'});
+ assert.equal(s.person.politicalCareer.office,null);
+ assert.equal(isSaveGame(s),true);
+});
+test('prison removes elected office and tampered political saves are rejected',()=>{
+ let s=expert(25);s=launch(s);
+ s.person.politicalCareer.campaign.reach=100;s.person.politicalCareer.campaign.debate=100;
+ s=act(s,'election');
+ const testSave=structuredClone(s);
+ testSave.person.politicalCareer.office.approval=Infinity;
+ assert.equal(isSaveGame(testSave),false);
+ const fake=structuredClone(s);
+ fake.person.politicalCareer.elections[0].votes=-10;
+ assert.equal(isSaveGame(fake),false);
+ const bogus=structuredClone(s);
+ bogus.person.politicalCareer.office.salary=9999999;
+ assert.equal(isSaveGame(bogus),false);
+ s.person.prisonYears=2;
+ s=ageTo(s,26);
+ assert.equal(s.person.politicalCareer.office,null);
+ assert.equal(isSaveGame(s),true);
+});
+test('political resignation ends office and ordinary jobs work again',()=>{
+ let s=expert(25);s=launch(s);
+ s.person.politicalCareer.campaign.reach=100;s.person.politicalCareer.campaign.debate=100;
+ s=act(s,'election');
+ s=act(s,'resign');
+ assert.equal(s.person.politicalCareer.office,null);
+ s=applyAction(s,{type:'JOB',id:'retail'});
+ assert.equal(s.person.jobId,'retail');
+});
