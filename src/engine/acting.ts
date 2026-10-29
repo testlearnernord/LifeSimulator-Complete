@@ -156,7 +156,7 @@ export function validActing(p:Person):boolean{
   const role=c.current;
   const offer=ACTING_OFFERS.find(o=>o.id===role.offerId);
   if(!offer||!role||role.title!==offer.title||role.kind!==offer.kind||role.role!==offer.role||role.quality!==offer.quality||role.payPerUnit!==offer.fee||role.episodes!==offer.episodes||!integer(role.yearsLeft,1,offer.seasons))return false;
-  if(p.jobId!==null||!!(p.musicCareer&&p.musicCareer.contractYears>0)||p.age<18)return false;
+  if(p.jobId!==null||!!(p.musicCareer&&p.musicCareer.contractYears>0)||!!p.politicalCareer?.office||p.age<18)return false;
  }
  return true;
 }
