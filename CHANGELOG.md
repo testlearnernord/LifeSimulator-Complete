@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.15.0 – 2026-10-29 (Politikerkarriere)
+
+- Eigenständige vierstufige Politikerkarriere mit Ehrenamt, fiktiven Parteien, programmatischen Schwerpunkten und Wahlkampfbudgets.
+- Kampagnenaktivitäten (Haustürgespräche, Debatten, Werbung), Wahlausgang und Wahlchronik.
+- Jahresgehälter, Zustimmungswerte, vierjährige Amtszeiten, politische Maßnahmen, Reden und Rücktritte.
+- Saubere Ausstiege bei Haft, Auswanderung und Tod; Sperren für konkurrierende Vollzeitkarrieren.
+- Schema-1-Save-Kompatibilität, Zeitreise, automatisierte Engine- und mobile Browser-Tests.
+- Eigene Modelle; **keine** behauptete Vollständigkeit oder Kopie der BitLife-Wahlmechaniken.
+
+
 ## 0.14.0 – 2026-10-28 (Arbeitswelt)
 
 - Vorstellungsgespräche für reguläre Jobs, maximal drei Bewerbungen pro Jahr; Absagen erhalten bestehende Anstellungen.
