@@ -9,6 +9,7 @@ import {ACTING_OFFERS,actingActive,actingOffersFor} from './engine/acting.js';
 import {CRIME_TYPES,CRIME_LABELS,CRIME_RANKS,crimeRisk,criminal} from './engine/crime.js';
 import {DIRECTOR_GENRES,DIRECTOR_BUDGETS} from './engine/director.js';
 import {SPORTS,SPORT_LEAGUES,sportActive} from './engine/sport.js';
+import {FIGHT_STYLES,fighterActive} from './engine/fighter.js';
 import {POLITICAL_PARTIES,POLITICAL_POLICIES,POLITICAL_BUDGETS,POLITICAL_OFFICES,POLITICAL_REQUIREMENTS,politicsActive} from './engine/politics.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
@@ -24,7 +25,7 @@ const menuRow=(symbol:string,title:string,description:string,action:string,id=''
 const heading=(text:string,right='')=>`<div class="section-head"><span>${text}</span><span class="small">${right}</span></div>`;
 const formatAge=(age:number)=>`${age} ${age===1?'Jahr':'Jahre'}`;
 const badges=(p:Person)=>`<div class="row"><span class="pill">Generation ${p.generation}</span><span class="pill">${html(p.country)}</span>${p.prisonYears>0?'<span class="pill">In Haft</span>':''}${!p.alive?'<span class="pill">Verstorben</span>':''}</div>`;
-function lifeStage(p:Person){if(!p.alive)return 'Verstorben';if(p.prisonYears>0)return 'In Haft';if(p.age<3)return 'Kleinkind';if(p.age<13)return 'Kind';if(p.age<18)return 'Jugendliche/r';if(actingActive(p))return 'Schauspieler/in';if(musicActive(p))return 'Musiker/in';if(p.jobId)return careerName(p);if(p.universityYears>0)return 'Student/in';if(p.age>=65)return 'Senior/in';return 'Erwachsen';}
+function lifeStage(p:Person){if(!p.alive)return 'Verstorben';if(p.prisonYears>0)return 'In Haft';if(p.age<3)return 'Kleinkind';if(p.age<13)return 'Kind';if(p.age<18)return 'Jugendliche/r';if(fighterActive(p))return 'Kampfsportprofi';if(actingActive(p))return 'Schauspieler/in';if(musicActive(p))return 'Musiker/in';if(p.jobId)return careerName(p);if(p.universityYears>0)return 'Student/in';if(p.age>=65)return 'Senior/in';return 'Erwachsen';}
 function avatar(p:Person){if(!p.alive)return '🕊️';if(p.age<4)return '👶';if(p.age<13)return p.gender==='weiblich'?'👧':'👦';if(p.age>=65)return p.gender==='weiblich'?'👵':'👴';return p.gender==='weiblich'?'👩':p.gender==='männlich'?'👨':'🧑';}
 function renderProfile(p:Person){return `<section class="profilebar"><button class="profile-person" data-action="open" data-id="profile" aria-label="Charakterprofil öffnen"><span class="avatar">${avatar(p)}</span><span class="profile-name-wrap"><span class="profile-name">${html(p.name)} <span class="profile-info">i</span></span><span class="profile-detail">🌐 ${html(p.birthCity||p.country)} · ${html(lifeStage(p))}</span></span></button><div class="profile-balance"><strong>${money(p.cash)}</strong><span>Kontostand</span></div></section>`;}
 function renderStats(p:Person){const names:{key:keyof Person['stats'];label:string;icon:string}[]=[{key:'happiness',label:'Glück',icon:'😊'},{key:'health',label:'Gesundheit',icon:'❤️'},{key:'smarts',label:'Intelligenz',icon:'💡'},{key:'looks',label:'Aussehen',icon:'✨'}];return `<section class="metrics" aria-label="Charakterwerte">${names.map(n=>`<div class="metric stat-${n.key}"><span class="stat-icon" aria-hidden="true">${n.icon}</span><span class="stat-label">${n.label}</span><div class="meter" role="progressbar" aria-label="${n.label}" aria-valuenow="${p.stats[n.key]}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p.stats[n.key]}%"></div></div><span class="stat-value">${p.stats[n.key]}%</span></div>`).join('')}</section>`;}
@@ -160,6 +161,23 @@ function renderSport(p:Person){
  const archive=c?.seasons.length?heading('Saisonchronik')+'<div class="info-card">'+c.seasons.length+' Spielzeiten · '+c.titles+' Meistertitel</div>'+c.seasons.slice(-15).reverse().map(y=>'<div class="acting-credit"><b>Alter '+y.age+' · '+html(y.club)+(y.title?' 🏆':'')+'</b><small>'+html(y.league)+'liga · '+y.victories+' Siege · '+y.performance+' % Leistung · '+money(y.earnings)+' netto</small></div>').join(''):'';
  return intro+practice+recovery+career+archive;
 }
+function renderFighter(p:Person){
+ const c=p.fighterCareer,blocked=p.prisonYears>0||!p.alive,injured=!!c?.injuryYears;
+ const summary=heading('Kampfsportlaufbahn')+'<div class="info-card"><h3>🥊 Kampfsport</h3><p>'+html(c?.style||'Stil auswählen')+' · Technik '+(c?.skill??0)+' % · Kondition '+(c?.stamina??60)+' % · Ruf '+(c?.reputation??10)+' %</p><p>'+(c?.wins??0)+' Siege · '+(c?.losses??0)+' Niederlagen · '+(c?.leagueWins??0)+' Ligasiege · '+(c?.titles??0)+' Titelgewinne</p><p class="small">Fiktive Liga, eigene Regeln. Keine interaktiven Originalkämpfe oder Originalmoves.</p>'+(c?.champion?'<b>🏆 Aktueller Champion</b>':'')+(injured?'<p class="prison-warning">Verletzt: Pause bis zum nächsten Jahr oder Reha.</p>':'')+'</div>';
+ const training=heading('Training')+'<div class="stack">'+(c?[c.style]:FIGHT_STYLES).map(style=>menuRow('🥋',style+' trainieren',p.age<18?'Kostenfrei · max. 3 jährlich':'180 € · max. 3 jährlich','fighter','train|'+style,blocked||p.age<14||!!c?.retired||injured||(p.age>=18&&p.cash<180))).join('')+'</div>';
+ const coach=c&&!c.coach?menuRow('🎽','Coach engagieren','1.800 € · Technikbonus','fighter','coach',blocked||p.age<18||p.cash<1800||c.retired):'';
+ const recovery=injured?menuRow('🩹','Rehabilitation','350 € · Heilungschance','fighter','recover',blocked||p.cash<350):'';
+ const fights=c&&!c.retired?heading('Kämpfe')+'<div class="stack">'+
+  menuRow('🥊','Sparring','220 € · ohne offiziellen Rekord','fighter','spar',blocked||p.age<16||injured||c.stamina<15||p.cash<220)+
+  menuRow('🧱','Straßenkampf','Preisgeld, Verletzungs- und Haftgefahr','fighter','street',blocked||p.age<16||injured||c.stamina<15)+
+  (c.league?menuRow('🏟️','Ligakampf','Zwei Kämpfe jährlich · Preisgeld','fighter','league',blocked||injured||c.stamina<20)+
+  menuRow('⚔️','Rivalen provozieren',html(c.rival||'Rivale')+' · zweimal jährlich','fighter','taunt',blocked)+
+  (c.champion?menuRow('🏆','Titel verteidigen','Gegen den Herausforderer antreten','fighter','defend',blocked||injured||c.stamina<20):menuRow('🏆','Titel herausfordern','80 % Technik, 3 Ligasiege, 55 % Ruf','fighter','challenge',blocked||injured||c.stamina<20||c.skill<80||c.leagueWins<3||c.reputation<55)):'')+
+  (!c.league?menuRow('✍️','Liga-Probetraining','500 € · ab 18, 60 % Technik, 50 % Kondition, 3 Siege','fighter','join',blocked||p.age<18||p.age>45||c.skill<60||c.stamina<50||c.wins<3||injured||p.cash<500||!!p.sportCareer?.contract||!!p.politicalCareer?.office):'')+
+  menuRow('🏁','Karriere beenden','Rücktritt ist unwiderruflich','fighter','retire',blocked||p.age<18)+'</div>':'';
+ const history=c?.bouts.length?heading('Kampfchronik')+'<div class="stack">'+c.bouts.slice(-15).reverse().map(b=>'<div class="acting-credit"><b>Alter '+b.age+' · '+html(b.kind)+' · '+(b.won?'Sieg':'Niederlage')+'</b><small>'+html(b.opponent)+' · '+money(b.payout)+' Preisgeld</small></div>').join('')+'</div>':'';
+ return summary+training+coach+recovery+(c?.retired?heading('Ruhestand')+'<div class="info-card">Deine Kampfsportlaufbahn ist beendet.</div>':fights)+history;
+}
 function renderWorkplace(p:Person){
  if(!p.jobId)return '';
  const w=p.workplace;
@@ -205,13 +223,14 @@ function renderCareer(p:Person){
  ${renderMusic(p)}
  ${renderActor(p)}
  ${renderSport(p)}
- ${heading('Politik')}${menuRow('🏛️','Politikerkarriere','Wahlkämpfe, Ämter und Zustimmung','category','politics')}
+ ${heading('Kampfsport')}${menuRow('🥊','Kampfsportmodus','Training, Straßenkämpfe, Liga und Titel','category','fighter')}
+  ${heading('Politik')}${menuRow('🏛️','Politikerkarriere','Wahlkämpfe, Ämter und Zustimmung','category','politics')}
  ${heading('Filmregie')}${menuRow('🎬','Regiestudio','Drehbuch, Casting, Produktion und Filmografie','category','director')}
- ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)||sportActive(p)||politicsActive(p)?'Aktive Karriere':'Arbeitssuchend')}
- <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:sportActive(p)?'Sportprofi · '+p.sportCareer!.contract!.club:politicsActive(p)?'Politisches Amt · '+p.politicalCareer!.office!.role:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':sportActive(p)?'Sportvertrag · Saisonabrechnung beim Altern':politicsActive(p)?'Wahlamt · Jahresgehalt':'Ohne regelmäßiges Einkommen'}</p>
+ ${heading('Beruf',p.jobId||actingActive(p)||musicActive(p)||sportActive(p)||fighterActive(p)||politicsActive(p)?'Aktive Karriere':'Arbeitssuchend')}
+ <div class='info-card'><b>${html(actingActive(p)?'Schauspieler/in · '+p.actorCareer!.current!.title:musicActive(p)?'Musiker/in · '+p.musicCareer!.mode:sportActive(p)?'Sportprofi · '+p.sportCareer!.contract!.club:fighterActive(p)?'Kampfsportprofi · fiktive Liga':politicsActive(p)?'Politisches Amt · '+p.politicalCareer!.office!.role:careerName(p))}</b><p class='small'>${p.jobId?`${p.jobYears} Berufsjahre · Leistungsbewertung ${p.careerPerformance??50}% · Gehaltsbonus ${money(p.salaryBonus||0)}/Jahr` :actingActive(p)?'Aktive Film- oder Serienrolle · Details unter Schauspielkarriere':musicActive(p)?'Aktiver Plattenvertrag · Einnahmen über Auftritte und Veröffentlichungen':sportActive(p)?'Sportvertrag · Saisonabrechnung beim Altern':fighterActive(p)?'Ligavertrag · Kämpfe und Jahresvergütung':politicsActive(p)?'Wahlamt · Jahresgehalt':'Ohne regelmäßiges Einkommen'}</p>
  ${p.jobId?`<div class='performance-meter'><div style='width:${p.careerPerformance??50}%'></div></div><div class='row'>${button('Härter arbeiten','activity','workhard','smallbtn',jailed)}${button('Gehalt verhandeln','activity','raise','smallbtn',jailed||p.jobYears<2)}${button('Kündigen','activity','resign','smallbtn danger',jailed)}</div>`:''}</div>
  ${renderWorkplace(p)}
-  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p)&&!politicsActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
+  ${heading('Stellenangebote')}<div class='stack'>${CAREERS.map(c=>{const qualified=p.age>=c.minAge&&p.stats.smarts>=c.minSmarts&&(!c.requiresDegree||p.degree)&&!jailed&&!musicActive(p)&&!actingActive(p)&&!sportActive(p)&&!fighterActive(p)&&!politicsActive(p);return card('💼',html(c.title),`${money(c.salary)} brutto · Mindestalter ${c.minAge} · Intelligenz ${c.minSmarts}${c.requiresDegree?' · Abschluss':''}`,'job',c.id,p.jobId===c.id?'Aktuell':'Bewerben',!qualified||p.jobId===c.id);}).join('')}</div>${renderBusiness(p)}`;
 }
 function renderPeople(p:Person){
  const living=p.relationships.filter(r=>r.alive);
@@ -312,6 +331,7 @@ function renderActivities(p:Person){
  ${menuRow('🎬','Filmregie','Filme produzieren, besetzen und veröffentlichen','category','director')}
   ${menuRow('🏛️','Politik','Wahlkampf und öffentliche Ämter','category','politics')}
   ${menuRow('🏅','Profisport','Sporttraining, Verträge und Meisterschaften','category','sport')}
+  ${menuRow('🥊','Kampfsport','Training, Rivalen und Titelkämpfe','category','fighter')}
  ${menuRow('🧛','Vampir-Modus','Spezialmodus · noch nicht verfügbar','premiumopen','',true)}
  ${menuRow('🌲','Outdoor-Leben','Zusätzliche Outdoor-Erlebnisse · geplant','premiumopen','',true)}
  </div>${heading('Alle Aktivitäten')}<div class='stack'>
@@ -353,6 +373,7 @@ function renderActivities(p:Person){
  if(activitySection==='director')return `${back}${renderDirector(p)}`;
   if(activitySection==='sport')return `${back}${renderSport(p)}`;
  if(activitySection==='politics')return `${back}${renderPolitics(p)}`;
+  if(activitySection==='fighter')return `${back}${renderFighter(p)}`;
  if(activitySection==='acting')return `${back}${renderActor(p)}`;
  if(activitySection==='music')return `${back}${renderMusic(p)}`;
  if(activitySection==='mind')return `${back}${heading('Körper und Geist')}<div class='stack'>${card('📖','Buch lesen','Intelligenz trainieren','activity','read','Lesen')}${card('📚','Bibliothek','Wissen und Lernfortschritt','activity','library','Besuchen')}${card('🧘','Meditieren','Glück und Gesundheit','activity','meditate','Meditieren')}${card('🩺','Arzt','Gesundheitscheck für 150 €','activity','doctor','Besuchen',p.cash<150)}${card('🏋️','Fitnessstudio','Training für 50 €, ab 12 Jahren','activity','gym','Trainieren',p.age<12||p.cash<50)}</div>`;
@@ -381,7 +402,7 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.15.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.16.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -434,7 +455,8 @@ root.addEventListener('click',async e=>{const target=e.target;if(!(target instan
  else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
  else if(kind==='work'){const [key,contactId]=id.split('|');await action({type:'WORK',key:key as 'introduce'|'talk'|'teamwork'|'conflict'|'promotion',id:contactId});}
   else if(kind==='politics'){const [key,value]=id.split('|');const get=(name:string)=>document.querySelector<HTMLSelectElement>('#politics-'+name)?.value;await action({type:'POLITICS',key:key as 'volunteer'|'launch'|'canvass'|'debate'|'advertise'|'election'|'speech'|'policy'|'resign',office:key==='launch'?get('office') as import('./engine/types.js').PoliticalOffice:undefined,party:key==='launch'?get('party') as import('./engine/types.js').PoliticalParty:undefined,policy:key==='launch'?get('policy') as import('./engine/types.js').PoliticalPolicy:key==='policy'?value as import('./engine/types.js').PoliticalPolicy:undefined,budget:key==='launch'?get('budget') as import('./engine/types.js').PoliticalBudget:undefined});}
-  else if(kind==='sport'){const [key,value]=id.split('|');await action({type:'SPORT',key:key as 'train'|'tryout'|'recover'|'negotiate'|'sponsor'|'retire',sport:key==='train'?value as import('./engine/types.js').SportKind:undefined,league:key==='tryout'?value as import('./engine/types.js').SportLeague:undefined});}
+  else if(kind==='fighter'){const [key,style]=id.split('|');await action({type:'FIGHTER',key:key as import('./engine/fighter.js').FighterAction,style:style as import('./engine/types.js').FighterStyle|undefined});}
+   else if(kind==='sport'){const [key,value]=id.split('|');await action({type:'SPORT',key:key as 'train'|'tryout'|'recover'|'negotiate'|'sponsor'|'retire',sport:key==='train'?value as import('./engine/types.js').SportKind:undefined,league:key==='tryout'?value as import('./engine/types.js').SportLeague:undefined});}
   else if(kind==='director'){const [key,choice,budget]=id.split('|');await action({type:'DIRECTOR',key:key as 'study'|'start'|'cast'|'shoot'|'release'|'cancel',genre:key==='start'?choice as import('./engine/types.js').DirectorGenre:undefined,budget:key==='start'?budget as 'kurz'|'mittel'|'gross':undefined,choice:key==='cast'||key==='shoot'?choice as 'newcomers'|'stars'|'careful'|'quick':undefined});}
  else if(kind==='actor'){const sep=id.indexOf('|');await action({type:'ACTOR',key:(sep>=0?id.slice(0,sep):id) as 'lesson'|'extra'|'hire-agent'|'fire-agent'|'agent-search'|'audition'|'rehearse'|'quit',offerId:sep>=0?id.slice(sep+1):undefined});}
  else if(kind==='music'){const args=id.split('|');await action({type:'MUSIC',key:args[0] as 'practice'|'audition'|'single'|'album'|'concert'|'tour'|'promote'|'quit',mode:args[0]==='audition'?args[1] as 'Solo'|'Band':undefined,role:(args[0]==='practice'?args[1]:args[0]==='audition'?args[2]:undefined) as import('./engine/types.js').MusicRole|undefined});}
