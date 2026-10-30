@@ -11,6 +11,7 @@ import {DIRECTOR_GENRES,DIRECTOR_BUDGETS} from './engine/director.js';
 import {SPORTS,SPORT_LEAGUES,sportActive} from './engine/sport.js';
 import {FIGHT_STYLES,fighterActive} from './engine/fighter.js';
 import {POLITICAL_PARTIES,POLITICAL_POLICIES,POLITICAL_BUDGETS,POLITICAL_OFFICES,POLITICAL_REQUIREMENTS,politicsActive} from './engine/politics.js';
+import {lifeSignals} from './engine/lifeConnections.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
 import {deleteGame,exportGame,importGame,listGames,putGame} from './storage/database.js';
 
@@ -40,7 +41,7 @@ function renderTimeline(p:Person){
  ${visible.map(g=>{const shown=historyExpanded?g.lines:g.lines.slice(-12);return `<section class='year-group'><h2>Alter: ${g.age} ${g.age===1?'Jahr':'Jahre'}</h2>${g.lines.length>shown.length?`<details class='past-events'><summary>${g.lines.length-shown.length} weitere Ereignisse</summary>${g.lines.slice(0,-12).map(e=>`<p class='timeline-line ${e.tone}'>${html(e.text)}</p>`).join('')}</details>`:''}${shown.map(e=>`<p class='timeline-line ${e.tone}'>${html(e.text)}</p>`).join('')}</section>`;}).join('')}
  ${historyExpanded&&groups.length>5?`<button class='timeline-toggle' data-action='history'>▴ Ältere Lebensjahre ausblenden</button>`:''}</div>`;
 }
-function renderLife(s:SaveGame){const p=s.person;return `<section class="life-feed"><div class="feed-label"><span>📖 Dein Lebenslauf</span><span>${p.generation}. Generation</span></div>${renderTimeline(p)}
+function renderLife(s:SaveGame){const p=s.person;const signals=lifeSignals(p);const warnings=signals.filter(x=>x.tone==='warning').length;return `<section class="life-feed"><div class="feed-label"><span>📖 Dein Lebenslauf</span><span>${p.generation}. Generation</span></div><details class="life-overview" aria-label="Aktuelle Lebenslage"><summary><span>🧭 Lebenslage</span><span class="life-overview-count">${warnings?`${warnings} Hinweis${warnings===1?'':'e'}`:'Aktuelles ansehen'} ▾</span></summary><div class="life-overview-items">${signals.map(x=>`<div class="life-overview-item signal-${x.tone}"><span aria-hidden="true">${x.icon}</span><div><b>${html(x.title)}</b><small>${html(x.detail)}</small></div></div>`).join('')}</div></details>${renderTimeline(p)}
  ${!p.alive?`<div class="end-of-life"><span class="end-symbol">🕊️</span><h2>Ein Leben geht zu Ende</h2><p>${html(p.causeOfDeath||'Deine Geschichte ist abgeschlossen.')}</p>${p.relationships.some(r=>r.kind==='Kind'&&r.alive)?'<p>Wähle ein Kind und führe die Familiengeschichte fort.</p>':'<p>Beginne eine neue Geschichte über das Menü.</p>'}</div>`:''}
  ${!p.alive&&p.relationships.some(r=>r.kind==='Kind'&&r.alive)?`${heading('Nächste Generation')}<div class="stack">${p.relationships.filter(r=>r.kind==='Kind'&&r.alive).map(r=>card('👶',html(r.name),`${r.age} Jahre alt`,'generation',r.id,'Spielen')).join('')}</div>`:''}</section>`;}
 function renderBusiness(p:Person){
