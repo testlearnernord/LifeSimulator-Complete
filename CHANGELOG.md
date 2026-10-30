@@ -192,3 +192,14 @@
 - Physical iPhone/Safari testing and CI E2E execution have not been performed in this execution environment.
 - GitHub repository could not be created automatically (GitHub tool does not expose repository creation).
 - Public HTTPS deployment is not active until the repository is created and Pages enabled.
+
+## 0.17.0 – 2026-10-30 (Verzahnte Lebenswege und Statusübersicht)
+
+- Situative Ereignisse nach Haftentlassung sowie bei Schulproblemen, Arbeitsplatzkonflikten, Partnerschaftskrisen, Haftbriefen und Unterweltkontakten.
+- Entscheidungen beeinflussen Gesundheit, Glück, Noten, Arbeitsleistung, Chefbeziehung, Vertrauen, Fahndungsdruck und Respekt.
+- Jährliche Wechselwirkungen für familiären Rückhalt, schulische Hilfe, berufliche Probleme durch Fahndungsdruck und Erschöpfung durch chronischen Stress.
+- Einklappbare, mobile Lebenslage-Übersicht mit aktuellen Risiken und Chancen aus dem Spielstand.
+- Keine Pflichtmigration älterer Spielstände; neue Entscheidungen bleiben durch Zeitreise rückgängig machbar.
+- Fünf veraltete DLC-Statuswerte korrigiert. Katalog: 18 teilweise, 22 offen.
+- Dokumentation: docs/INTERCONNECTED_LIFE.md. Eigene Modelle und Texte, keine Originalkopie.
+
