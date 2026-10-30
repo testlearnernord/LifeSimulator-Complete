@@ -15,6 +15,10 @@ with sync_playwright() as playwright:
     expect(page.locator('.profile-name')).to_contain_text('Testspieler')
     expect(page.locator('.year-group h2').last).to_contain_text('Alter: 0 Jahre')
     expect(page.locator('.timeline-line').first).to_be_visible()
+    expect(page.locator('.life-overview')).to_be_visible()
+    page.locator('.life-overview summary').click()
+    assert page.locator('.life-overview-item').count() >= 1
+    page.locator('.life-overview summary').click()
     page.get_by_role('button', name='Charakterprofil öffnen').click()
     expect(page.get_by_role('heading', name='Steckbrief')).to_be_visible()
     expect(page.get_by_text('Geburtstag:', exact=False)).to_be_visible()
@@ -271,6 +275,6 @@ with sync_playwright() as playwright:
     expect(page.get_by_text('Kampfchronik')).to_be_visible()
     context.set_offline(False)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.16 fighter, politics, workplace, athlete, director, saves and offline: PASSED')
+    print('v0.17 life-consequences, fighter, politics, workplace, saves and offline: PASSED')
     context.close()
     browser.close()
