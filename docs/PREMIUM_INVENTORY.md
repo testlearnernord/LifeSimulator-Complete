@@ -1,6 +1,6 @@
 # Recherche: käufliche Zusatzinhalte von BitLife
 
-**Stand:** 26.10.2026. **Referenz:** internationale BitLife-App von Candywriter für iOS. **Projekt:** Lebenslinien 0.13.0, unabhängige PWA.
+**Stand:** 26.10.2026. **Referenz:** internationale BitLife-App von Candywriter für iOS. **Projekt:** Lebenslinien 0.17.0, unabhängige PWA.
 
 ## Wichtige Einschränkungen
 
@@ -64,3 +64,7 @@ Das **offizielle Job Pack Politician** ist als Referenz nachgewiesen (BitLife He
 ## Kampfsportmodus ab 0.16.0
 
 Die [offizielle Beschreibung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode) bestätigt Coach, Straßenkämpfe, Liga, Titel, Rivalen, über 200 Moves und MMA-Minispiel. Die eigene Version bietet nur Training, Sparring, Straßen- und Ligakämpfe, Rivalen, Preisgeld, Titel und Verletzungen. **Teilweise**, kein vollständiges Originalpaket. Siehe [FIGHTER_MODE.md](FIGHTER_MODE.md).
+
+## Katalogabgleich, 30. Oktober 2026
+
+Die 40 recherchierten Angebote umfassen jetzt **18 teilweise umgesetzte und 22 offene** Einträge. Time Machine (maximal fünf Jahre), Golden Pacifier (Familienplanung), Get Out of Jail Free Card (Haftentlassung), Hollywood Star (Ruhmschub) und Golden Diploma (ausgewählte Abschlüsse) wurden als **teilweise** markiert, weil bereits entsprechende eigene Funktionen existieren. Das bedeutet weder vollständige Feature-Gleichheit noch eine Freischaltung im Originalspiel.
