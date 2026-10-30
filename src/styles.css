@@ -222,3 +222,21 @@ html,body,#app{background:#e3e9f1}
 .crime-contact .row{gap:6px;flex-wrap:wrap}
 .crime-contact .smallbtn{min-height:40px}
 @media(max-width:390px){.crime-summary b{font-size:11px}.crime-contact .smallbtn{font-size:11px;padding:7px}}
+
+
+/* v0.17: compact, accessible life situation summary without obscuring the timeline */
+.life-overview{margin:3px 13px 11px;border:1px solid #cad9e4;border-radius:7px;background:#f5f9fc;overflow:hidden}
+.life-overview>summary{display:flex;justify-content:space-between;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:11px 12px;font-weight:700;font-size:12px;color:#095e92;min-height:42px}
+.life-overview>summary::-webkit-details-marker{display:none}
+.life-overview>summary:focus-visible{outline:3px solid #176aab;outline-offset:-3px}
+.life-overview-count{color:#617d8e;font-weight:500;font-size:11px}
+.life-overview[open]>summary{border-bottom:1px solid #cad9e4;background:#eaf2f8}
+.life-overview-items{padding:7px 10px 9px;display:grid;gap:5px}
+.life-overview-item{display:grid;grid-template-columns:26px 1fr;align-items:start;gap:8px;padding:8px 6px;border-radius:5px;background:#fff}
+.life-overview-item>span{font-size:18px}
+.life-overview-item>div{display:grid;gap:3px}
+.life-overview-item b{font-size:12px;color:#0d5c8c}
+.life-overview-item small{font-size:11px;line-height:1.45;color:#5b7181}
+.life-overview-item.signal-warning{border-left:3px solid #e49b25}
+.life-overview-item.signal-positive{border-left:3px solid #2b9b52}
+.life-overview-item.signal-neutral{border-left:3px solid #8aa7bc}
