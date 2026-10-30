@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.16.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.17.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -162,3 +162,13 @@ Die Mechaniken und Wahrscheinlichkeiten stammen aus eigener Entwicklung. Offizie
 ## Lebenslinien 0.16.0: Eigenständiger Kampfsportmodus
 
 Unter **Aktivitäten → Kampfsport** bzw. **Beruf → Kampfsportmodus** kannst du ab 14 einen Stil trainieren, ab 16 sparren oder riskante Straßenkämpfe austragen und ab 18 über ein Ligaprobetraining zur Meisterschaft aufsteigen. Trainer, Verletzungen, Rehabilitation, Rivalen, Preisgeld, Jahresvergütung, Kampfchronik, Titelverteidigung und Ruhestand beeinflussen den Spielstand. Bestehende Saves behalten Schema 1; die Kampfkarriere ist optional und wird in Zeitreise-Snapshots erfasst. **Nicht implementiert:** interaktives MMA-Minispiel, 200+ Moves und die vollständige Originalkarriere. Quelle: [offizielle Ankündigung vom 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode). [Technische Grenzen](docs/FIGHTER_MODE.md).
+
+## Lebenslinien 0.17.0: Lebenswege greifen ineinander
+
+Die wichtigsten Systeme beeinflussen sich nun stärker gegenseitig. Nach der Gefängnisentlassung entscheidest du, ob du Unterstützung für einen Neustart suchst, selbstständig bleibst oder zu alten Kontakten zurückkehrst. Schulprobleme, Konflikte am Arbeitsplatz, Beziehungskrisen und Unterweltkontakte können situative Entscheidungen auslösen, die echte Auswirkungen auf Gesundheit, Arbeit, Beziehungen und Reputation haben.
+
+Verlässliche Familienbeziehungen können bei schlechter Stimmung helfen und schulische Leistungen unterstützen. Hoher Fahndungsdruck kann gelegentlich das Arbeitsverhältnis belasten. Anhaltender beruflicher und privater Stress kann Erschöpfung auslösen.
+
+Die neue, standardmäßig eingeklappte **Lebenslage-Übersicht** zeigt aktuelle Risiken und Chancen anhand gespeicherter Spielwerte an. Der DLC-Katalog wurde korrigiert: **18 teilweise umgesetzt, 22 offen**, ohne 1:1-Anspruch.
+
+[Mechaniken und offene Punkte](docs/INTERCONNECTED_LIFE.md).
