@@ -10,6 +10,7 @@ import {CRIME_TYPES,CRIME_LABELS,CRIME_RANKS,crimeRisk,criminal} from './engine/
 import {DIRECTOR_GENRES,DIRECTOR_BUDGETS} from './engine/director.js';
 import {SPORTS,SPORT_LEAGUES,sportActive} from './engine/sport.js';
 import {FIGHT_STYLES,fighterActive} from './engine/fighter.js';
+import {HEIRLOOM_CATALOG,heirloomWorth,todayHeirloomKey} from './engine/heirlooms.js';
 import {POLITICAL_PARTIES,POLITICAL_POLICIES,POLITICAL_BUDGETS,POLITICAL_OFFICES,POLITICAL_REQUIREMENTS,politicsActive} from './engine/politics.js';
 import {lifeSignals} from './engine/lifeConnections.js';
 import type {Action,Gender,Person,SaveGame} from './engine/types.js';
@@ -274,8 +275,28 @@ function renderInvestments(p:Person){
   ${button('Verkaufen','investment','sell|'+a.id,'smallbtn',p.age<18||p.prisonYears>0||shares===0)}
   </div></article>`;}).join('')}</div>`;
 }
+function renderHeirlooms(p:Person){
+ const items=p.heirlooms||[];
+ const free=p.alive&&p.prisonYears===0;
+ const searched=!!p.heirloomSearchDate&&p.heirloomSearchDate>=todayHeirloomKey();
+ const rows=items.map(item=>{
+  const found=HEIRLOOM_CATALOG.find(x=>x.kind===item.kind)!;
+  const estimate=Math.floor(item.value*item.condition/100*.9);
+  return `<article class="info-card"><h3>${found.icon} ${html(found.name)}</h3><p class="small">${html(found.rarity)} · Zustand ${item.condition}% · Gefunden mit ${item.foundAge} Jahren</p><p>${item.appraised?'Geschätzter Verkaufserlös: <b>'+money(estimate)+'</b>':'Wert unbekannt · Schätzung für 100 € möglich'}</p><div class="row">
+  ${button('Schätzen','heirloom','appraise|'+item.id,'smallbtn',!free||item.appraised||p.cash<100)}
+  ${button('Restaurieren','heirloom','restore|'+item.id,'smallbtn',!free||p.age<16||item.condition===100||p.cash<400)}
+  ${button('Zeigen','heirloom','exhibit|'+item.id,'smallbtn',!free)}
+  ${button('Verkaufen','heirloom','sell|'+item.id,'danger smallbtn',!free||p.age<18||!item.appraised)}
+  </div></article>`;
+ }).join('');
+ return `${heading('Erbstücke und Fundstücke')}<div class="well">Ein Fund pro echtem Kalendertag, lokal auf diesem Gerät. Fundstücke können geschätzt, restauriert, verkauft oder an die nächste Generation weitergegeben werden. Alle Gegenstände sind frei erfunden.</div>
+ <div class="info-card"><b>${items.length} Fundstücke</b> · Geschätzter Sammlungswert ${money(heirloomWorth(p))}</div>
+ <div class="stack">${menuRow('🔦','Dachboden durchsuchen',searched?'Heute bereits gesucht':'Neue Fundchance · ab 8 Jahren','heirloom','search',!free||p.age<8||searched||items.length>=100)}</div>
+ ${heading('Deine Sammlung')}${items.length?'<div class="stack">'+rows+'</div>':'<div class="empty">Noch keine Fundstücke entdeckt.</div>'}`;
+}
 function renderAssetsDetail(p:Person){return `<div class="banner"><h1>${money(netWorth(p))}</h1><p>Aktuelles Vermögen inklusive Sachwerten</p></div>${heading('Eigentum')}${p.assets.length?`<div class="stack">${p.assets.map(a=>card(a.kind==='Haus'?'⌂':'🚙',html(a.name),`Wert ${money(a.value)} · Unterhalt ${money(a.annualCost)} / Jahr`,'sell',a.id,'Verkaufen',!p.alive )+rentalPanel(p,a)).join('')}</div>`:'<div class="empty">Noch kein eigener Besitz.</div>'}${heading('Immobilien und Fahrzeuge')}<div class="stack">${ITEMS.map(i=>card(i.kind==='Haus'?'⌂':'🚙',html(i.name),`${money(i.price)} Kaufpreis · ${money(i.annualCost)}/Jahr`,'buy',i.id,'Kaufen',p.age<18||p.cash<i.price||!p.alive)).join('')}</div>`;}
 function renderAssets(p:Person){
+ if(assetsSection==='heirlooms')return `<button class='screen-back' data-action='assetback'>‹ Besitz</button>${renderHeirlooms(p)}`;
  if(assetsSection==='invest')return `<button class='screen-back' data-action='assetback'>‹ Besitz</button>${renderInvestments(p)}`;
  if(assetsSection==='estate')return `<button class='screen-back' data-action='assetback'>‹ Besitz</button>${renderAssetsDetail(p)}`;
  return `${heading('Finanzen')}<div class='stack'>
@@ -289,6 +310,7 @@ function renderAssets(p:Person){
  ${menuRow('🏎️','Rennwagen-Garage','Rennwagen sammeln · noch offen','assetview','',true)}
  ${menuRow('🦁','Zoo','Eigenen Tierpark führen · noch offen','assetview','',true)}
  </div>${heading('Eigentum')}<div class='stack'>
+ ${menuRow('🔦','Erbstücke',`${(p.heirlooms||[]).length} Fundstücke · Suchen, schätzen und vererben`,'assetview','heirlooms')}
  ${menuRow('🏡','Immobilien und Fahrzeuge',`${p.assets.length} Gegenstände · Kaufen, verkaufen, vermieten`,'assetview','estate')}
  ${menuRow('📱','Social Media','Online-Profile und Reichweite','tab','activities')}
  </div>`;
@@ -403,7 +425,8 @@ function renderPremium(){
  ${PREMIUM_GROUPS.map(group=>`${heading(group)}<div class='premium-list'>${PREMIUM_CATALOG.filter(item=>item.group===group).map(item=>{const status=playable.includes(item.id)?'spielbar':item.status;return `<div class='premium-line'><span><b>${html(item.name)}</b><small>${html(item.description)}</small></span><span class='premium-status ${status}'>${status==='spielbar'?'Spielbar':status==='teilweise'?'Teilweise':'Offen'}</span></div>`;}).join('')}</div>`).join('')}
  <p class='small' style='padding:12px'>Quellen und Einschränkungen: docs/PREMIUM_INVENTORY.md. Alle Originalmarken dienen nur als Referenz.</p>`;
 }
-function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.17.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+function renderMenu(){if(premiumOpen)return renderPremium();return `${heading('Dein Projekt')}<div class="well">Eigenständige Lebenssimulation, Version 0.18.0. Alle hier implementierten Systeme sind freigeschaltet, vollständig lokal und ohne Käufe nutzbar. Die nicht implementierten BitLife-Erweiterungen werden nicht als spielbar ausgegeben.</div>
+ ${heading('Sammlungen')}<div class='stack'>${card('🔦','Erbstücke','Tägliche Fundchance, Sammlung und Vererbung','heirloomopen','','Öffnen')}</div>
  ${heading('Zusatzinhalte')}<div class='stack'>${card('🎁','Premium-Inhalte','Kaufangebote, Status und kostenlose Sonderfunktionen','premiumopen','','Öffnen')}</div>
  ${heading('Admin / Charaktergestaltung')}<div class='stack'>${card('⚡','Charakter bearbeiten','Alle Charakterwerte kostenlos anpassen.','open','edit','Bearbeiten',!current||!current.person.alive)}</div>
  ${heading('Speicherstände')}<div class="stack">${card('⌑','Spielstände verwalten',`${games.length} Leben auf diesem Gerät gespeichert.`,'open','saves','Öffnen')}${card('＋','Neues Leben','Beginne eine unabhängige Geschichte.','open','new','Erstellen')}${card('⇩','Spielstand exportieren','JSON-Sicherung zum Archivieren oder auf ein anderes Gerät übertragen.','export','','Exportieren',!current)}<article class="tile"><div class="emoji">⇧</div><div class="tile-main"><div class="tile-title">Speicherstand importieren</div><div class="tile-desc">JSON-Datei mit gültigem Schema 1 wählen</div><input id="import-file" type="file" accept=".json,application/json" aria-label="Spielstand importieren"></div></article></div>
@@ -446,13 +469,14 @@ root.addEventListener('submit',async e=>{const target=e.target;if(!(target insta
 root.addEventListener('input',e=>{const t=e.target;if(!(t instanceof HTMLInputElement)||t.type!=='range')return;const output=t.closest('.range-field')?.querySelector('output');if(output)output.textContent=t.value+'%';});
 root.addEventListener('change',async e=>{const target=e.target;if(!(target instanceof HTMLInputElement)||target.id!=='import-file'||!target.files?.[0])return;try{const imported=await importGame(target.files[0]);current=imported;games=await listGames();tab='life';modal=null;notify('Spielstand erfolgreich importiert.',true);}catch(error){notify(error instanceof Error?error.message:'Import fehlgeschlagen.');}});
 root.addEventListener('click',async e=>{const target=e.target;if(!(target instanceof Element))return;const control=target.closest<HTMLElement>('[data-action]');if(!control||control instanceof HTMLButtonElement&&control.disabled)return;const kind=control.dataset.action||'';const id=control.dataset.id||'';
- if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if((id==='school-clubs'||id==='director'||id==='politics')&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
+ if(kind==='heirloomopen'){tab='assets';assetsSection='heirlooms';render();return;}if(kind==='tab'){tab=id as Tab;premiumOpen=false;activitySection=null;assetsSection=null;relationFocus=null;playSound('tap');render();return;}if(kind==='premiumopen'){premiumOpen=true;tab='menu';render();return;}if(kind==='premiumback'){premiumOpen=false;render();return;}if(kind==='assetview'){assetsSection=id||null;render();return;}if(kind==='assetback'){assetsSection=null;render();return;}if(kind==='category'){activitySection=id||null;if((id==='school-clubs'||id==='director'||id==='politics')&&tab==='career')tab='activities';render();return;}if(kind==='relview'){relationFocus=id||null;render();return;}if(kind==='history'){historyExpanded=!historyExpanded;render();return;}if(kind==='sound'){toggleSound();render();return;}if(kind==='open'){modal=id as typeof modal;render();return;}if(kind==='close'){modal=null;render();return;}
  if(kind==='load'){try{current=await (await import('./storage/database.js')).getGame(id);tab='life';modal=null;render();}catch{notify('Spielstand konnte nicht geladen werden.');}return;}
  if(kind==='deleteprompt'){deleteTarget=id;modal='delete';render();return;}
  if(kind==='deleteconfirm'){await deleteGame(id);games=await listGames();if(current?.id===id)current=games[0]||null;modal='saves';render();return;}
  if(kind==='export'){if(current)exportGame(current);return;}
  if(kind==='update'){const reg=await navigator.serviceWorker.getRegistration();reg?.waiting?.postMessage('SKIP_WAITING');location.reload();return;}
  if(kind==='age'){playSound('year');await action({type:'AGE'});}
+ else if(kind==='heirloom'){const [key,itemId]=id.split('|');await action({type:'HEIRLOOM',key:key as 'search'|'appraise'|'restore'|'sell'|'exhibit',id:itemId});}
  else if(kind==='crime'){const [key,contactId,skill]=id.split('|');await action({type:'CRIME',key:key as 'shoplift'|'pickpocket'|'burglary'|'meet'|'mentor'|'build-trust'|'crew-job'|'join'|'promote'|'leave'|'rehabilitate',contactId:contactId||undefined,skill:skill as import('./engine/types.js').CrimeType|undefined});}
  else if(kind==='work'){const [key,contactId]=id.split('|');await action({type:'WORK',key:key as 'introduce'|'talk'|'teamwork'|'conflict'|'promotion',id:contactId});}
   else if(kind==='politics'){const [key,value]=id.split('|');const get=(name:string)=>document.querySelector<HTMLSelectElement>('#politics-'+name)?.value;await action({type:'POLITICS',key:key as 'volunteer'|'launch'|'canvass'|'debate'|'advertise'|'election'|'speech'|'policy'|'resign',office:key==='launch'?get('office') as import('./engine/types.js').PoliticalOffice:undefined,party:key==='launch'?get('party') as import('./engine/types.js').PoliticalParty:undefined,policy:key==='launch'?get('policy') as import('./engine/types.js').PoliticalPolicy:key==='policy'?value as import('./engine/types.js').PoliticalPolicy:undefined,budget:key==='launch'?get('budget') as import('./engine/types.js').PoliticalBudget:undefined});}
