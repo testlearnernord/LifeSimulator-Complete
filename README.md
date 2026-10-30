@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.17.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.18.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -23,7 +23,7 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Kampfsportmodus mit drei Stilen, Coach, Straßenkämpfen, Ligavertrag, Rivalen, Preisgeld und Titelverteidigung
 - Profisport mit drei Sportarten, Trainingsentwicklung, Probetrainings, fiktiven Vereinen, Verträgen, Saisons, Verletzungen und Sponsoren
 - Politikerkarriere mit Ehrenamt, Wahlkampfbudgets, vier Amtsebenen, Debatten, Wahlen, Zustimmungswerten und Amtsgehältern
-- Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
+- Erbstücke: tägliche Dachboden-Fundchance, sieben eigene Fundstücke, Seltenheit, Schätzung, Restaurierung, Verkauf und Vererbung\n- Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
 
 **Teilweise spielbar:** Politik, Musik, Schauspiel, Profisport, Kriminalitätsnetzwerke, Unternehmen, Vermietung, Investments und Filmregie mit eigenen Regeln. **Weiterhin offen:** unter anderem Zoos, vollständiger Fighter Mode, Filmfestivals und die vollständigen DLC-Systeme; Originalformeln und Originalassets werden nicht übernommen. Siehe [Feature-Matrix](docs/FEATURE_MATRIX.md).
 
@@ -172,3 +172,9 @@ Verlässliche Familienbeziehungen können bei schlechter Stimmung helfen und sch
 Die neue, standardmäßig eingeklappte **Lebenslage-Übersicht** zeigt aktuelle Risiken und Chancen anhand gespeicherter Spielwerte an. Der DLC-Katalog wurde korrigiert: **18 teilweise umgesetzt, 22 offen**, ohne 1:1-Anspruch.
 
 [Mechaniken und offene Punkte](docs/INTERCONNECTED_LIFE.md).
+
+## Version 0.18.0: Erbstücke und Sammlungen
+
+Unter **Besitz → Erbstücke** sowie im **Hauptmenü → Sammlungen** findest du eine neue tägliche Suchaktion auf dem Dachboden. Sieben selbst entworfene Gegenstände haben unterschiedliche Seltenheit, Zustand und Wert. Du kannst Fundstücke schätzen, restaurieren, Freunden zeigen oder verkaufen. Sammlungen werden an die nächste Generation vererbt. Das Funddatum wird lokal gespeichert; nach einem Fund ist erst am nächsten Kalendertag eine neue Suche möglich.
+
+Alte Spielstände bleiben unter `schema: 1` kompatibel. Zeitreise speichert die Sammlung mit. Die Zahlen und Gegenstände sind eigene Entwürfe; als offizielle Referenz ist lediglich das allgemeine Heirloom-System im [BitLife Help Center](https://bitlifeapp.com/help/) bestätigt. Details: [Erbstück-Design](docs/HEIRLOOMS.md).
