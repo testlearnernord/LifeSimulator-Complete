@@ -108,7 +108,7 @@ test('prison blocks attic and collection actions; minors cannot sell',()=>{
 });
 
 test('daily date is local ISO format and duplicate item identifiers cannot enter saves',()=>{
- assert.match(todayHeirloomKey(),/^\\d{4}-\\d{2}-\\d{2}$/);
+ assert.match(todayHeirloomKey(),/^\d{4}-\d{2}-\d{2}$/);
  let s=advance(born(),18);
  s=act(s,'search');
  const cloned=structuredClone(s);
