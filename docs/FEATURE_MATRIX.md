@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.16.0 (2026-10-29).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.17.0 (2026-10-30).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -237,3 +237,16 @@ Schauspielerkarriere enthält mehrere Staffeljahre, agentenvermittelte Castingvo
 - Offiziell belegt durch [Ultimate Fighter Mode, 11.06.2026](https://bitlifeapp.com/whats-new/ultimate-fighter-mode): Straßenkämpfe, Coach, Ligen, Rivalen, Meistertitel, über 200 Moves, interaktives MMA-Minispiel.
 - Eigenständig umgesetzt: drei Kampfstile, altersabhängiges Training, Sparring, riskante Straßenkämpfe, Coach, Ligabewerbung, zwei Ligakämpfe jährlich, Rivalen, Titelkampf und Verteidigung, Preisgeld, Verletzungen, Rehabilitation, Ruhestand und persistente Kampfchronik. Alle Formeln, Gegner und Texte sind eigenständig.
 - **Offen:** interaktives Kampfsystem, mehr als 200 individuelle Moves, komplexe Rivalen-/Liga-Hierarchie, vollständiger Originalabgleich und iOS-Safari-Hardwaretest. Technische Details: [FIGHTER_MODE.md](FIGHTER_MODE.md).
+
+### 0.17.0: Verzahnte Lebenswege
+
+| System | Neue Verbindung | Noch offen |
+|---|---|---|
+| Gefängnis und Kontakte | Neustartentscheidung, Familienhilfe oder alte Beziehungen | Vollständiges Resozialisierungssystem |
+| Familie und Schule | Unterstützung beeinflusst gelegentlich Noten und Lebensglück | Individuelle Lehrer und Fachnoten |
+| Arbeit und Kriminalität | Fahndungsdruck kann Chefbeziehungen und Leistung beeinträchtigen | Vollständige Berufsreputation |
+| Gesundheit | Berufliche Belastung und private Krise können zu Erschöpfung führen | Komplexe Erkrankungen |
+| Beziehungen | Situative Partnerschaftskrisen mit dauerhaften Folgen | Individuelle lange Dialogketten |
+| Lebenslauf | Einklappbare Chancen- und Risikenübersicht | Erweiterte Interaktionen |
+
+Der Referenzkatalog zählt **18 teilweise** und **22 offene** Angebote. [Technische Dokumentation](INTERCONNECTED_LIFE.md).
