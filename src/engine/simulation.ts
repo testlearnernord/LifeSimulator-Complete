@@ -13,6 +13,7 @@ import {advanceSport,sportAction,sportActive,validSport} from './sport.js';
 import {advanceFighter,fighterAction,validFighter} from './fighter.js';
 import {applyForWork,workAction,startWork,workYear,promoteWork,validWork} from './work.js';
 import {advancePolitics,politicalAction,politicsActive,validPolitics} from './politics.js';
+import {advanceConnections,connectionEvent,resolveConnectionEvent} from './lifeConnections.js';
 import type {ExpansionHooks} from './expansions.js';
 const clamp=(x:number)=>Math.max(0,Math.min(100,Math.round(x)));
 export const money=(x:number)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
@@ -100,6 +101,7 @@ function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.
  if(p.universityYears>0){p.universityYears--;p.cash-=2800;stat(p,'smarts',4);if(p.universityYears===0){p.degree=true;p.school='Abgeschlossen';log(s,'Du hast dein Studium abgeschlossen.','good');}}
  educationYear(s,expansionHooks(s));
   healthYear(s,expansionHooks(s));
+  advanceConnections(s,expansionHooks(s));
   if(p.age===6)log(s,'Du kommst in die Grundschule.');if(p.age===11)log(s,'Du wechselst auf eine weiterführende Schule.');if(p.age===18)log(s,'Du beendest die Schule und wirst erwachsen.','good');
  stat(p,'health',p.age>60? -2:chance(s,.2)?-1:0);
  if(p.age>30&&chance(s,.11))stat(p,'looks',-1);
@@ -108,7 +110,7 @@ function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.
  if(p.cash < -25000)stat(p,'happiness',-5);
  const deathRisk=p.age<40?.00015:p.age<65?.001:p.age<80?.009:Math.min(.9,.015+(p.age-80)*.032);
  if(p.stats.health<=0||chance(s,deathRisk)){die(s,p.stats.health<=0?'Schwere gesundheitliche Probleme':'Natürliche Ursachen');return;}
- if(p.age>=3)yearlyEvent(s);
+ if(p.age>=3&&!connectionEvent(s,expansionHooks(s),releasedThisYear))yearlyEvent(s);
  log(s,`Du bist jetzt ${p.age} Jahre alt.`);
 }
 function activity(s:SaveGame,key:string){const p=s.person;
@@ -155,6 +157,7 @@ function interact(s:SaveGame,id:string,key:string){const p=s.person;const r=p.re
  else throw Error('Unbekannte Interaktion.');
 }
 function resolve(s:SaveGame,kind:string){const p=s.person;const pending=p.pending;if(!pending||!pending.options.some(o=>o.kind===kind))throw Error('Keine passende Entscheidung vorhanden.');p.pending=null;
+ if(kind.startsWith('cross:')){resolveConnectionEvent(s,kind,expansionHooks(s));return;}
  switch(kind){
   case 'schoolHelp':p.schoolRecord&&(p.schoolRecord.discipline=clamp(p.schoolRecord.discipline+6));stat(p,'happiness',3);log(s,'Deine Lehrkraft hat dir geholfen, den Konflikt zu lösen.','good');break;
   case 'schoolCalm':stat(p,'happiness',2);log(s,'Du hast dich nicht provozieren lassen.');break;
