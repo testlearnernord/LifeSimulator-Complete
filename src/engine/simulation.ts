@@ -11,6 +11,7 @@ import {advanceCrime,crimeAction,crimeReleased,validCrime} from './crime.js';
 import {advanceDirector,directorAction,validDirector} from './director.js';
 import {advanceSport,sportAction,sportActive,validSport} from './sport.js';
 import {advanceFighter,fighterAction,validFighter} from './fighter.js';
+import {advanceHeirlooms,heirloomAction,heirloomWorth,validHeirlooms} from './heirlooms.js';
 import {applyForWork,workAction,startWork,workYear,promoteWork,validWork} from './work.js';
 import {advancePolitics,politicalAction,politicsActive,validPolitics} from './politics.js';
 import {advanceConnections,connectionEvent,resolveConnectionEvent} from './lifeConnections.js';
@@ -87,6 +88,7 @@ function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.
  p.cash-=expense+assetExpense;
  advanceExpansions(s,expansionHooks(s));
  advanceInvestments(s,expansionHooks(s));
+ advanceHeirlooms(s,expansionHooks(s));
   advanceCrime(s,expansionHooks(s));
   if(releasedThisYear)crimeReleased(p);
  advanceMusic(s,expansionHooks(s));
@@ -181,7 +183,9 @@ function nextGeneration(s:SaveGame,childId:string):SaveGame{
  const previous={name:p.name,age:p.age,cause:p.causeOfDeath||'Unbekannt'};
  const inheritance=Math.max(0,Math.floor((p.cash+p.assets.reduce((a,b)=>a+b.value,0)+portfolioValue(p)-(p.loanBalance||0))*.8));
  const copy=createLife({name:child.name,gender:child.gender,country:p.country,seed:(s.seed^0x9e3779b9)>>>0,generation:p.generation+1,inheritance});
- copy.id=s.id;copy.ancestry=[...s.ancestry,previous];copy.person.age=child.age;copy.person.school=schoolFor(child.age,0,false);copy.person.talent=child.talent;
+ copy.id=s.id;copy.ancestry=[...s.ancestry,previous];
+ copy.person.heirlooms=structuredClone(p.heirlooms||[]);
+ copy.person.heirloomSearchDate=p.heirloomSearchDate;copy.person.age=child.age;copy.person.school=schoolFor(child.age,0,false);copy.person.talent=child.talent;
   if(child.development!==undefined)copy.person.stats.smarts=Math.max(copy.person.stats.smarts,Math.round(25+child.development*.7));
   if(child.talent==='intelligenz')copy.person.stats.smarts=Math.max(80,copy.person.stats.smarts);
   if(child.talent==='sport')copy.person.stats.health=Math.max(85,copy.person.stats.health);
@@ -245,6 +249,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
   for(const key of ['health','happiness','smarts','looks'] as Stat[]){const value=action.stats[key];if(!Number.isInteger(value)||value<0||value>100)throw Error('Ungültiger Charakterwert.');}
   p.stats={...action.stats};log(s,'Du hast deine persönlichen Werte angepasst.');break;
  }
+ case 'HEIRLOOM':heirloomAction(s,action.key,action.id,expansionHooks(s));break;
  case 'FIGHTER':fighterAction(s,action.key,action.style,expansionHooks(s));break;
  case 'POLITICS':politicalAction(s,action.key,action.office,action.party,action.policy,action.budget,expansionHooks(s));break;
   case 'SPORT':sportAction(s,action.key,action.sport,action.league,expansionHooks(s));break;
@@ -292,7 +297,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validFighter(p)||!validWork(p)||!validPolitics(p))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validFighter(p)||!validHeirlooms(p)||!validWork(p)||!validPolitics(p))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;
@@ -311,4 +316,4 @@ export function isSaveGame(value:unknown):value is SaveGame{
  return true;
 }
 export function careerName(p:Person){return CAREERS.find(c=>c.id===p.jobId)?.title||'Keine Anstellung';}
-export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0)+portfolioValue(p)-(p.loanBalance||0);}
+export function netWorth(p:Person){return p.cash+p.assets.reduce((sum,item)=>sum+item.value,0)+portfolioValue(p)+heirloomWorth(p)-(p.loanBalance||0);}
