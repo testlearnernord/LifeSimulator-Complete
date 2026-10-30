@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.17.0 (2026-10-30).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.18.0 (2026-10-30).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -92,7 +92,7 @@
 | Sonderfunktionen | Aura Ring (2026) | A | O | Beziehungs-Item offiziell im März 2026 erwähnt |
 | Sonderfunktionen | Time Machine | H,A | O | In-Game-Rücksprung fehlt |
 | Meta | Season / BitPass (historisch) | N | O | Offiziell am 14.08.2026 eingestellt; keine Priorität für eine neue Live-Season-Infrastruktur |
-| Meta | Achievements, Heirlooms, Ribbons | H | O | Kein Meta-Fortschritt |
+| Meta | Achievements | H | O | Noch kein lebensübergreifendes Erfolgssystem |\n| Meta | Heirlooms / Erbstücke | H | P | Eigenständige tägliche Dachboden-Funde, Seltenheit, Schätzung, Restaurierung, Verkauf, Generationenvererbung und Offline-Save; kein Originalkatalog |\n| Meta | Ribbons | H | O | Noch keine Lebensabschluss-Bänder |
 | Meta | Mehrere gespeicherte Leben | H | S | Pro Leben ein lokaler IndexedDB-Datensatz |
 | Meta | Speicherung / Wiederaufnahme | H | S | Auto-Save nach jeder Aktion |
 | Meta | Sprache/Internationalisierung | H,A | P | UI derzeit deutsch, keine Lokalisierung |
@@ -250,3 +250,10 @@ Schauspielerkarriere enthält mehrere Staffeljahre, agentenvermittelte Castingvo
 | Lebenslauf | Einklappbare Chancen- und Risikenübersicht | Erweiterte Interaktionen |
 
 Der Referenzkatalog zählt **18 teilweise** und **22 offene** Angebote. [Technische Dokumentation](INTERCONNECTED_LIFE.md).
+
+### Neu in 0.18.0: Erbstück-Sammlung
+
+- Offizieller Referenzbeleg: [BitLife Help Center, „What are Heirlooms?“](https://bitlifeapp.com/help/) bestätigt tägliche Dachboden-Fundchance, unterschiedliche Seltenheit, Verkauf und Weitergabe an Nachkommen. Einzelobjekte, Wertformeln und die weiteren Aktionen sind **eigene Spielgestaltung**.
+- Sieben eigenständige Gegenstände mit gewichteten Fundchancen, Schätzung, Zustandswert, Restaurierung, Präsentation, Verkauf und Berücksichtigung im Vermögen. Ein Fund pro lokalem Kalendertag, ohne Netzwerk.
+- Erbstücke bleiben bei Tod und Generationenwechsel erhalten; Zeitreise und ältere `schema:1`-Spielstände bleiben kompatibel. Engine- und Mobile-E2E-Tests unter `tests/heirlooms.test.mjs` und `tests/browser_e2e.py`.
+- **Offen:** originaler Fundkatalog, Raritätswahrscheinlichkeiten, Museum, Auktionen, Achievements und Ribbons. Kein Anspruch auf 1:1-Treue.
