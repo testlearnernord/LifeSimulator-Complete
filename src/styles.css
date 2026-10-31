@@ -240,3 +240,10 @@ html,body,#app{background:#e3e9f1}
 .life-overview-item.signal-warning{border-left:3px solid #e49b25}
 .life-overview-item.signal-positive{border-left:3px solid #2b9b52}
 .life-overview-item.signal-neutral{border-left:3px solid #8aa7bc}
+
+
+/* v0.19: clear touch-friendly language switcher on mobile */
+.locale-settings{display:grid;gap:8px}
+.locale-settings label{font-size:13px;font-weight:700;color:#155b88}
+.locale-settings select{width:100%;min-height:46px;padding:10px 12px;border:1px solid #a9c5d7;border-radius:7px;background:#fff;color:#153f61;font-size:16px}
+.locale-settings select:focus-visible{outline:3px solid #2f8bc7;outline-offset:2px}
