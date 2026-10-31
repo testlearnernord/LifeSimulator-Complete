@@ -19,7 +19,7 @@ export function translateText(source:string,lang:Language):string{
  const direct=dictionary[lang].get(value);
  if(direct!==undefined)return source.replace(value,direct);
  const boundary=value.indexOf(' ');
- if(boundary>0&&boundary<7&&/^[^\\p{L}\\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
+ if(boundary>0&&boundary<7&&/^[^\p{L}\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
  const format=(en:string,pt:string)=>source.replace(value,lang==='en'?en:pt);
  let m:RegExpMatchArray|null;
  if((m=value.match(/^Alter: (\d+) Jahre?$/)))return format('Age: '+m[1]+' years','Idade: '+m[1]+' anos');
