@@ -1,0 +1,51 @@
+/** Dynamic German-source story templates. Returns null when no explicit translation exists.
+ * Names, numbers and gameplay identifiers are never modified. */
+export function translateDynamic(source:string,lang:'en'|'pt'):string|null{
+ const tr=(en:string,pt:string)=>lang==='en'?en:pt;
+ let m:RegExpMatchArray|null;
+ if((m=source.match(/^Du heißt (.+)\.$/)))return tr('Your name is '+m[1]+'.','Chamas-te '+m[1]+'.');
+ if((m=source.match(/^Deine Mutter heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/)))return tr('Your mother is '+m[1]+', works as '+m[2]+' and is '+m[3]+' years old.','A tua mãe chama-se '+m[1]+', trabalha como '+m[2]+' e tem '+m[3]+' anos.');
+ if((m=source.match(/^Dein Vater heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/)))return tr('Your father is '+m[1]+', works as '+m[2]+' and is '+m[3]+' years old.','O teu pai chama-se '+m[1]+', trabalha como '+m[2]+' e tem '+m[3]+' anos.');
+ if((m=source.match(/^(.+) ist verstorben\.$/)))return tr(m[1]+' has died.',m[1]+' faleceu.');
+ if((m=source.match(/^Du bist im Alter von (\d+) Jahren gestorben\. Ursache: (.+)\.$/)))return tr('You died at age '+m[1]+'. Cause: '+m[2]+'.','Morreste aos '+m[1]+' anos. Causa: '+m[2]+'.');
+ if((m=source.match(/^Lebenshaltung und Besitz: (.+)\.$/)))return tr('Living and asset expenses: '+m[1]+'.','Despesas de vida e bens: '+m[1]+'.');
+ if((m=source.match(/^Du bist jetzt mit (.+) zusammen\.$/)))return tr('You are now dating '+m[1]+'.','Agora namoras com '+m[1]+'.');
+ if((m=source.match(/^Du hast mit (.+) gesprochen\.$/)))return tr('You talked to '+m[1]+'.','Conversaste com '+m[1]+'.');
+ if((m=source.match(/^Du hast (.+) ein Kompliment gemacht\.$/)))return tr('You complimented '+m[1]+'.','Fizeste um elogio a '+m[1]+'.');
+ if((m=source.match(/^Du hattest Streit mit (.+)\.$/)))return tr('You argued with '+m[1]+'.','Discutiste com '+m[1]+'.');
+ if((m=source.match(/^Du hast (.+) geheiratet!$/)))return tr('You married '+m[1]+'!','Casaste com '+m[1]+'!');
+ if((m=source.match(/^Du hast dich von (.+) getrennt\.$/)))return tr('You broke up with '+m[1]+'.','Terminaste a relação com '+m[1]+'.');
+ if((m=source.match(/^Du hast (.+) einen Brief geschrieben\.$/)))return tr('You wrote a letter to '+m[1]+'.','Escreveste uma carta a '+m[1]+'.');
+ if((m=source.match(/^Du hast (.+) beschenkt\.$/)))return tr('You gave '+m[1]+' a gift.','Deste um presente a '+m[1]+'.');
+ if((m=source.match(/^Du hast Zeit mit (.+) verbracht\.$/)))return tr('You spent time with '+m[1]+'.','Passaste tempo com '+m[1]+'.');
+ if((m=source.match(/^Du hast dich mit (.+) angefreundet\.$/)))return tr('You became friends with '+m[1]+'.','Fizeste amizade com '+m[1]+'.');
+ if((m=source.match(/^Du hast (.+) aus der Geldbörse genommen\.$/)))return tr('You took '+m[1]+' from the wallet.','Tiraste '+m[1]+' da carteira.');
+ if((m=source.match(/^Dein Nebenverdienst brachte (.+)\.$/)))return tr('You earned '+m[1]+' from a side job.','Ganhaste '+m[1]+' num trabalho extra.');
+ if((m=source.match(/^Du hast (.+) für (.+) gekauft\.$/)))return tr('You bought '+m[1]+' for '+m[2]+'.','Compraste '+m[1]+' por '+m[2]+'.');
+ if((m=source.match(/^Du hast (.+) kennengelernt\. Eine neue Freundschaft beginnt\.$/)))return tr('You met '+m[1]+'. A new friendship begins.','Conheceste '+m[1]+'. Começa uma nova amizade.');
+ if((m=source.match(/^Ihr habt gemeinsam Zeit als Familie verbracht\. (\d+) Beziehungen wurden gestärkt\.$/)))return tr('You spent quality time as a family. '+m[1]+' relationships improved.','Passaram tempo em família. '+m[1]+' relações ficaram mais fortes.');
+ if((m=source.match(/^Du hast dich bei (.+) entschuldigt\. Ihr habt euch wieder angenähert\.$/)))return tr('You apologized to '+m[1]+'. You grew closer again.','Pediste desculpa a '+m[1]+'. Aproximaram-se novamente.');
+ if((m=source.match(/^(.+) möchte derzeit keine Entschuldigung annehmen\.$/)))return tr(m[1]+' is not ready to accept an apology.',''+m[1]+' ainda não está pronto/a para aceitar um pedido de desculpa.');
+ if((m=source.match(/^(.+) hat dir mit (.+) finanziell geholfen\.$/)))return tr(m[1]+' helped you financially with '+m[2]+'.',m[1]+' ajudou-te financeiramente com '+m[2]+'.');
+ if((m=source.match(/^(.+) konnte dir kein Geld geben\.$/)))return tr(m[1]+' could not lend you money.',m[1]+' não te pôde dar dinheiro.');
+ if((m=source.match(/^Du hast (.+) beim Lernen unterstützt\. Entwicklungsstand: (\d+) %\.$/)))return tr('You helped '+m[1]+' study. Development: '+m[2]+'%.','Ajudaste '+m[1]+' a estudar. Desenvolvimento: '+m[2]+'%.');
+ if((m=source.match(/^Du und (.+) habt euch wieder versöhnt\.$/)))return tr('You and '+m[1]+' reconciled.','Tu e '+m[1]+' fizeram as pazes.');
+ if((m=source.match(/^(.+) ist noch nicht bereit, den Kontakt wiederaufzunehmen\.$/)))return tr(m[1]+' is not yet ready to reconnect.',m[1]+' ainda não está pronto/a para retomar o contacto.');
+ if((m=source.match(/^Die Scheidung von (.+) ist abgeschlossen\. Die Vermögensaufteilung kostete dich (.+)\.$/)))return tr('Your divorce from '+m[1]+' is final. Dividing assets cost '+m[2]+'.','O teu divórcio de '+m[1]+' está concluído. A divisão de bens custou '+m[2]+'.');
+ if((m=source.match(/^Du hast den Kontakt zu (.+) abgebrochen\.$/)))return tr('You cut ties with '+m[1]+'.','Cortaste o contacto com '+m[1]+'.');
+ if((m=source.match(/^Familienunterhalt für (\d+) minderjährige Kinder: (.+)\.$/)))return tr('Child support for '+m[1]+' minors: '+m[2]+'.','Despesas familiares para '+m[1]+' menores: '+m[2]+'.');
+ if((m=source.match(/^Die Beziehung zu (.+) ist sehr angespannt\.$/)))return tr('Your relationship with '+m[1]+' is very strained.','A tua relação com '+m[1]+' está muito tensa.');
+ if((m=source.match(/^Du hast (.+) im Gefängnis kennengelernt\. Ob du der Person vertrauen kannst, bleibt offen\.$/)))return tr('You met '+m[1]+' in prison. It is unclear whether you can trust them.','Conheceste '+m[1]+' na prisão. Ainda não sabes se podes confiar nessa pessoa.');
+ if((m=source.match(/^Du hast (.+) über Bekannte kennengelernt\. Ob du der Person vertrauen kannst, bleibt offen\.$/)))return tr('You met '+m[1]+' through acquaintances. It is unclear whether you can trust them.','Conheceste '+m[1]+' através de conhecidos. Ainda não sabes se podes confiar nessa pessoa.');
+ if((m=source.match(/^Du hast mit (.+) über dessen Erfahrungen gesprochen\. Dein (.+)-Wert steigt um (\d+) Punkte\.$/)))return tr('You discussed past experiences with '+m[1]+'. Your '+m[2]+' skill increased by '+m[3]+' points.','Conversaste com '+m[1]+' sobre as suas experiências. A tua competência de '+m[2]+' aumentou '+m[3]+' pontos.');
+ if((m=source.match(/^Ein Gespräch mit (.+) lief schlecht\. Euer Vertrauen sinkt\.$/)))return tr('Your conversation with '+m[1]+' went badly. Trust decreased.','A conversa com '+m[1]+' correu mal. A confiança diminuiu.');
+ if((m=source.match(/^Du hast deine Bekanntschaft mit (.+) vertieft\.$/)))return tr('You strengthened your connection with '+m[1]+'.','Fortaleceste a tua ligação com '+m[1]+'.');
+ if((m=source.match(/^Ein fiktiver Auftrag für (.+) war erfolgreich\. Gewinn: (.+)\.$/)))return tr('A fictional assignment for '+m[1]+' succeeded. Reward: '+m[2]+'.','Uma missão fictícia para '+m[1]+' correu bem. Ganho: '+m[2]+'.');
+ if((m=source.match(/^(.+) hat dich bei der gemeinsamen Aktion im Stich gelassen\.$/)))return tr(m[1]+' abandoned you during the shared assignment.',m[1]+' abandonou-te durante a missão conjunta.');
+ if((m=source.match(/^Der Kontakt zu (.+) ist eingeschlafen\.$/)))return tr('You lost touch with '+m[1]+'.','Perdeste o contacto com '+m[1]+'.');
+ if((m=source.match(/^(.+) steht dir nah\. Die Beziehung kann dir in Krisen helfen\.$/)))return tr(m[1]+' is close to you. This relationship can help in difficult times.',m[1]+' é uma pessoa próxima. Esta relação pode ajudar-te em tempos difíceis.');
+ if((m=source.match(/^(\d+) Jahre Resthaft · Kontakte und Weiterbildung sind weiterhin möglich\.$/)))return tr(m[1]+' years remaining · you can still keep in touch and learn.',m[1]+' anos restantes · ainda podes manter contactos e aprender.');
+ if((m=source.match(/^(\d+) Jahre Bewährung · ein stabiles Umfeld kann helfen\.$/)))return tr(m[1]+' years on probation · a stable environment can help.',m[1]+' anos em liberdade condicional · um ambiente estável pode ajudar.');
+ if((m=source.match(/^(.+) · Stärke (\d+) %\.$/)))return tr(m[1]+' · severity '+m[2]+'%.',m[1]+' · gravidade '+m[2]+'%.');
+ return null;
+}
