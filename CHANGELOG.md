@@ -203,3 +203,15 @@
 - Fünf veraltete DLC-Statuswerte korrigiert. Katalog: 18 teilweise, 22 offen.
 - Dokumentation: docs/INTERCONNECTED_LIFE.md. Eigene Modelle und Texte, keine Originalkopie.
 
+
+## 0.19.0 – 2026-10-31 (Mehrsprachige Benutzeroberfläche)
+
+- Sprachumschalter im Hauptmenü: Deutsch, Englisch und Portugiesisch (Europa/pt-PT).
+- Sofortiger Wechsel ohne Neustart. Die Sprache wird lokal, unabhängig vom Spielstand, gespeichert.
+- Übersetzungen für Basisnavigation, Charakterdaten, Menüs, verbreitete Aktionen und zahlreiche Lebensereignisse; dynamische Jahresangaben werden ebenfalls lokalisiert.
+- Browser-Sprachkennung, Dokumenttitel und wichtige Zugänglichkeitslabels folgen der Auswahl.
+- Kein Online-Übersetzungsdienst, keine zusätzlichen Abhängigkeiten und keine Änderung an Spielstandsformat, Aktions-IDs oder Simulation.
+- Neue Engine- und mobile Browser-Tests für Fallback, Sprachwechsel und Persistenz nach dem Neuladen.
+- Noch nicht vollständige Lokalisierung aller Spezialkarrieren und generierten Ereignistexte. Unbekannte Texte fallen auf Deutsch zurück.
+- Dokumentiert in docs/LANGUAGES.md.
+
