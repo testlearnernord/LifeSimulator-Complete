@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.19.0 (2026-10-31).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.21.0 (2026-10-31).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -92,7 +92,7 @@
 | Sonderfunktionen | Aura Ring (2026) | A | O | Beziehungs-Item offiziell im März 2026 erwähnt |
 | Sonderfunktionen | Time Machine | H,A | O | In-Game-Rücksprung fehlt |
 | Meta | Season / BitPass (historisch) | N | O | Offiziell am 14.08.2026 eingestellt; keine Priorität für eine neue Live-Season-Infrastruktur |
-| Meta | Achievements | H | O | Noch kein lebensübergreifendes Erfolgssystem |\n| Meta | Heirlooms / Erbstücke | H | P | Eigenständige tägliche Dachboden-Funde, Seltenheit, Schätzung, Restaurierung, Verkauf, Generationenvererbung und Offline-Save; kein Originalkatalog |\n| Meta | Ribbons | H | O | Noch keine Lebensabschluss-Bänder |
+| Meta | Achievements | H | P | 16 eigenständige, automatisch freischaltbare Erfolge mit Fortschrittsanzeige, generationenübergreifender Speicherung und Zusammenfassung lokaler Saves; Originalkatalog nicht übernommen |\n| Meta | Heirlooms / Erbstücke | H | P | Eigenständige tägliche Dachboden-Funde, Seltenheit, Schätzung, Restaurierung, Verkauf, Generationenvererbung und Offline-Save; kein Originalkatalog |\n| Meta | Ribbons | H | P | Neun eigene Lebensabschluss-Bänder nach Lebenslauf, Verleihung beim Tod, Sammlung über Generationen und lokale Saves; keine Originalregeln |
 | Meta | Mehrere gespeicherte Leben | H | S | Pro Leben ein lokaler IndexedDB-Datensatz |
 | Meta | Speicherung / Wiederaufnahme | H | S | Auto-Save nach jeder Aktion |
 | Meta | Sprache/Internationalisierung | H,A | P | UI derzeit deutsch, keine Lokalisierung |
@@ -263,3 +263,11 @@ Der Referenzkatalog zählt **18 teilweise** und **22 offene** Angebote. [Technis
 Die App bietet eine lokal gespeicherte Sprachauswahl für **Deutsch**, **Englisch** und **Portugiesisch (pt-PT)**. Kernnavigation, Einstellungen und häufige Ereignisse sind übersetzt. Ältere Ereignistexte und spezialisierte Karrierebeschreibungen besitzen derzeit noch teilweise deutsche Rückfalltexte. Die gewählte Sprache verändert weder gespeicherte Spielstände noch den Simulationsalgorithmus.
 
 [Details, Tests und Grenzen](LANGUAGES.md).
+
+### Neu in 0.21.0: Erfolge und Lebensbänder
+
+- Das offizielle [BitLife Help Center](https://bitlifeapp.com/help/) bestätigt Achievements als sammelbare Meilensteine und Ribbons als Auszeichnungen am Lebensende. **Konkrete eigene Namen, Schwellen, Prioritäten und Berechnungen** sind nicht aus dem Original übernommen.
+- 16 automatische Erfolge mit sichtbarem Fortschritt (Alter, Familie, Bildung, Vermögen, Immobilien, Erbstücke, Film, Musik, Sport, Politik, Generationen). Neun eigenständige Lebensbänder werden beim Tod abhängig vom erreichten Lebensweg verliehen.
+- Menü-Sammlung aus allen lokal vorhandenen Spielständen, trilinguale Texte (Deutsch, Englisch, Portugiesisch), Endbildschirm-Auszeichnung, kompatible optionale Schema-1-Felder `achievements` und `ribbons`.
+- Zeitreise behält bereits verdiente Erfolge als Metafortschritt, entfernt aber ein Lebensband, wenn vor den Tod zurückgespult wird. Generationenwechsel übernimmt beide Sammlungen. Löschen aller lokalen Spielstände entfernt auch deren Sammlungen; kein Server-Sync.
+- **Lücken:** BitLife-Originalkatalog, exakte Band-Prioritäten, echte kontoübergreifende Sammlung bei gelöschten Saves, iPhone-Safari-Hardwaretest.
