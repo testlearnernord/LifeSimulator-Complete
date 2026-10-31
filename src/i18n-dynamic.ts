@@ -47,5 +47,18 @@ export function translateDynamic(source:string,lang:'en'|'pt'):string|null{
  if((m=source.match(/^(\d+) Jahre Resthaft · Kontakte und Weiterbildung sind weiterhin möglich\.$/)))return tr(m[1]+' years remaining · you can still keep in touch and learn.',m[1]+' anos restantes · ainda podes manter contactos e aprender.');
  if((m=source.match(/^(\d+) Jahre Bewährung · ein stabiles Umfeld kann helfen\.$/)))return tr(m[1]+' years on probation · a stable environment can help.',m[1]+' anos em liberdade condicional · um ambiente estável pode ajudar.');
  if((m=source.match(/^(.+) · Stärke (\d+) %\.$/)))return tr(m[1]+' · severity '+m[2]+'%.',m[1]+' · gravidade '+m[2]+'%.');
+
+ if((m=source.match(/^Die Produktion kostet (.+)\.$/)))return tr('Production costs '+m[1]+'.','A produção custa '+m[1]+'.');
+ if((m=source.match(/^Für Organisation und Proben fehlen (.+)\.$/)))return tr('You need '+m[1]+' for organisation and rehearsals.','Precisas de '+m[1]+' para organização e ensaios.');
+ if((m=source.match(/^Für die Kandidatur fehlen (.+)\.$/)))return tr('You need '+m[1]+' to run for office.','Precisas de '+m[1]+' para te candidatares.');
+ if((m=source.match(/^Für die Wahlkampagne fehlen (.+)\.$/)))return tr('You need '+m[1]+' for the election campaign.','Precisas de '+m[1]+' para a campanha eleitoral.');
+ if((m=source.match(/^Für den Familienausflug fehlen (.+)\.$/)))return tr('You need '+m[1]+' for the family outing.','Precisas de '+m[1]+' para o passeio em família.');
+ if((m=source.match(/^Für die Renovierung fehlen (.+)\.$/)))return tr('You need '+m[1]+' for renovations.','Precisas de '+m[1]+' para a renovação.');
+ if((m=source.match(/^Für die Unternehmensgründung fehlen (.+)\.$/)))return tr('You need '+m[1]+' to start a company.','Precisas de '+m[1]+' para fundar a empresa.');
+ if((m=source.match(/^Diese Funktion ist erst ab (\d+) Jahren verfügbar\.$/)))return tr('This feature is available from age '+m[1]+'.','Esta funcionalidade está disponível a partir dos '+m[1]+' anos.');
+ if((m=source.match(/^Verfügbar ab (\d+) Jahren\.$/)))return tr('Available from age '+m[1]+'.','Disponível a partir dos '+m[1]+' anos.');
+ if((m=source.match(/^Du hast sofort deinen Abschluss in (.+) erhalten\.$/)))return tr('You instantly earned a degree in '+m[1]+'.','Recebeste imediatamente um diploma em '+m[1]+'.');
+ if((m=source.match(/^Deine Familie wächst um (\d+) Kinder\. Du hast Geschlecht und Talente festgelegt\.$/)))return tr('Your family has grown by '+m[1]+' children. You chose their gender and talents.','A tua família cresceu com mais '+m[1]+' filhos. Escolheste o género e os talentos.');
+ if((m=source.match(/^Die .*? kostet (\d[\d.,]* €)\.$/)))return tr('This activity costs '+m[1]+'.','Esta atividade custa '+m[1]+'.');
  return null;
 }
