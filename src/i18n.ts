@@ -2,7 +2,7 @@ import {EXTRA_TRANSLATIONS} from './i18n-extra.js';
 import {ERROR_TRANSLATIONS} from './i18n-errors.js';
 import {UI_TRANSLATIONS} from './i18n-ui.js';
 import {STORY_TRANSLATIONS} from './i18n-story.js';
-import {MORE_TRANSLATIONS} from './i18n-more.js';
+import {MORE_TRANSLATIONS,WORK_SCHOOL_TRANSLATIONS} from './i18n-more.js';
 import {translateDynamic} from './i18n-dynamic.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
@@ -24,6 +24,7 @@ rows.push(...ERROR_TRANSLATIONS.map(row=>[...row]));
 rows.push(...UI_TRANSLATIONS.map(row=>[...row]));
 rows.push(...STORY_TRANSLATIONS.map(row=>[...row]));
 rows.push(...MORE_TRANSLATIONS.map(row=>[...row]));
+rows.push(...WORK_SCHOOL_TRANSLATIONS.map(row=>[...row]));
 rows.push(...[["Speicherstand hat ein ungültiges Format.","The saved game has an invalid format.","O jogo guardado tem um formato inválido."],["Spielstand erfolgreich importiert.","Saved game imported successfully.","Jogo guardado importado com sucesso."],["Import fehlgeschlagen.","Import failed.","Falha na importação."],["Datei zu groß.","File too large.","O ficheiro é demasiado grande."],["Kein gültiges JSON.","Not valid JSON.","O ficheiro JSON não é válido."],["Unbekanntes oder beschädigtes Savegame.","Unknown or corrupted saved game.","Jogo guardado desconhecido ou danificado."],["IndexedDB konnte nicht geöffnet werden.","Could not open the browser database.","Não foi possível abrir a base de dados do navegador."]]);
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
