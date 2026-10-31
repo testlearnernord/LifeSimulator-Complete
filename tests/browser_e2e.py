@@ -346,6 +346,6 @@ with sync_playwright() as playwright:
     expect(page.get_by_text('Kampfchronik')).to_be_visible()
     context.set_offline(False)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.19 trilingual selection, mobile controls, careers, saves and offline: PASSED')
+    print('v0.21 trilingual selection, mobile controls, careers, saves and offline: PASSED')
     context.close()
     browser.close()
