@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.18.0 (2026-10-30).
+**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.19.0 (2026-10-31).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -257,3 +257,9 @@ Der Referenzkatalog zählt **18 teilweise** und **22 offene** Angebote. [Technis
 - Sieben eigenständige Gegenstände mit gewichteten Fundchancen, Schätzung, Zustandswert, Restaurierung, Präsentation, Verkauf und Berücksichtigung im Vermögen. Ein Fund pro lokalem Kalendertag, ohne Netzwerk.
 - Erbstücke bleiben bei Tod und Generationenwechsel erhalten; Zeitreise und ältere `schema:1`-Spielstände bleiben kompatibel. Engine- und Mobile-E2E-Tests unter `tests/heirlooms.test.mjs` und `tests/browser_e2e.py`.
 - **Offen:** originaler Fundkatalog, Raritätswahrscheinlichkeiten, Museum, Auktionen, Achievements und Ribbons. Kein Anspruch auf 1:1-Treue.
+
+## Mehrsprachigkeit in 0.19.0
+
+Die App bietet eine lokal gespeicherte Sprachauswahl für **Deutsch**, **Englisch** und **Portugiesisch (pt-PT)**. Kernnavigation, Einstellungen und häufige Ereignisse sind übersetzt. Ältere Ereignistexte und spezialisierte Karrierebeschreibungen besitzen derzeit noch teilweise deutsche Rückfalltexte. Die gewählte Sprache verändert weder gespeicherte Spielstände noch den Simulationsalgorithmus.
+
+[Details, Tests und Grenzen](LANGUAGES.md).
