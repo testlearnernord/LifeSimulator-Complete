@@ -1,4 +1,5 @@
 import {EXTRA_TRANSLATIONS} from './i18n-extra.js';
+import {translateDynamic} from './i18n-dynamic.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
 export const LANGUAGE_STORAGE_KEY='lebenslinien-language-v1';
@@ -22,6 +23,8 @@ export function translateText(source:string,lang:Language):string{
  const value=source.trim();
  const direct=dictionary[lang].get(value);
  if(direct!==undefined)return source.replace(value,direct);
+ const dynamic=translateDynamic(value,lang);
+ if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
  if(boundary>0&&boundary<7&&/^[^\p{L}\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
  
