@@ -8,7 +8,33 @@ with sync_playwright() as playwright:
     page = context.new_page()
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
+    # A clean iPhone/browser with no saves must start in English.
+    for test_lang in ('en', 'pt'):
+        fresh_context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+        fresh_page = fresh_context.new_page()
+        fresh_errors = []
+        fresh_page.on('pageerror', lambda error: fresh_errors.append(str(error)))
+        fresh_page.goto(URL, wait_until='networkidle')
+        expect(fresh_page.locator('html')).to_have_attribute('lang', 'en')
+        expect(fresh_page.locator('#app-language')).to_have_value('en')
+        if test_lang == 'pt':
+            fresh_page.locator('#app-language').select_option('pt')
+            expect(fresh_page.locator('html')).to_have_attribute('lang', 'pt-PT')
+        fresh_page.locator('[data-action="open"][data-id="new"]').click()
+        expect(fresh_page.locator('form#new-form select[name="gender"] option[value="weiblich"]')).to_have_count(1)
+        fresh_page.locator('form#new-form select[name="gender"]').select_option('weiblich')
+        fresh_page.locator('form#new-form input[name="name"]').fill('Brenda Test')
+        fresh_page.locator('form#new-form button[type="submit"]').click()
+        expect(fresh_page.locator('.profile-name')).to_contain_text('Brenda Test')
+        expect(fresh_page.locator('form#new-form')).to_have_count(0)
+        fresh_page.reload(wait_until='networkidle')
+        expect(fresh_page.locator('.profile-name')).to_contain_text('Brenda Test')
+        expect(fresh_page.locator('html')).to_have_attribute('lang', 'pt-PT' if test_lang == 'pt' else 'en')
+        assert not fresh_errors, f'Clean-start locale {test_lang} browser errors: {fresh_errors}'
+        fresh_context.close()
+    # The existing full gameplay regression continues in German for stable selectors.
     page.goto(URL, wait_until='networkidle')
+    page.locator('#app-language').select_option('de')
     page.get_by_role('button', name='Neues Leben beginnen', exact=True).click()
     page.locator('input[name=name]').fill('Testspieler')
     page.get_by_role('button', name='Leben beginnen', exact=True).click()
