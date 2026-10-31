@@ -1,6 +1,7 @@
 import {EXTRA_TRANSLATIONS} from './i18n-extra.js';
 import {ERROR_TRANSLATIONS} from './i18n-errors.js';
 import {UI_TRANSLATIONS} from './i18n-ui.js';
+import {STORY_TRANSLATIONS} from './i18n-story.js';
 import {translateDynamic} from './i18n-dynamic.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
@@ -20,6 +21,7 @@ rows.push(...[["Deutschland","Germany","Alemanha"],["USA","USA","EUA"],["Großbr
 rows.push(...EXTRA_TRANSLATIONS.map(row=>[...row]));
 rows.push(...ERROR_TRANSLATIONS.map(row=>[...row]));
 rows.push(...UI_TRANSLATIONS.map(row=>[...row]));
+rows.push(...STORY_TRANSLATIONS.map(row=>[...row]));
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
 export function translateText(source:string,lang:Language):string{
