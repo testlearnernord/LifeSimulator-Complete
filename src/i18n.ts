@@ -1,5 +1,6 @@
 import {EXTRA_TRANSLATIONS} from './i18n-extra.js';
 import {ERROR_TRANSLATIONS} from './i18n-errors.js';
+import {UI_TRANSLATIONS} from './i18n-ui.js';
 import {translateDynamic} from './i18n-dynamic.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
@@ -18,6 +19,7 @@ rows.push(...[["Du kommst in die Grundschule.","You start primary school.","Come
 rows.push(...[["Deutschland","Germany","Alemanha"],["USA","USA","EUA"],["Großbritannien","United Kingdom","Reino Unido"],["Brasilien","Brazil","Brasil"],["Portugal","Portugal","Portugal"],["Frankreich","France","França"],["Japan","Japan","Japão"],["Kanada","Canada","Canadá"],["Australien","Australia","Austrália"],["Indien","India","Índia"],["Januar","January","janeiro"],["Februar","February","fevereiro"],["März","March","março"],["April","April","abril"],["Mai","May","maio"],["Juni","June","junho"],["Juli","July","julho"],["August","August","agosto"],["September","September","setembro"],["Oktober","October","outubro"],["November","November","novembro"],["Dezember","December","dezembro"],["Widder","Aries","Carneiro"],["Stier","Taurus","Touro"],["Zwillinge","Gemini","Gémeos"],["Krebs","Cancer","Caranguejo"],["Löwe","Leo","Leão"],["Jungfrau","Virgo","Virgem"],["Waage","Libra","Balança"],["Skorpion","Scorpio","Escorpião"],["Schütze","Sagittarius","Sagitário"],["Steinbock","Capricorn","Capricórnio"],["Wassermann","Aquarius","Aquário"],["Fische","Pisces","Peixes"]]);
 rows.push(...EXTRA_TRANSLATIONS.map(row=>[...row]));
 rows.push(...ERROR_TRANSLATIONS.map(row=>[...row]));
+rows.push(...UI_TRANSLATIONS.map(row=>[...row]));
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
 export function translateText(source:string,lang:Language):string{
