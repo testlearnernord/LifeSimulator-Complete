@@ -1,6 +1,6 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.18.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.19.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine deutschsprachige Lebenssimulation für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
 
@@ -178,3 +178,11 @@ Die neue, standardmäßig eingeklappte **Lebenslage-Übersicht** zeigt aktuelle 
 Unter **Besitz → Erbstücke** sowie im **Hauptmenü → Sammlungen** findest du eine neue tägliche Suchaktion auf dem Dachboden. Sieben selbst entworfene Gegenstände haben unterschiedliche Seltenheit, Zustand und Wert. Du kannst Fundstücke schätzen, restaurieren, Freunden zeigen oder verkaufen. Sammlungen werden an die nächste Generation vererbt. Das Funddatum wird lokal gespeichert; nach einem Fund ist erst am nächsten Kalendertag eine neue Suche möglich.
 
 Alte Spielstände bleiben unter `schema: 1` kompatibel. Zeitreise speichert die Sammlung mit. Die Zahlen und Gegenstände sind eigene Entwürfe; als offizielle Referenz ist lediglich das allgemeine Heirloom-System im [BitLife Help Center](https://bitlifeapp.com/help/) bestätigt. Details: [Erbstück-Design](docs/HEIRLOOMS.md).
+
+## 0.19.0 – Sprachauswahl / Language / Idioma
+
+Im Hauptmenü kann die Anzeigesprache jetzt zwischen **Deutsch, Englisch und Portugiesisch (Portugal)** umgeschaltet werden. Das funktioniert sofort, auch ohne neue Spielstände, und bleibt nach dem Neuladen im Browser gespeichert. Die vorhandenen Spielstände werden nicht verändert. Die Übersetzungen funktionieren offline.
+
+**Stand der Übersetzung:** Basisnavigation, Hauptmenü, Charakteranzeigen, verbreitete Aktionen und viele Lebensereignisse sind lokalisiert. Einzelne spezialisierte Karrieren, dynamische Texte und historische Lebenslaufeinträge können weiter auf Deutsch erscheinen. Dieser Schritt ist ein funktionierender Einstieg in eine vollständige Lokalisierung, keine behauptete 100%-Abdeckung.
+
+[Sprachauswahl und technische Details](docs/LANGUAGES.md).
