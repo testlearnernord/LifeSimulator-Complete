@@ -6,9 +6,10 @@ test('three supported languages are stable, persisted independently from savegam
  assert.ok(isLanguage('de'));assert.ok(isLanguage('en'));assert.ok(isLanguage('pt'));
  assert.equal(isLanguage('fr'),false);
  assert.equal(initialLanguage({getItem:k=>k===LANGUAGE_STORAGE_KEY?'pt':null}),'pt');
- assert.equal(initialLanguage({getItem:()=>null}),'de');
- assert.equal(initialLanguage({getItem:()=> 'not-a-locale'}),'de');
- assert.equal(initialLanguage({getItem:()=>{throw Error('Storage blocked');}}),'de');
+ assert.equal(initialLanguage({getItem:k=>k===LANGUAGE_STORAGE_KEY?'de':null}),'de');
+ assert.equal(initialLanguage({getItem:()=>null}),'en');
+ assert.equal(initialLanguage({getItem:()=> 'not-a-locale'}),'en');
+ assert.equal(initialLanguage({getItem:()=>{throw Error('Storage blocked');}}),'en');
 });
 test('German, English and pt-PT labels cover navigation, families, crime and events',()=>{
  assert.equal(translateText('Beziehungen','en'),'Relationships');
