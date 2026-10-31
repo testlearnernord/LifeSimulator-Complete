@@ -223,6 +223,13 @@ with sync_playwright() as playwright:
     import os
     os.makedirs('artifacts', exist_ok=True)
     page.screenshot(path='artifacts/life-mobile.png', full_page=True)
+    # Milestone collection: menu opens and shows the full achievement catalog.
+    page.get_by_role('button', name='Hauptmenü öffnen').click()
+    page.locator('[data-action="milestonesopen"]').click()
+    expect(page.get_by_text('Freigeschaltete Erfolge')).to_be_visible()
+    expect(page.locator('[data-milestone-id="adult"]')).to_have_count(1)
+    page.locator('[data-action="milestonesback"]').click()
+    page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
     # Work career: real mobile UI, application, colleagues, save/reload.
     page.evaluate("""async () => {
         const {createLife, applyAction} = await import('/app/engine/simulation.js');
@@ -239,6 +246,15 @@ with sync_playwright() as playwright:
     }""")
     page.reload(wait_until='networkidle')
     expect(page.locator('.profile-name')).to_contain_text('Arbeitswelt E2E')
+    page.get_by_role('button', name='Hauptmenü öffnen').click()
+    page.locator('[data-action="milestonesopen"]').click()
+    expect(page.locator('[data-milestone-id="adult"].milestone-earned')).to_have_count(1)
+    page.reload(wait_until='networkidle')
+    page.get_by_role('button', name='Hauptmenü öffnen').click()
+    page.locator('[data-action="milestonesopen"]').click()
+    expect(page.locator('[data-milestone-id="adult"].milestone-earned')).to_have_count(1)
+    page.locator('[data-action="milestonesback"]').click()
+    page.get_by_role('button', name='Schließen und zum Lebenslauf').click()
     page.locator('nav [data-action="tab"][data-id="career"]').click()
     page.locator('[data-action="job"][data-id="retail"]').click()
     expect(page.get_by_text('Arbeitsumfeld', exact=True)).to_be_visible()
