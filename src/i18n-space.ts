@@ -35,6 +35,8 @@ export const SPACE_TRANSLATIONS:readonly (readonly [string,string,string])[]=[
  ['Flugsimulator','Flight simulator','Simulador de voo'],
  ['Flugpraxis verbessern · 300 €','Improve flight skills · €300','Melhorar prática de voo · 300 €'],
  ['Rehabilitation','Rehabilitation','Reabilitação'],
+ ['Jahr(e) Rehabilitation','year(s) of recovery','ano(s) de recuperação'],
+ ['Einsatz mit Risiko · Prämie','Risky mission · bonus','Missão de risco · prémio'],
  ['Verletzung behandeln · 450 €','Treat injury · €450','Tratar lesão · 450 €'],
  ['Raumfahrtakademie','Space academy','Academia espacial'],
  ['Hochschulabschluss, 65 % Intelligenz, Training und 8.000 € erforderlich.','University degree, 65% intelligence, training and €8,000 required.','Exige curso superior, 65% de inteligência, treino e 8.000 €.'],
