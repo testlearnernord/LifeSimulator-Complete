@@ -11,6 +11,7 @@ import {advanceCrime,crimeAction,crimeReleased,validCrime} from './crime.js';
 import {advanceDirector,directorAction,validDirector} from './director.js';
 import {advanceSport,sportAction,sportActive,validSport} from './sport.js';
 import {advanceFighter,fighterAction,validFighter} from './fighter.js';
+import {advanceSpace,spaceAction,spaceActive,validSpace} from './space.js';
 import {advanceHeirlooms,heirloomAction,heirloomWorth,validHeirlooms} from './heirlooms.js';
 import {awardAchievements,recordRibbon,validMilestones} from './milestones.js';
 import {applyForWork,workAction,startWork,workYear,promoteWork,validWork} from './work.js';
@@ -78,7 +79,7 @@ function yearlyEvent(s:SaveGame){const p=s.person;
  else if(roll<.47&&p.age>=18){event(s,'Eine Gelegenheit',`Ein Nebenverdienst bietet sich an.`,[{label:'Auftrag annehmen',kind:'sidejob'},{label:'Auslassen',kind:'ignore'}]);}
  else if(roll<.55&&p.age>=18){event(s,'Ein unerwarteter Fund',`Du findest eine fremde Geldbörse auf dem Weg nach Hause.`,[{label:'Zurückgeben',kind:'walletReturn'},{label:'Geld behalten',kind:'walletKeep'}]);}
 }
-function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;recordRibbon(s);p.jobId=null;p.workplace=null;if(p.sportCareer)p.sportCareer.contract=null;if(p.fighterCareer){p.fighterCareer.league=false;p.fighterCareer.champion=false;}if(p.politicalCareer){p.politicalCareer.office=null;p.politicalCareer.campaign=null;}log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
+function die(s:SaveGame,cause:string){const p=s.person;p.alive=false;p.pending=null;p.causeOfDeath=cause;recordRibbon(s);p.jobId=null;p.workplace=null;if(p.sportCareer)p.sportCareer.contract=null;if(p.fighterCareer){p.fighterCareer.league=false;p.fighterCareer.champion=false;}if(p.spaceCareer)p.spaceCareer.employed=false;if(p.politicalCareer){p.politicalCareer.office=null;p.politicalCareer.campaign=null;}log(s,`Du bist im Alter von ${p.age} Jahren gestorben. Ursache: ${cause}.`,'bad');}
 function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.age++;const releasedThisYear=p.prisonYears===1;p.yearlyActions={};p.school=schoolFor(p.age,p.universityYears,p.degree);
  for(const r of p.relationships){r.age++;if(r.alive&&chance(s,Math.max(.001,(r.age-68)*.006))) {r.alive=false;log(s,`${r.name} ist verstorben.`,'bad');}}
  if(p.prisonYears>0){p.prisonYears--;if(p.prisonYears===0)log(s,'Du wurdest aus dem Gefängnis entlassen.','good');}
@@ -98,6 +99,7 @@ function age(s:SaveGame){const p=s.person;const jailedAtStart=p.prisonYears>0;p.
   advanceSport(s,expansionHooks(s),jailedAtStart);
   advanceFighter(s,expansionHooks(s),jailedAtStart);
   advancePolitics(s,expansionHooks(s),jailedAtStart);
+  advanceSpace(s,expansionHooks(s),jailedAtStart);
  advanceLifestyle(s,expansionHooks(s));
   familyYear(s,expansionHooks(s));
  if(expense+assetExpense>0)log(s,`Lebenshaltung und Besitz: ${money(expense+assetExpense)}.`);
@@ -213,6 +215,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  if(!p.alive)throw Error('Dieses Leben ist bereits beendet.');
  if(p.pending&&action.type!=='EVENT')throw Error('Bitte zuerst die offene Entscheidung treffen.');
  if(p.fighterCareer?.league&&(action.type==='JOB'||(action.type==='WORK'&&action.key==='apply')||(action.type==='SPORT'&&action.key==='tryout')||(action.type==='ACTOR'&&action.key==='audition')||(action.type==='MUSIC'&&action.key==='audition')||(action.type==='POLITICS'&&action.key==='launch')||(action.type==='DIRECTOR'&&action.key==='start')))throw Error('Beende zuerst deinen Vertrag in der Kampfliga.');
+ if(spaceActive(p)&&(action.type==='JOB'||action.type==='STUDY'||(action.type==='WORK'&&action.key==='apply')||(action.type==='SPORT'&&action.key==='tryout')||(action.type==='FIGHTER'&&action.key==='join')||(action.type==='ACTOR'&&action.key==='audition')||(action.type==='MUSIC'&&action.key==='audition')||(action.type==='POLITICS'&&action.key==='launch')||(action.type==='DIRECTOR'&&action.key==='start')))throw Error('Beende zuerst deinen Raumfahrtvertrag.');
  switch(action.type){
  case 'BIRTH':{
    if(p.age<18||p.prisonYears>0)throw Error('Ein geplanter Nachwuchs ist jetzt nicht möglich.');
@@ -253,6 +256,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  }
  case 'HEIRLOOM':heirloomAction(s,action.key,action.id,expansionHooks(s));break;
  case 'FIGHTER':fighterAction(s,action.key,action.style,expansionHooks(s));break;
+ case 'SPACE':spaceAction(s,action.key,action.mission,expansionHooks(s));break;
  case 'POLITICS':politicalAction(s,action.key,action.office,action.party,action.policy,action.budget,expansionHooks(s));break;
   case 'SPORT':sportAction(s,action.key,action.sport,action.league,expansionHooks(s));break;
   case 'DIRECTOR':directorAction(s,action.key,action.genre,action.budget,action.choice,expansionHooks(s));break;
@@ -281,7 +285,7 @@ export function applyAction(input:SaveGame,action:Action):SaveGame{
  case 'JOB':{requireFree(p);if(politicsActive(p))throw Error('Beende zuerst dein politisches Amt.');if(p.musicCareer&&p.musicCareer.contractYears>0)throw Error('Beende zuerst deinen Musikvertrag.');if(actingActive(p))throw Error('Beende zuerst deine Schauspielrolle.');if(sportActive(p))throw Error('Beende zuerst deinen Sportvertrag.');const job=CAREERS.find(j=>j.id===action.id);if(!job)throw Error('Unbekannte Stelle.');if(p.age<job.minAge||p.stats.smarts<job.minSmarts||(job.requiresDegree&&!p.degree)||p.prisonYears>0)throw Error('Du erfüllst die Voraussetzungen noch nicht.');p.jobId=job.id;p.jobYears=0;p.salaryBonus=0;p.careerPerformance=50;startWork(s,expansionHooks(s));log(s,`Du arbeitest jetzt als ${job.title}.`,'good');break;}
  case 'BUY':{requireFree(p);const item=ITEMS.find(i=>i.id===action.id);if(!item)throw Error('Unbekannter Gegenstand.');if(p.age<18||p.cash<item.price)throw Error('Kauf derzeit nicht möglich.');p.cash-=item.price;p.assets.push({id:uid(s),name:item.name,kind:item.kind,value:item.price,annualCost:item.annualCost});log(s,`Du hast ${item.name} für ${money(item.price)} gekauft.`,'good');break;}
  case 'SELL':{requireFree(p);const item=p.assets.find(i=>i.id===action.id);if(!item)throw Error('Gegenstand nicht vorhanden.');const sale=Math.floor(item.value*.85);p.cash+=sale;p.assets=p.assets.filter(i=>i.id!==item.id);log(s,`Du hast ${item.name} für ${money(sale)} verkauft.`,'good');break;}
- case 'EMIGRATE':if(p.age<18||p.prisonYears>0||!COUNTRIES.includes(action.country)||p.country===action.country)throw Error('Auswanderung nicht verfügbar.');if(p.cash<3500)throw Error('Die Auswanderung kostet 3.500 €.');p.cash-=3500;p.country=action.country;if(p.politicalCareer?.office||p.politicalCareer?.campaign){p.politicalCareer.office=null;p.politicalCareer.campaign=null;log(s,'Deine politische Laufbahn in diesem Land endet durch die Auswanderung.');}p.jobId=null;p.workplace=null;p.jobYears=0;if(p.sportCareer?.contract){p.sportCareer.contract=null;log(s,'Dein bisheriger Sportvertrag endet mit der Auswanderung.');}if(p.fighterCareer?.league){p.fighterCareer.league=false;p.fighterCareer.champion=false;log(s,'Dein Kampfliga-Vertrag endet durch die Auswanderung.');}log(s,`Du bist nach ${action.country} ausgewandert.`,'good');break;
+ case 'EMIGRATE':if(p.age<18||p.prisonYears>0||!COUNTRIES.includes(action.country)||p.country===action.country)throw Error('Auswanderung nicht verfügbar.');if(p.cash<3500)throw Error('Die Auswanderung kostet 3.500 €.');p.cash-=3500;p.country=action.country;if(p.politicalCareer?.office||p.politicalCareer?.campaign){p.politicalCareer.office=null;p.politicalCareer.campaign=null;log(s,'Deine politische Laufbahn in diesem Land endet durch die Auswanderung.');}p.jobId=null;p.workplace=null;p.jobYears=0;if(p.sportCareer?.contract){p.sportCareer.contract=null;log(s,'Dein bisheriger Sportvertrag endet mit der Auswanderung.');}if(p.fighterCareer?.league){p.fighterCareer.league=false;p.fighterCareer.champion=false;log(s,'Dein Kampfliga-Vertrag endet durch die Auswanderung.');}if(p.spaceCareer?.employed){p.spaceCareer.employed=false;log(s,'Dein Raumfahrtvertrag endet durch die Auswanderung.');}log(s,`Du bist nach ${action.country} ausgewandert.`,'good');break;
  }
  awardAchievements(s);s.updated=Date.now();return s;
 }
@@ -299,7 +303,7 @@ export function isSaveGame(value:unknown):value is SaveGame{
  if(p.talent!==undefined&&!['musik','sport','schauspiel','intelligenz','keines'].includes(p.talent))return false;
  if(p.degrees!==undefined&&(!Array.isArray(p.degrees)||p.degrees.length>2||!p.degrees.every(x=>['Ingenieurwesen','Medizin','Rechtswissenschaften','Geisteswissenschaften'].includes(x))||new Set(p.degrees).size!==p.degrees.length))return false;
  if(!Array.isArray(p.assets)||p.assets.length>1000||!p.assets.every(a=>str(a.id,100)&&str(a.name)&&['Haus','Auto'].includes(a.kind)&&num(a.value,0)&&num(a.annualCost,0)))return false;
- if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validFighter(p)||!validHeirlooms(p)||!validWork(p)||!validPolitics(p)||!validMilestones(x as SaveGame))return false;
+ if(!validExtensions(p)||!validInvestments(p)||!validLifestyle(p)||!validSchoolHealth(p)||!validFamily(p)||!validMusic(p)||!validActing(p)||!validCrime(p)||!validDirector(p)||!validSport(p)||!validFighter(p)||!validSpace(p)||!validHeirlooms(p)||!validWork(p)||!validPolitics(p)||!validMilestones(x as SaveGame))return false;
   if(!Array.isArray(p.history)||p.history.length>250||!p.history.every(h=>str(h.id,100)&&int(h.age,0,200)&&str(h.text,1000)&&['normal','good','bad'].includes(h.tone)))return false;
  if(p.yearlyActions!==undefined&&(typeof p.yearlyActions!=='object'||p.yearlyActions===null||Object.keys(p.yearlyActions).length>250||!Object.entries(p.yearlyActions).every(([k,v])=>str(k,100)&&int(v,0,100))))return false;
  if(p.careerPerformance!==undefined&&!num(p.careerPerformance,0,100))return false;

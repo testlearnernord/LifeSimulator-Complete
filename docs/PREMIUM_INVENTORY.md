@@ -18,7 +18,7 @@ Der App Store listet nur einen Teil der In-App-Käufe (die angezeigten Angebote 
 | Gruppe | Erwähnte Angebote | Typ | Umsetzungsstand |
 |---|---|---|---|
 | Basispremium | Bitizenship, God Mode, Bitizenship+God Mode, Boss Mode | dauerhaft | **Teilweise**: Eigene lokale Spielstände, Charakterattribute, keine Werbung, einige berufliche Systeme |
-| Job-Packs | Mafia, Profisport, Musiker, Schauspieler, Politiker, Astronaut, Model, Street Hustler, Dealer, Business, Music Producer | spezialisierte Karrieren | **Offen**, Business **teilweise** |
+| Job-Packs | Mafia, Profisport, Musiker, Schauspieler, Politiker, Astronaut, Model, Street Hustler, Dealer, Business, Music Producer | spezialisierte Karrieren | **Offen**, Business und Astronaut **teilweise** |
 | Expansion Packs | Landlord, Investor, C.U.L.T., Black Market, Movie Director, Secret Agent, Zoo, Casino, Grand Prix/Racing, Outdoor Lifestyle | Spielsysteme | Landlord, Investor und Movie Director **teilweise**, Rest **offen** |
 | Items | Golden Pacifier, Get Out of Jail Free Card, Hollywood Star, Assassin's Blade, Golden Passport, Promiscuity Potion, Golden Diploma, Golden Piggy Bank, Golden Resume, Friendship Bracelet | permanente/spezielle Gegenstände | **Eigene spielbare Funktionen:** Pacifier, Jail Card, Hollywood Star, Diploma. Rest **offen** |
 | Verschiedenes | Time Machine, Ultimate Fighter Mode, Challenge Vault, Luxury Lifestyle, BitPass/Seasons (historisch) | Modi und Sammlungen | Time Machine **spielbar**; Fighter Mode **teilweise**; weitere offen; Seasons offiziell eingestellt |

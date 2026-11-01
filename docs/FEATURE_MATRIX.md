@@ -2,7 +2,7 @@
 
 # Feature-Matrix – BitLife-Referenzinventar
 
-**Referenzdatum:** 2026-10-26. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.21.0 (2026-10-31).
+**Referenzdatum:** 2026-11-01. **Letzter klar erkennbarer App-Store-Versionsstand:** 3.26 (die genaue Versionskennung und der Rollout können je nach Store abweichen). **Projektstand:** Lebenslinien v0.22.0 (2026-11-01).
 
 **Status:** `S` = als eigener Mechanismus spielbar, jedoch **nicht** auf mathematische Originaltreue geprüft; `P` = teilweise umgesetzt; `O` = offen; `?` = Existenz, genaue Regeln oder Verfügbarkeit nicht abschließend verifiziert. Kein `S` beansprucht eine 1:1-Reproduktion von BitLife. **Quellen:** `A` offizieller App Store, `H` offizielles Help Center, `W` Community-Wiki (Sekundärquelle), `N` offizielle What's-New-Seite, `C` Community-Karriereliste. Durch ältere Quellen ist eine Versionszuordnung zu einzelnen Features oft nicht belegbar; das ist ausdrücklich keine vollständige Bestandsaufnahme.
 
@@ -41,27 +41,27 @@
 | Karriere | Beförderung und Karriereleiter | H,C | P | Leistung, vier interne Stufen, Chefbeziehung, Bonus, Abmahnungen und Kündigung; keine Originalränge |
 | Karriere | Teilzeitjobs | W | O | Noch nicht integriert |
 | Karriere | Militär | W | O | Keine Einsätze, Laufbahnen oder Minenfelder |
-| Karriere | Fame / Berühmtheit | H | O | Kein Fame-System |
+| Karriere | Fame / Berühmtheit | H | P | Eigener Bekanntheitswert mit Social-Media- und Karriereeffekten, kein vollständiger Ruhmkatalog |
 | Karriere | Social Media / SoundCloud | A | P | Fünf Plattformen, Reichweite, Beiträge, Sponsoring, Bekanntheit; kein SoundCloud-Katalog, Formeln eigener Entwurf |
 | Karriere | Mafia Job Pack | H,W | O | Nicht implementiert |
 | Karriere | Pro Athlete Job Pack | H,W | P | Eigene Sportlaufbahn mit drei Sportarten, Training, Probetraining, fiktiven Clubs, Verträgen, Saisons, Meisterschaften und Verletzungen; keine echten Sportligen oder Originalregeln |
-| Karriere | Musician Job Pack | H,W | O | Nicht implementiert |
-| Karriere | Actor Job Pack | H,W | O | Nicht implementiert |
+| Karriere | Musician Job Pack | H,W | P | Unterricht, Solo/Band, Aufnahmen, Verträge, Tourneen und Tantiemen als eigenes Modell |
+| Karriere | Actor Job Pack | H,W | P | Unterricht, Agent, Castings, Film-/Serienrollen und Gagen als eigenes Modell |
 | Karriere | Politician Job Pack | H,W | P | Eigene Politikerkarriere mit fiktiven Parteien, vier Amtsebenen, Wahlkampagnen, Wahlen, Amtszeiten, Reden, politischen Vorhaben und Jahresgehältern; keine Originalformeln |
-| Karriere | Business Job Pack | W | O | Nicht implementiert |
+| Karriere | Business Job Pack | H,W | P | Eigene Unternehmensgründung, Personal, Marketing und Jahresabrechnung; Originaltiefe fehlt |
 | Karriere | Street Hustler Job Pack | W | O | Nicht implementiert |
-| Karriere | Astronaut Job Pack | W | O | Nicht implementiert |
+| Karriere | Astronaut Job Pack | A(DE),W | P | Eigene Raumfahrtakademie, Bewerbung, vier Dienstgrade, Forschung, drei Missionstypen, Verletzungen und Jahresgehälter; keine Original-Minispiele |
 | Karriere | Model Job Pack | W | O | Nicht implementiert |
 | Karriere | Dealer Job Pack | W | O | Nicht implementiert |
 | Karriere | Music Producer Job Pack (2026) | A | O | Offiziell im Januar 2026 erwähnt |
 | Spezialmodus | Ultimate Fighter Mode (2026) | N | P | Eigene Stile, Training, Coach, Straßenkämpfe, Ligakämpfe, Rivalen, Titel, Verletzungen und Kampfchronik; 200+ Moves und interaktives MMA-Minispiel fehlen |
 | Finanzen | Einkommen und Ausgaben | A | S | Jährliche Gehälter und Unterhalt, modellierte Werte |
 | Finanzen | Schulden / negative Liquidität | A | P | Negativsaldo möglich, keine Kreditverträge |
-| Finanzen | Loans / Kredite (2026) | A | O | Offiziell April 2026 erwähnt |
+| Finanzen | Loans / Kredite (2026) | A | P | Drei eigene Kreditgrößen, jährliche Zinsen und Sondertilgung; Originalbedingungen nicht geprüft |
 | Vermögen | Immobilien kaufen / verkaufen | A | P | 2 Immobilienprofile und Unterhalt |
 | Vermögen | Fahrzeuge kaufen / verkaufen | A | P | 2 Fahrzeugprofile und Unterhalt |
-| Finanzen | Investor Expansion Pack | W,A | O | Aktien, Anleihen, Krypto nicht integriert |
-| Finanzen | Landlord Expansion Pack | W,A | O | Mieter/Miete/Objektmanagement nicht integriert |
+| Finanzen | Investor Expansion Pack | W,A | P | Fiktives Depot, fünf Anlageklassen, Kauf/Verkauf, Marktpreise und Berater; keine Originalmärkte |
+| Finanzen | Landlord Expansion Pack | W,A | P | Eigene Vermietung, Reparaturen, Leerstand und Mieteinnahmen; begrenztes Mietrecht |
 | Finanzen | Black Market Expansion Pack | W | O | Schwarzmarkt-/Auktionsfunktionen fehlen |
 | Finanzen | Cult Expansion Pack | W,A | O | Kult-/Gemeinschaftsmanagement fehlt |
 | Finanzen | Secret Agent Expansion Pack | W | O | Agentur und Missionen fehlen |
@@ -69,9 +69,9 @@
 | Finanzen | Casino Expansion Pack | C | ? | Weitere Primärquellen/Plattformabgleich nötig |
 | Finanzen | Outdoor Pack Collection | W | ? | Pack-Bezeichnung in Wiki, Inhalt unvollständig |
 | Film | Movie Director Expansion Pack (2026) | A,N | P | Eigenes Regiestudio: Filmkurse, Genres, Budget, Casting, Dreh, Premiere, Einspielergebnis, Filmografie und Preise; keine Originalformeln oder Filmfestivals |
-| Gesundheit | Arztbesuche | A | P | Gesundheit erhöht, Krankheiten fehlen |
+| Gesundheit | Arztbesuche | A | P | Check, Diagnose und Behandlung für drei eigene Erkrankungen; keine komplexen Eingriffe |
 | Gesundheit | Fitnessstudio | A | S | Gesundheits-/Aussehenswirkung |
-| Gesundheit | Krankheiten / Therapien | A | O | Kein spezifischer Krankheitskatalog |
+| Gesundheit | Krankheiten / Therapien | A | P | Erkältung, Grippe, Erschöpfung, Behandlung, Gesprächstherapie und Erholung; stark vereinfacht |
 | Gesundheit | Promiscuity Potion | H | O | Offizielles Item, STD-Schutz |
 | Delikte | Diebstahl / Risiko | A | S | Zufall: Geld oder Haft, vereinfachtes Modell |
 | Delikte | Polizeikontakt / Gefängnis | A,W | P | Haftjahre, Akteneintrag, gesondertes Haftmenü, kein Straftat-Spam in Haft |
@@ -87,15 +87,17 @@
 | Sonderfunktionen | God Mode | H | P | Vier sichtbare Charakterwerte frei anpassbar, andere Aspekte noch offen |
 | Sonderfunktionen | Bitizenship | H | P | Spielfunktionen nicht monetarisiert |
 | Sonderfunktionen | Boss Mode | H | O | Kein künstliches Paywall-System, Job-Packs fehlen |
-| Sonderfunktionen | Hollywood Star | H | O | Item und sofortige Berühmtheit fehlen |
+| Sonderfunktionen | Hollywood Star | H | P | Eigene sofortige Bekanntheit für ausgewählte Karrieren, nicht identisch zum Kaufitem |
 | Sonderfunktionen | Assassin's Blade | H | O | Sonderitem fehlt |
 | Sonderfunktionen | Aura Ring (2026) | A | O | Beziehungs-Item offiziell im März 2026 erwähnt |
-| Sonderfunktionen | Time Machine | H,A | O | In-Game-Rücksprung fehlt |
+| Sonderfunktionen | Time Machine | H,A | P | Bis 15 Jahres-Snapshots und Rücksprung 1–5 Jahre; kein Original-Zeitreisekatalog |
 | Meta | Season / BitPass (historisch) | N | O | Offiziell am 14.08.2026 eingestellt; keine Priorität für eine neue Live-Season-Infrastruktur |
-| Meta | Achievements | H | P | 16 eigenständige, automatisch freischaltbare Erfolge mit Fortschrittsanzeige, generationenübergreifender Speicherung und Zusammenfassung lokaler Saves; Originalkatalog nicht übernommen |\n| Meta | Heirlooms / Erbstücke | H | P | Eigenständige tägliche Dachboden-Funde, Seltenheit, Schätzung, Restaurierung, Verkauf, Generationenvererbung und Offline-Save; kein Originalkatalog |\n| Meta | Ribbons | H | P | Neun eigene Lebensabschluss-Bänder nach Lebenslauf, Verleihung beim Tod, Sammlung über Generationen und lokale Saves; keine Originalregeln |
+| Meta | Achievements | H | P | 16 eigenständige, automatisch freischaltbare Erfolge mit Fortschrittsanzeige, generationenübergreifender Speicherung und Zusammenfassung lokaler Saves; Originalkatalog nicht übernommen |
+| Meta | Heirlooms / Erbstücke | H | P | Eigenständige tägliche Dachboden-Funde, Seltenheit, Schätzung, Restaurierung, Verkauf, Generationenvererbung und Offline-Save; kein Originalkatalog |
+| Meta | Ribbons | H | P | Neun eigene Lebensabschluss-Bänder nach Lebenslauf, Verleihung beim Tod, Sammlung über Generationen und lokale Saves; keine Originalregeln |
 | Meta | Mehrere gespeicherte Leben | H | S | Pro Leben ein lokaler IndexedDB-Datensatz |
 | Meta | Speicherung / Wiederaufnahme | H | S | Auto-Save nach jeder Aktion |
-| Meta | Sprache/Internationalisierung | H,A | P | UI derzeit deutsch, keine Lokalisierung |
+| Meta | Sprache/Internationalisierung | H,A | P | Deutsch, Englisch (Standard) und pt-PT, viele Menüs und Meldungen übersetzt; Restlücken bei älteren dynamischen Texten |
 | Meta | Monetarisierung / Ad Removal | H | S | Keine Werbung, keine In-App-Käufe |
 
 ## Aktualisierung 28.10.2026
@@ -206,7 +208,7 @@ Details und verbleibende Lücken: [SCHOOL_HEALTH_DESIGN.md](SCHOOL_HEALTH_DESIGN
 |---|---|---|
 | Musician Job Pack | **P – teilweise spielbar** | Gesang, Instrumente, Solo/Band-Vorspiele, Verträge, Pop/Rock/Hip-Hop/Country/Electronic, Singles/Alben, Diskografie, Konzerte, Tourneen, Tantiemen und eigene Popularität |
 | Music Producer Job Pack | **O – offen** | Keine Produzentenkarriere, Künstlerverträge, Kollaborationen oder eigene Musiklabels |
-| Actor, Astronaut, Mafia, Model, Politician, Pro Athlete, Street Hustler | **O – offen** | Karriere-Packs sind noch nicht im erforderlichen Umfang implementiert |
+| Mafia, Model, Street Hustler | **O – offen** | Noch keine eigenständigen vollständigen Karriere-Packs; Schauspiel, Astronaut, Politik und Sport sind teilweise spielbar |
 
 Vollständige Einordnung und Quellen: [MUSICIAN_CAREER.md](MUSICIAN_CAREER.md). Mechaniken und Erfolgswahrscheinlichkeiten sind eigene Modelle.
 
@@ -271,3 +273,10 @@ Die App bietet eine lokal gespeicherte Sprachauswahl für **Deutsch**, **Englisc
 - Menü-Sammlung aus allen lokal vorhandenen Spielständen, trilinguale Texte (Deutsch, Englisch, Portugiesisch), Endbildschirm-Auszeichnung, kompatible optionale Schema-1-Felder `achievements` und `ribbons`.
 - Zeitreise behält bereits verdiente Erfolge als Metafortschritt, entfernt aber ein Lebensband, wenn vor den Tod zurückgespult wird. Generationenwechsel übernimmt beide Sammlungen. Löschen aller lokalen Spielstände entfernt auch deren Sammlungen; kein Server-Sync.
 - **Lücken:** BitLife-Originalkatalog, exakte Band-Prioritäten, echte kontoübergreifende Sammlung bei gelöschten Saves, iPhone-Safari-Hardwaretest.
+
+### Neu in 0.22.0: Eigenständige Raumfahrtlaufbahn
+
+- **Referenzgrenze:** Die offizielle [BitLife-DE-App-Store-Seite](https://apps.apple.com/hu/app/bitlife-de-lebenssimulation/id1570661587) listet historisch einen kaufbaren Astronauteninhalt. Die [offizielle BitLife-Hilfe](https://bitlifeapp.com/help/) bestätigt das Job-Pack-Konzept allgemein, jedoch keine konkreten Astronautenformeln. Die deutsche Einzel-App ist nicht mit der aktuellen globalen App gleichzusetzen. Details zu Akademie, Rang und Einsätzen beruhen ergänzend auf [Sekundärquellen](https://bitlife-life-simulator.fandom.com/wiki/Astronaut) und sind **nicht** als vollständige aktuelle Originalmechanik verifiziert.
+- **Spielbar:** Fachwissen, Flugtraining und Fitness; zweijährige kostenpflichtige Akademie mit Abschlussbedingungen; Bewerbung bei fiktiver Agentur; vier Dienstgrade; Messdatenforschung und Entdeckungen; Satellitenwartung, Orbitalforschung und Mondsonden-Einsätze mit eigenen Erfolgswahrscheinlichkeiten, Prämien und Verletzungsrisiken; Jahresgehälter, Beförderung, Kündigung, Ruhestand, Haft- und Auswanderungsfolgen.
+- **Technik:** Optionales `spaceCareer` in bestehenden `schema:1`-Saves, strenge Datenvalidierung, Zeitreise-Snapshots, mobile UI, Deutsch/Englisch/pt-PT, automatisierte Engine-/Browser-/Offline-Tests. Details in [SPACE_CAREER.md](SPACE_CAREER.md).
+- **Offen:** Astronauten-Originalfragen, Flug-Minispiele, Weltraumspaziergänge, Planetenbenennung, außerirdische Signale, Mond-/Marslandungen, vollständige Rang-/Gehaltssysteme und iPhone-Safari-Hardwaretest. Keine geschützten Assets oder Originaltexte.
