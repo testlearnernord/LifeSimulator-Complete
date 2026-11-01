@@ -373,7 +373,7 @@ with sync_playwright() as playwright:
     expect(page.locator('.profile-name')).to_contain_text('Raumfahrt E2E')
     page.locator('nav [data-action="tab"][data-id="activities"]').click()
     page.locator('[data-action="category"][data-id="space"]').click()
-    expect(page.get_by_text('Raumfahrtlaufbahn')).to_be_visible()
+    expect(page.get_by_text('Raumfahrtlaufbahn', exact=True)).to_be_visible()
     expect(page.get_by_text('Raumfahrtagentur')).to_be_visible()
     page.locator('[data-action="space"][data-id="research"]').click()
     page.locator('[data-action="space"][data-id="mission|Satellitenwartung"]').click()
