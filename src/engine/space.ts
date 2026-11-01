@@ -17,7 +17,7 @@ const employedElsewhere=(p:Person)=>!!(p.sportCareer?.contract||p.fighterCareer?
  p.politicalCareer?.office||p.politicalCareer?.campaign||p.actorCareer?.current||
  p.musicCareer?.contractYears||p.directorCareer?.current);
 const successful=(c:SpaceCareer)=>c.missions.filter(m=>m.success).length;
-const missionSettings:Record<SpaceMissionType,{rank:number;knowledge:number;piloting:number;fitness:number;reward:number;penalty:number}>={
+export const SPACE_MISSION_REQUIREMENTS:Record<SpaceMissionType,{rank:number;knowledge:number;piloting:number;fitness:number;reward:number;penalty:number}>={
  Satellitenwartung:{rank:0,knowledge:55,piloting:50,fitness:40,reward:4000,penalty:.08},
  Orbitalforschung:{rank:1,knowledge:65,piloting:65,fitness:60,reward:12000,penalty:.20},
  Mondsonde:{rank:2,knowledge:80,piloting:80,fitness:75,reward:28000,penalty:.32}
@@ -92,7 +92,7 @@ export function spaceAction(s:SaveGame,key:SpaceAction,kind:SpaceMissionType|und
  if(key==='mission'){
   if(!kind||!SPACE_MISSIONS.includes(kind))throw Error('Unbekannter Raumfahrtauftrag.');
   if(c.injuryYears>0)throw Error('Während der Rehabilitation darfst du keine Mission starten.');
-  const m=missionSettings[kind];
+  const m=SPACE_MISSION_REQUIREMENTS[kind];
   if(c.rank<m.rank||c.knowledge<m.knowledge||c.piloting<m.piloting||c.fitness<m.fitness)throw Error('Für diesen Einsatz fehlen Dienstgrad oder Fähigkeiten.');
   h.annual('space:mission',2);
   const probability=Math.max(.15,Math.min(.94,.55+c.knowledge*.0016+c.piloting*.0013+c.fitness*.0006-m.penalty));
@@ -158,6 +158,6 @@ export function validSpace(p:Person):boolean{
   c.retired&&c.academyYears>0)return false;
  return c.missions.every(m=>m&&typeof m==='object'&&whole(m.age,20,p.age)&&
   SPACE_MISSIONS.includes(m.kind)&&typeof m.success==='boolean'&&
-  whole(m.reward,0,28000)&&m.reward===(m.success?missionSettings[m.kind].reward:0)&&
+  whole(m.reward,0,28000)&&m.reward===(m.success?SPACE_MISSION_REQUIREMENTS[m.kind].reward:0)&&
   typeof m.discovery==='boolean'&&(!m.discovery||m.success));
 }
