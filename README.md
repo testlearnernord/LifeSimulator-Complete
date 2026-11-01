@@ -1,8 +1,10 @@
 # Lebenslinien: LifeSimulator-Complete
 
-**v0.21.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
+**v0.22.0 – Spielbarer, unabhängiger Offline-PWA-Start, keine 1:1-BitLife-Kopie.**
 
 Eine mehrsprachige Lebenssimulation (Deutsch, Englisch und europäisches Portugiesisch) für Browser und iPhone. Neue Leben beginnen bei der Geburt und können über Schule, Studium, Arbeit, Beziehungen, Geld, Krankheit, Ereignisse, Besitz, Gefängnis und Generationenwechsel verlaufen. Alles, was im UI anklickbar ist, hat eine echte Zustandsänderung. Die Mechanik ist bisher eine **eigene Annäherung** an einzelne nachgewiesene Kategorien des Referenzspiels, keine exakte Reproduktion.
+
+**Neu in v0.22.0:** Die [Raumfahrtlaufbahn](docs/SPACE_CAREER.md) ergänzt Akademie, Forschungsarbeit, drei fiktive Missionstypen und langfristige Dienstgrade. Bestehende Schema-1-Spielstände bleiben gültig. Die Karriere ist eine Teilimplementierung, keine exakte BitLife-Reproduktion.
 
 ## Mobile-Oberfläche ab v0.2.0
 
@@ -21,6 +23,7 @@ Das Interface ist eigenständig gestaltet und verwendet keine BitLife-Originalas
 - Kaufen/Verkaufen von Häusern und Autos, Auswanderung
 - Filmregie mit Budget, Casting, Dreh, Kinopremiere, Filmografie und Auszeichnungen
 - Kampfsportmodus mit drei Stilen, Coach, Straßenkämpfen, Ligavertrag, Rivalen, Preisgeld und Titelverteidigung
+- Eigenständige Raumfahrtlaufbahn mit Akademie, drei Trainingsarten, Forschungszentrum, vier Dienstgraden, Missionen, Entdeckungen und Verletzungsfolgen
 - Profisport mit drei Sportarten, Trainingsentwicklung, Probetrainings, fiktiven Vereinen, Verträgen, Saisons, Verletzungen und Sponsoren
 - Politikerkarriere mit Ehrenamt, Wahlkampfbudgets, vier Amtsebenen, Debatten, Wahlen, Zustimmungswerten und Amtsgehältern
 - Erbstücke: tägliche Dachboden-Fundchance, sieben eigene Fundstücke, Seltenheit, Schätzung, Restaurierung, Verkauf und Vererbung\n- Lokal gespeicherte mehrere Leben, automatisches Speichern und JSON-Backup
