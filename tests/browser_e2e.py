@@ -345,7 +345,50 @@ with sync_playwright() as playwright:
     page.locator('[data-action="category"][data-id="fighter"]').click()
     expect(page.get_by_text('Kampfchronik')).to_be_visible()
     context.set_offline(False)
+    # Independent space career: academy -> agency -> research -> mission -> persistent offline UI.
+    page.evaluate("""async () => {
+        const {createLife,applyAction}=await import('/app/engine/simulation.js');
+        const {putGame}=await import('/app/storage/database.js');
+        let s=createLife({name:'Raumfahrt E2E',gender:'divers',country:'Deutschland',seed:772200,
+          stats:{health:100,happiness:100,smarts:100,looks:100}});
+        while(s.person.age<25){
+          if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+          s=applyAction(s,{type:'AGE'});
+        }
+        if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+        s.person.cash=250000;s.person.degree=true;
+        s=applyAction(s,{type:'SPACE',key:'study'});
+        s.person.spaceCareer.knowledge=100;s.person.spaceCareer.piloting=100;
+        s.person.spaceCareer.fitness=100;
+        s=applyAction(s,{type:'SPACE',key:'academy'});
+        for(let i=0;i<2;i++){
+          if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+          s=applyAction(s,{type:'AGE'});
+        }
+        if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});
+        s=applyAction(s,{type:'SPACE',key:'apply'});
+        s.updated=Date.now()+600000;await putGame(s);
+    }""")
+    page.reload(wait_until='networkidle')
+    expect(page.locator('.profile-name')).to_contain_text('Raumfahrt E2E')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="space"]').click()
+    expect(page.get_by_text('Raumfahrtlaufbahn')).to_be_visible()
+    expect(page.get_by_text('Raumfahrtagentur')).to_be_visible()
+    page.locator('[data-action="space"][data-id="research"]').click()
+    page.locator('[data-action="space"][data-id="mission|Satellitenwartung"]').click()
+    expect(page.get_by_text('Missionschronik')).to_be_visible()
+    page.reload(wait_until='networkidle')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="space"]').click()
+    expect(page.get_by_text('Missionschronik')).to_be_visible()
+    context.set_offline(True)
+    page.reload(wait_until='domcontentloaded')
+    page.locator('nav [data-action="tab"][data-id="activities"]').click()
+    page.locator('[data-action="category"][data-id="space"]').click()
+    expect(page.get_by_text('Missionschronik')).to_be_visible()
+    context.set_offline(False)
     assert not errors, f'Browser errors: {errors}'
-    print('v0.21 trilingual selection, mobile controls, careers, saves and offline: PASSED')
+    print('v0.22 trilingual selection, mobile controls, careers, saves and offline: PASSED')
     context.close()
     browser.close()
