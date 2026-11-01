@@ -131,6 +131,7 @@ test('emigration and imprisonment end service, retirement blocks new application
  assert.equal(s.person.spaceCareer.employed,false);
  assert.equal(s.person.spaceCareer.certified,true);
  assert.equal(isSaveGame(s),true);
+ s=advance(s,1);
  s=applyAction(s,{type:'SPACE',key:'apply'});
  s=applyAction(s,{type:'SPACE',key:'retire'});
  assert.equal(s.person.spaceCareer.retired,true);
