@@ -37,6 +37,20 @@ rows.push(...STORY_TRANSLATIONS.map(row=>[...row]));
 rows.push(...MORE_TRANSLATIONS.map(row=>[...row]));
 rows.push(...WORK_SCHOOL_TRANSLATIONS.map(row=>[...row]));
 rows.push(...SPACE_TRANSLATIONS.map(row=>[...row]));
+// Stable German values embedded in old histories and character profiles.
+rows.push(...[
+ ['Verwaltungsangestellte/r','administrative clerk','funcionário/a administrativo/a'],
+ ['Elektriker/in','electrician','eletricista'],
+ ['Pflegekraft','nurse','profissional de enfermagem'],
+ ['Lehrer/in','teacher','professor/a'],
+ ['Büroangestellte/r','office worker','funcionário/a de escritório'],
+ ['Koch/Köchin','cook','cozinheiro/a'],
+ ['Techniker/in','technician','técnico/a'],
+ ['Köln','Cologne','Colónia'],
+ ['Lissabon','Lisbon','Lisboa'],
+ ['Tokio','Tokyo','Tóquio'],
+ ['Eine Stadt','A city','Uma cidade']
+]);
 rows.push(...[["Speicherstand hat ein ungültiges Format.","The saved game has an invalid format.","O jogo guardado tem um formato inválido."],["Spielstand erfolgreich importiert.","Saved game imported successfully.","Jogo guardado importado com sucesso."],["Import fehlgeschlagen.","Import failed.","Falha na importação."],["Datei zu groß.","File too large.","O ficheiro é demasiado grande."],["Kein gültiges JSON.","Not valid JSON.","O ficheiro JSON não é válido."],["Unbekanntes oder beschädigtes Savegame.","Unknown or corrupted saved game.","Jogo guardado desconhecido ou danificado."],["IndexedDB konnte nicht geöffnet werden.","Could not open the browser database.","Não foi possível abrir a base de dados do navegador."]]);
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
@@ -45,6 +59,21 @@ export function translateText(source:string,lang:Language):string{
  const value=source.trim();
  const direct=dictionary[lang].get(value);
  if(direct!==undefined)return source.replace(value,direct);
+ // Nested saved-game values must be translated separately; otherwise an English
+ // or Portuguese sentence can still contain a German occupation or death cause.
+ const parent=value.match(/^Dein(e Mutter| Vater) heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/);
+ if(parent)return source.replace(value,lang==='en'?
+  'Your '+(parent[1]==='e Mutter'?'mother':'father')+' is '+parent[2]+', works as '+translateText(parent[3],lang)+' and is '+parent[4]+' years old.':
+  (parent[1]==='e Mutter'?'A tua mãe':'O teu pai')+' chama-se '+parent[2]+', trabalha como '+translateText(parent[3],lang)+' e tem '+parent[4]+' anos.');
+
+ const death=value.match(/^Du bist im Alter von (\d+) Jahren gestorben\. Ursache: (.+)\.$/);
+ if(death)return source.replace(value,lang==='en'?
+  'You died at age '+death[1]+'. Cause: '+translateText(death[2],lang)+'.':
+  'Morreste aos '+death[1]+' anos. Causa: '+translateText(death[2],lang)+'.');
+ const birthday=value.match(/^(\d{1,2})\. (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)$/);
+ if(birthday)return source.replace(value,lang==='en'?
+  birthday[1]+' '+translateText(birthday[2],lang):
+  birthday[1]+' de '+translateText(birthday[2],lang));
  const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang);
  if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
@@ -57,14 +86,9 @@ export function translateText(source:string,lang:Language):string{
    (lang==='en'?'You grow up with your parents.':'Cresces com os teus pais.'):
    (lang==='en'?'Your mother raises you on her own.':'A tua mãe cria-te sozinha.');
   return source.replace(value,lang==='en'?
-   'You were born in '+born[1]+', '+born[2]+'. '+origin+' Your birthday is '+born[4]+', and your zodiac sign is '+born[5]+'.':
-   'Nasceste em '+born[1]+', '+born[2]+'. '+origin+' Fazes anos a '+born[4]+' e o teu signo é '+born[5]+'.');
+   'You were born in '+translateText(born[1],lang)+', '+translateText(born[2],lang)+'. '+origin+' Your birthday is '+translateText(born[4],lang)+', and your zodiac sign is '+translateText(born[5],lang)+'.':
+   'Nasceste em '+translateText(born[1],lang)+', '+translateText(born[2],lang)+'. '+origin+' Fazes anos a '+translateText(born[4],lang)+' e o teu signo é '+translateText(born[5],lang)+'.');
  }
- const parent=value.match(/^Dein(e Mutter| Vater) heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/);
- if(parent)return source.replace(value,lang==='en'?
-  'Your '+(parent[1]==='e Mutter'?'mother':'father')+' is '+parent[2]+', works as '+parent[3]+' and is '+parent[4]+' years old.':
-  'A '+(parent[1]==='e Mutter'?'tua mãe':'teu pai')+' chama-se '+parent[2]+', trabalha como '+parent[3]+' e tem '+parent[4]+' anos.');
-
  const format=(en:string,pt:string)=>source.replace(value,lang==='en'?en:pt);
  let m:RegExpMatchArray|null;
  if((m=value.match(/^Alter: (\d+) Jahre?$/)))return format('Age: '+m[1]+' years','Idade: '+m[1]+' anos');
