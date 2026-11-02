@@ -37,6 +37,10 @@ rows.push(...STORY_TRANSLATIONS.map(row=>[...row]));
 rows.push(...MORE_TRANSLATIONS.map(row=>[...row]));
 rows.push(...WORK_SCHOOL_TRANSLATIONS.map(row=>[...row]));
 rows.push(...SPACE_TRANSLATIONS.map(row=>[...row]));
+rows.push(...[
+ ['Speicherung nicht verfügbar','Storage unavailable','Armazenamento indisponível'],
+ ['IndexedDB konnte nicht geöffnet werden. Bitte öffne die App über HTTPS oder localhost und erlaube dem Browser, Daten zu speichern.','Could not open the browser database. Open the app over HTTPS or localhost and allow your browser to store data.','Não foi possível abrir a base de dados do navegador. Abre a aplicação por HTTPS ou localhost e permite ao navegador guardar dados.']
+]);
 // Stable German values embedded in old histories and character profiles.
 rows.push(...[
  ['Verwaltungsangestellte/r','administrative clerk','funcionário/a administrativo/a'],
