@@ -26,6 +26,12 @@ with sync_playwright() as playwright:
         fresh_page.locator('form#new-form input[name="name"]').fill('Brenda Test')
         fresh_page.locator('form#new-form button[type="submit"]').click()
         expect(fresh_page.locator('.profile-name')).to_contain_text('Brenda Test')
+        # A generated birth story must not retain German occupations, dates or zodiac signs.
+        timeline_text = ' '.join(fresh_page.locator('.timeline-line').all_text_contents())
+        assert ('You were born' if test_lang == 'en' else 'Nasceste em') in timeline_text, timeline_text
+        assert ('works as' if test_lang == 'en' else 'trabalha como') in timeline_text, timeline_text
+        for german_fragment in ('geboren', 'arbeitet als', 'Jahre)', 'Sternzeichen'):
+            assert german_fragment not in timeline_text, f'{test_lang}: {german_fragment} in {timeline_text}'
         expect(fresh_page.locator('form#new-form')).to_have_count(0)
         fresh_page.reload(wait_until='networkidle')
         expect(fresh_page.locator('.profile-name')).to_contain_text('Brenda Test')
