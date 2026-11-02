@@ -104,6 +104,11 @@ export function translateText(source:string,lang:Language):string{
  if((m=value.match(/^(\d+) (Jahr|Jahre)$/)))return format(m[1]+' '+(m[1]==='1'?'year':'years'),m[1]+' '+(m[1]==='1'?'ano':'anos'));
  if((m=value.match(/^(\d+) weitere Ereignisse$/)))return format(m[1]+' more events',m[1]+' acontecimentos adicionais');
  if((m=value.match(/^▾ Ältere Lebensjahre anzeigen \((\d+)\)$/)))return format('▾ Show earlier years ('+m[1]+')','▾ Mostrar anos anteriores ('+m[1]+')');
+ // Director career events are stored in German in legacy saves; localize on display.
+ if((m=value.match(/^Du finanzierst (.+) mit ([\d.,]+) € Eigenkapital\.$/)))return format('You finance '+m[1]+' with €'+m[2]+' of your own capital.','Financias '+m[1]+' com '+m[2]+' € de capital próprio.');
+ if((m=value.match(/^Du hast die Produktion abgebrochen\. Restbudget: ([\d.,]+) €\.$/)))return format('You cancelled the production. Remaining budget: €'+m[1]+'.','Cancelaste a produção. Orçamento restante: '+m[1]+' €.');
+ if((m=value.match(/^Die verzögerte Filmproduktion kostet weitere ([\d.,]+) €\.$/)))return format('The delayed film production costs another €'+m[1]+'.','O atraso na produção do filme custa mais '+m[1]+' €.');
+ if((m=value.match(/^Das Filmprojekt wurde nach drei Jahren eingestellt\. Restbudget: ([\d.,]+) €\.$/)))return format('The film project was cancelled after three years. Remaining budget: €'+m[1]+'.','O projeto cinematográfico foi cancelado após três anos. Orçamento restante: '+m[1]+' €.');
  if((m=value.match(/^Du heißt (.+)\.$/)))return format('Your name is '+m[1]+'.','Chamas-te '+m[1]+'.');
  if((m=value.match(/^(.+) hat dich in einer schwierigen Phase unterstützt\.$/)))return format(m[1]+' supported you during a difficult time.',m[1]+' apoiou-te numa fase difícil.');
  return source;
