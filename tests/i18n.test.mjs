@@ -30,3 +30,13 @@ test('dynamic years, character timeline and source preservation',()=>{
  assert.equal(translateText('5 Leben auf diesem Gerät gespeichert.','en'),'5 lives saved on this device.');
  assert.equal(translateText(' ▾ Ältere Lebensjahre anzeigen (20) ','en'),' ▾ Show earlier years (20) ');
 });
+
+test('director financial timeline entries localize without mutating legacy German text',()=>{
+ const cases=[
+  ['Du finanzierst Zwischen den Zeilen (1) mit 8.000 € Eigenkapital.','You finance Zwischen den Zeilen (1) with €8.000 of your own capital.','Financias Zwischen den Zeilen (1) com 8.000 € de capital próprio.'],
+  ['Du hast die Produktion abgebrochen. Restbudget: 4.500 €.','You cancelled the production. Remaining budget: €4.500.','Cancelaste a produção. Orçamento restante: 4.500 €.'],
+  ['Die verzögerte Filmproduktion kostet weitere 320 €.','The delayed film production costs another €320.','O atraso na produção do filme custa mais 320 €.'],
+  ['Das Filmprojekt wurde nach drei Jahren eingestellt. Restbudget: 7.000 €.','The film project was cancelled after three years. Remaining budget: €7.000.','O projeto cinematográfico foi cancelado após três anos. Orçamento restante: 7.000 €.']
+ ];
+ for(const [de,en,pt] of cases){assert.equal(translateText(de,'en'),en);assert.equal(translateText(de,'pt'),pt);assert.equal(translateText(de,'de'),de);}
+});
