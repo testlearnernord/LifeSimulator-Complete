@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createLife,applyAction,isSaveGame,netWorth} from '../dist/app/engine/simulation.js';
 import {crimeRisk} from '../dist/app/engine/crime.js';
+import {translateText} from '../dist/app/i18n.js';
 const born=()=>createLife({name:'Testfigur',gender:'divers',country:'Deutschland',seed:123456});
 function advance(s,n){for(let i=0;i<n;i++){if(!s.person.alive)break;if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});s=applyAction(s,{type:'AGE'});}if(s.person.pending)s=applyAction(s,{type:'EVENT',kind:s.person.pending.options[0].kind});return s;}
 test('deterministic initial stats and independent snapshots',()=>{const a=born(),b=born();assert.deepEqual(a.person.stats,b.person.stats);const c=applyAction(a,{type:'ACTIVITY',key:'read'});assert.notEqual(c.person.stats.smarts,a.person.stats.smarts);assert.equal(a.person.age,0);});
@@ -897,6 +898,31 @@ test('director pipeline finances casting, shooting, release and keeps a filmogra
  assert.ok(s.person.cash>before);
  assert.ok(isSaveGame(s));
  assert.throws(()=>applyAction(s,{type:'DIRECTOR',key:'start',genre:'Drama',budget:'kurz'}),/dieses Jahr/);
+});
+test('generated director logs are localized in EN/pt-PT without changing save data',()=>{
+ let s=advance(born(),25);s.person.cash=300000;
+ const generated=[];
+ for(const action of [
+  {type:'DIRECTOR',key:'study'},
+  {type:'DIRECTOR',key:'start',genre:'Drama',budget:'mittel'},
+  {type:'DIRECTOR',key:'cast',choice:'stars'},
+  {type:'DIRECTOR',key:'shoot',choice:'careful'},
+  {type:'DIRECTOR',key:'release'}
+ ]){
+  s=applyAction(s,action);
+  generated.push(s.person.history[0].text);
+ }
+ assert.equal(generated.length,5);
+ const original=structuredClone(s);
+ for(const de of generated){
+  const en=translateText(de,'en'),pt=translateText(de,'pt');
+  assert.notEqual(en,de,'Untranslated English director log: '+de);
+  assert.notEqual(pt,de,'Untranslated Portuguese director log: '+de);
+  assert.doesNotMatch(en,/Du hast|Du finanzierst|Premiere von|Kritik|Kinokasse|Rückfluss/);
+  assert.doesNotMatch(pt,/Du hast|Du finanzierst|Premiere von|Kritik|Kinokasse|Rückfluss/);
+ }
+ assert.deepEqual(s,original,'Translating legacy history must not mutate the save');
+ assert.ok(isSaveGame(s));
 });
 test('director rejects invalid paths, enforces age, custody and film budgets',()=>{
  let s=born();
