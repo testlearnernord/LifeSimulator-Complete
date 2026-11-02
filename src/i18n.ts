@@ -5,6 +5,7 @@ import {STORY_TRANSLATIONS} from './i18n-story.js';
 import {MORE_TRANSLATIONS,WORK_SCHOOL_TRANSLATIONS} from './i18n-more.js';
 import {translateDynamic} from './i18n-dynamic.js';
 import {SPACE_TRANSLATIONS,translateSpaceDynamic} from './i18n-space.js';
+import {DIRECTOR_TRANSLATIONS,translateDirectorDynamic} from './i18n-director.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
 export const LANGUAGE_STORAGE_KEY='lebenslinien-language-v1';
@@ -56,6 +57,7 @@ rows.push(...[
  ['Eine Stadt','A city','Uma cidade']
 ]);
 rows.push(...[["Speicherstand hat ein ungültiges Format.","The saved game has an invalid format.","O jogo guardado tem um formato inválido."],["Spielstand erfolgreich importiert.","Saved game imported successfully.","Jogo guardado importado com sucesso."],["Import fehlgeschlagen.","Import failed.","Falha na importação."],["Datei zu groß.","File too large.","O ficheiro é demasiado grande."],["Kein gültiges JSON.","Not valid JSON.","O ficheiro JSON não é válido."],["Unbekanntes oder beschädigtes Savegame.","Unknown or corrupted saved game.","Jogo guardado desconhecido ou danificado."],["IndexedDB konnte nicht geöffnet werden.","Could not open the browser database.","Não foi possível abrir a base de dados do navegador."]]);
+rows.push(...DIRECTOR_TRANSLATIONS.map(row=>[...row]));
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
 export function translateText(source:string,lang:Language):string{
@@ -78,7 +80,7 @@ export function translateText(source:string,lang:Language):string{
  if(birthday)return source.replace(value,lang==='en'?
   birthday[1]+' '+translateText(birthday[2]!,lang):
   birthday[1]+' de '+translateText(birthday[2]!,lang));
- const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang);
+ const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang)??translateDirectorDynamic(value,lang);
  if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
  if(boundary>0&&boundary<7&&/^[^\p{L}\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
@@ -104,11 +106,6 @@ export function translateText(source:string,lang:Language):string{
  if((m=value.match(/^(\d+) (Jahr|Jahre)$/)))return format(m[1]+' '+(m[1]==='1'?'year':'years'),m[1]+' '+(m[1]==='1'?'ano':'anos'));
  if((m=value.match(/^(\d+) weitere Ereignisse$/)))return format(m[1]+' more events',m[1]+' acontecimentos adicionais');
  if((m=value.match(/^▾ Ältere Lebensjahre anzeigen \((\d+)\)$/)))return format('▾ Show earlier years ('+m[1]+')','▾ Mostrar anos anteriores ('+m[1]+')');
- // Director career events are stored in German in legacy saves; localize on display.
- if((m=value.match(/^Du finanzierst (.+) mit ([\d.,]+) € Eigenkapital\.$/)))return format('You finance '+m[1]+' with €'+m[2]+' of your own capital.','Financias '+m[1]+' com '+m[2]+' € de capital próprio.');
- if((m=value.match(/^Du hast die Produktion abgebrochen\. Restbudget: ([\d.,]+) €\.$/)))return format('You cancelled the production. Remaining budget: €'+m[1]+'.','Cancelaste a produção. Orçamento restante: '+m[1]+' €.');
- if((m=value.match(/^Die verzögerte Filmproduktion kostet weitere ([\d.,]+) €\.$/)))return format('The delayed film production costs another €'+m[1]+'.','O atraso na produção do filme custa mais '+m[1]+' €.');
- if((m=value.match(/^Das Filmprojekt wurde nach drei Jahren eingestellt\. Restbudget: ([\d.,]+) €\.$/)))return format('The film project was cancelled after three years. Remaining budget: €'+m[1]+'.','O projeto cinematográfico foi cancelado após três anos. Orçamento restante: '+m[1]+' €.');
  if((m=value.match(/^Du heißt (.+)\.$/)))return format('Your name is '+m[1]+'.','Chamas-te '+m[1]+'.');
  if((m=value.match(/^(.+) hat dich in einer schwierigen Phase unterstützt\.$/)))return format(m[1]+' supported you during a difficult time.',m[1]+' apoiou-te numa fase difícil.');
  return source;
