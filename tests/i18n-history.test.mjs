@@ -43,6 +43,13 @@ test('death history translates the cause, not just its sentence frame',()=>{
   'You died at age 46. Cause: Serious health problems.');
 });
 
+test('storage failures are localized instead of bypassing the translation layer',()=>{
+ const german='IndexedDB konnte nicht geöffnet werden. Bitte öffne die App über HTTPS oder localhost und erlaube dem Browser, Daten zu speichern.';
+ assert.match(translateText(german,'en'),/^Could not open the browser database/);
+ assert.match(translateText(german,'pt'),/^Não foi possível abrir a base de dados/);
+ assert.equal(translateText('Speicherung nicht verfügbar','en'),'Storage unavailable');
+});
+
 test('actual generated save histories translate without modifying old saves or random state',()=>{
  const save=createLife({name:'Locale Tester',gender:'weiblich',country:'Portugal',seed:1337});
  const original=JSON.stringify(save);
