@@ -36,3 +36,11 @@ Weitere Schritte: vollständige Übersetzungsabdeckung mit klaren Übersetzungs-
 - Die sieben bislang unübersetzten Berufe der Eltern werden auch innerhalb ganzer Geburtseinträge auf Englisch und pt-PT lokalisiert. Die englischen Berufsartikel werden grammatisch angepasst.
 - Die Todeschronik übersetzt jetzt auch die Todesursache statt nur den Satzrahmen. Regressionstests decken beide Sprachen und die Unveränderlichkeit älterer Spielstände ab.
 - **Weiterhin offen:** vollständige systematische Prüfung sämtlicher zusammengesetzter Ereignisse und Dialoge, langfristige Balancing-Messungen, physischer Safari-Test und native pt-PT-Sprachkorrektur. Es wird keine vollständige Lokalisierung behauptet.
+
+## Korrektur 03.11.2026: Filmregie und historische Filmtitel
+
+- Bestehende Filmregie-Historien werden beim Anzeigen auf Englisch und pt-PT übersetzt: Filmkurse, Produktionsstart, Casting, Dreh, Premiere, Abbruch, Verzögerung und automatische Einstellung nach drei Jahren.
+- Neun automatisch erzeugte Filmtitel werden einschließlich ihrer fortlaufenden Nummer lokalisiert. Frei eingegebene oder unbekannte historische Filmtitel bleiben unverändert, damit keine Namen erfunden werden.
+- Beträge in diesen Ereignissen werden sprachabhängig formatiert (englisch: en-GB; portugiesisch: pt-PT). Gespeicherte deutsche Originaltexte, Geldwerte und Spielregeln bleiben unangetastet.
+- Dreisprachige Regressionstests prüfen auch Premierentexte mit und ohne Preis; ein Integrationstest prüft die tatsächlich von der Filmregie erzeugten Ereignisse und unveränderte Save-Daten.
+- **Grenze:** Andere Spezialkarrieren und frei zusammengesetzte Texte enthalten weiterhin unübersetzte Fälle. Dies ist keine Zusage vollständiger EN-/pt-PT-Abdeckung.
