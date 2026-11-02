@@ -66,18 +66,18 @@ export function translateText(source:string,lang:Language):string{
  // Nested saved-game values must be translated separately; otherwise an English
  // or Portuguese sentence can still contain a German occupation or death cause.
  const parent=value.match(/^Dein(e Mutter| Vater) heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/);
- if(parent){const occupation=translateText(parent[3],lang);return source.replace(value,lang==='en'?
+ if(parent){const occupation=translateText(parent[3]!,lang);return source.replace(value,lang==='en'?
   'Your '+(parent[1]==='e Mutter'?'mother':'father')+' is '+parent[2]+', works as '+(/^[aeiou]/i.test(occupation)?'an ':'a ')+occupation+' and is '+parent[4]+' years old.':
   (parent[1]==='e Mutter'?'A tua mãe':'O teu pai')+' chama-se '+parent[2]+', trabalha como '+occupation+' e tem '+parent[4]+' anos.');}
 
  const death=value.match(/^Du bist im Alter von (\d+) Jahren gestorben\. Ursache: (.+)\.$/);
  if(death)return source.replace(value,lang==='en'?
-  'You died at age '+death[1]+'. Cause: '+translateText(death[2],lang)+'.':
-  'Morreste aos '+death[1]+' anos. Causa: '+translateText(death[2],lang)+'.');
+  'You died at age '+death[1]+'. Cause: '+translateText(death[2]!,lang)+'.':
+  'Morreste aos '+death[1]+' anos. Causa: '+translateText(death[2]!,lang)+'.');
  const birthday=value.match(/^(\d{1,2})\. (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)$/);
  if(birthday)return source.replace(value,lang==='en'?
-  birthday[1]+' '+translateText(birthday[2],lang):
-  birthday[1]+' de '+translateText(birthday[2],lang));
+  birthday[1]+' '+translateText(birthday[2]!,lang):
+  birthday[1]+' de '+translateText(birthday[2]!,lang));
  const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang);
  if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
@@ -90,8 +90,8 @@ export function translateText(source:string,lang:Language):string{
    (lang==='en'?'You grow up with your parents.':'Cresces com os teus pais.'):
    (lang==='en'?'Your mother raises you on her own.':'A tua mãe cria-te sozinha.');
   return source.replace(value,lang==='en'?
-   'You were born in '+translateText(born[1],lang)+', '+translateText(born[2],lang)+'. '+origin+' Your birthday is '+translateText(born[4],lang)+', and your zodiac sign is '+translateText(born[5],lang)+'.':
-   'Nasceste em '+translateText(born[1],lang)+', '+translateText(born[2],lang)+'. '+origin+' Fazes anos a '+translateText(born[4],lang)+' e o teu signo é '+translateText(born[5],lang)+'.');
+   'You were born in '+translateText(born[1]!,lang)+', '+translateText(born[2]!,lang)+'. '+origin+' Your birthday is '+translateText(born[4]!,lang)+', and your zodiac sign is '+translateText(born[5]!,lang)+'.':
+   'Nasceste em '+translateText(born[1]!,lang)+', '+translateText(born[2]!,lang)+'. '+origin+' Fazes anos a '+translateText(born[4]!,lang)+' e o teu signo é '+translateText(born[5]!,lang)+'.');
  }
  const format=(en:string,pt:string)=>source.replace(value,lang==='en'?en:pt);
  let m:RegExpMatchArray|null;
