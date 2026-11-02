@@ -15,10 +15,12 @@ test('all parent occupations are translated without changing stable saved values
    assert.ok(!translated.includes('arbeitet als'),language+': '+translated);
   }
  }
+ assert.equal(translateText('Deine Mutter heißt Eva Costa und arbeitet als Elektriker/in (34 Jahre).','en'),
+  'Your mother is Eva Costa, works as an electrician and is 34 years old.');
  assert.equal(translateText('Dein Vater heißt Paulo Costa und arbeitet als Pflegekraft (35 Jahre).','pt'),
   'O teu pai chama-se Paulo Costa, trabalha como profissional de enfermagem e tem 35 anos.');
  assert.equal(translateText('Deine Mutter heißt Maria Costa und arbeitet als Pflegekraft (33 Jahre).','en'),
-  'Your mother is Maria Costa, works as nurse and is 33 years old.');
+  'Your mother is Maria Costa, works as a nurse and is 33 years old.');
 });
 
 test('birth city, country, birthday and zodiac are localized inside legacy story templates',()=>{
