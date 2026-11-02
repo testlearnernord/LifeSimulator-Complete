@@ -97,7 +97,7 @@
 | Meta | Ribbons | H | P | Neun eigene Lebensabschluss-Bänder nach Lebenslauf, Verleihung beim Tod, Sammlung über Generationen und lokale Saves; keine Originalregeln |
 | Meta | Mehrere gespeicherte Leben | H | S | Pro Leben ein lokaler IndexedDB-Datensatz |
 | Meta | Speicherung / Wiederaufnahme | H | S | Auto-Save nach jeder Aktion |
-| Meta | Sprache/Internationalisierung | H,A | P | Deutsch, Englisch (Standard) und pt-PT, viele Menüs und Meldungen übersetzt; Restlücken bei älteren dynamischen Texten |
+| Meta | Sprache/Internationalisierung | H,A | P | Deutsch, Englisch (Standard) und pt-PT; Geburtshistorien, Elternberufe und Todesursachen seit 02.11.2026 korrigiert, übrige dynamische Texte weiterhin nur teilweise abgedeckt |
 | Meta | Monetarisierung / Ad Removal | H | S | Keine Werbung, keine In-App-Käufe |
 
 ## Aktualisierung 28.10.2026
@@ -280,3 +280,9 @@ Die App bietet eine lokal gespeicherte Sprachauswahl für **Deutsch**, **Englisc
 - **Spielbar:** Fachwissen, Flugtraining und Fitness; zweijährige kostenpflichtige Akademie mit Abschlussbedingungen; Bewerbung bei fiktiver Agentur; vier Dienstgrade; Messdatenforschung und Entdeckungen; Satellitenwartung, Orbitalforschung und Mondsonden-Einsätze mit eigenen Erfolgswahrscheinlichkeiten, Prämien und Verletzungsrisiken; Jahresgehälter, Beförderung, Kündigung, Ruhestand, Haft- und Auswanderungsfolgen.
 - **Technik:** Optionales `spaceCareer` in bestehenden `schema:1`-Saves, strenge Datenvalidierung, Zeitreise-Snapshots, mobile UI, Deutsch/Englisch/pt-PT, automatisierte Engine-/Browser-/Offline-Tests. Details in [SPACE_CAREER.md](SPACE_CAREER.md).
 - **Offen:** Astronauten-Originalfragen, Flug-Minispiele, Weltraumspaziergänge, Planetenbenennung, außerirdische Signale, Mond-/Marslandungen, vollständige Rang-/Gehaltssysteme und iPhone-Safari-Hardwaretest. Keine geschützten Assets oder Originaltexte.
+
+### Stabilisierungsphase ab 02.11.2026 (keine neuen Gameplay-Features)
+
+- Priorität P0: deutsche Rückfalltexte in EN/pt-PT systematisch beseitigen. Bereits korrigiert: verschachtelte Elternberufe, Geburtstage, Länder/Orte, Sternzeichen, Todesursachen und lokalisierte Speicherfehleranzeige. Alt-Spielstände bleiben unverändert.
+- Die i18n-Abdeckung bleibt **P**, da spezialisierte dynamische Texte und ältere Ereignisse noch nicht vollständig inventarisiert sind. Keine vollständige Übersetzung behauptet.
+- Danach: Save-/CI-Regressionen, reproduzierbare Balancing- und Systemverzahnungstests sowie iPhone-Offline-Polishing. Die Feature-Erweiterungs-Roadmap ist eingefroren; Details siehe [BACKLOG.md](BACKLOG.md).
