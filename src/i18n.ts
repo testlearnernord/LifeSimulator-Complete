@@ -62,9 +62,9 @@ export function translateText(source:string,lang:Language):string{
  // Nested saved-game values must be translated separately; otherwise an English
  // or Portuguese sentence can still contain a German occupation or death cause.
  const parent=value.match(/^Dein(e Mutter| Vater) heißt (.+) und arbeitet als (.+) \((\d+) Jahre\)\.$/);
- if(parent)return source.replace(value,lang==='en'?
-  'Your '+(parent[1]==='e Mutter'?'mother':'father')+' is '+parent[2]+', works as '+translateText(parent[3],lang)+' and is '+parent[4]+' years old.':
-  (parent[1]==='e Mutter'?'A tua mãe':'O teu pai')+' chama-se '+parent[2]+', trabalha como '+translateText(parent[3],lang)+' e tem '+parent[4]+' anos.');
+ if(parent){const occupation=translateText(parent[3],lang);return source.replace(value,lang==='en'?
+  'Your '+(parent[1]==='e Mutter'?'mother':'father')+' is '+parent[2]+', works as '+(/^[aeiou]/i.test(occupation)?'an ':'a ')+occupation+' and is '+parent[4]+' years old.':
+  (parent[1]==='e Mutter'?'A tua mãe':'O teu pai')+' chama-se '+parent[2]+', trabalha como '+occupation+' e tem '+parent[4]+' anos.');}
 
  const death=value.match(/^Du bist im Alter von (\d+) Jahren gestorben\. Ursache: (.+)\.$/);
  if(death)return source.replace(value,lang==='en'?
