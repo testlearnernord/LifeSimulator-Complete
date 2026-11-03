@@ -800,14 +800,6 @@ export const EXTRA_TRANSLATIONS:readonly (readonly [string,string,string])[]=[
   "Clothes and personal items",
   "Roupa e objetos pessoais"
  ],
- ["Du hast keine Sportverletzung.","You have no sports injury.","Não tens nenhuma lesão desportiva."],
- ["Die Rehabilitation war erfolgreich. Du bist wieder fit.","Rehabilitation was successful. You're fit again.","A reabilitação foi bem-sucedida. Estás novamente em forma."],
- ["Du machst Fortschritte in der Reha, brauchst aber weiter Ruhe.","You're making progress in rehabilitation, but still need rest.","Estás a progredir na reabilitação, mas ainda precisas de descansar."],
- ["Beim Probetraining konntest du den Verein noch nicht überzeugen.","You couldn't convince the club at the tryout yet.","Ainda não conseguiste convencer o clube nas provas de seleção."],
- ["Du hast dich bereits auf eine andere Sportart spezialisiert.","You've already specialized in another sport.","Já te especializaste noutra modalidade desportiva."],
- ["Deine Sportverletzung ist ausgeheilt.","Your sports injury has healed.","A tua lesão desportiva está curada."],
- ["Eine Sportverletzung zwingt dich zur Pause.","A sports injury forces you to take a break.","Uma lesão desportiva obriga-te a fazer uma pausa."],
  ["Dein Sportvertrag wurde wegen der Haft aufgelöst.","Your sports contract was terminated because you were imprisoned.","O teu contrato desportivo foi rescindido devido à prisão."],
  ["Du beendest deine aktive Profikarriere mit 46 Jahren.","You retire from professional sport at age 46.","Terminas a carreira desportiva profissional aos 46 anos."],
- ["Dein Verein lehnt die Gehaltsforderung ab.","Your club rejects your salary request.","O teu clube rejeita o pedido de aumento salarial."],
 ];
