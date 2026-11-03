@@ -799,7 +799,7 @@ export const EXTRA_TRANSLATIONS:readonly (readonly [string,string,string])[]=[
   "Kleidung und persönliche Gegenstände",
   "Clothes and personal items",
   "Roupa e objetos pessoais"
- ]
+ ],
  ["Du hast keine Sportverletzung.","You have no sports injury.","Não tens nenhuma lesão desportiva."],
  ["Die Rehabilitation war erfolgreich. Du bist wieder fit.","Rehabilitation was successful. You're fit again.","A reabilitação foi bem-sucedida. Estás novamente em forma."],
  ["Du machst Fortschritte in der Reha, brauchst aber weiter Ruhe.","You're making progress in rehabilitation, but still need rest.","Estás a progredir na reabilitação, mas ainda precisas de descansar."],
