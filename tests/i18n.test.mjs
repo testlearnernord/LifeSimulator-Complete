@@ -58,10 +58,10 @@ test('director history and old save strings localize in all three languages',()=
 
 test('sports career static timeline messages display in English and European Portuguese',()=>{
  const samples=[
-  ['Die Rehabilitation war erfolgreich. Du bist wieder fit.',"Rehabilitation was successful. You're fit again.",'A reabilitação foi bem-sucedida. Estás novamente em forma.'],
-  ['Beim Probetraining konntest du den Verein noch nicht überzeugen.',"You couldn't convince the club at the tryout yet.",'Ainda não conseguiste convencer o clube nas provas de seleção.'],
+  ['Die Rehabilitation war erfolgreich. Du bist wieder fit.',"Rehabilitation succeeded. You are fit again.",'A reabilitação foi bem-sucedida. Já estás em forma.'],
+  ['Beim Probetraining konntest du den Verein noch nicht überzeugen.',"You failed to impress the club at the tryout.",'Não conseguiste impressionar o clube no teste.'],
   ['Deine Sportverletzung ist ausgeheilt.','Your sports injury has healed.','A tua lesão desportiva está curada.'],
-  ['Eine Sportverletzung zwingt dich zur Pause.','A sports injury forces you to take a break.','Uma lesão desportiva obriga-te a fazer uma pausa.'],
+  ['Eine Sportverletzung zwingt dich zur Pause.','A sports injury forces you to rest.','Uma lesão desportiva obriga-te a fazer uma pausa.'],
   ['Dein Sportvertrag wurde wegen der Haft aufgelöst.','Your sports contract was terminated because you were imprisoned.','O teu contrato desportivo foi rescindido devido à prisão.'],
   ['Du beendest deine aktive Profikarriere mit 46 Jahren.','You retire from professional sport at age 46.','Terminas a carreira desportiva profissional aos 46 anos.']
  ];
