@@ -799,5 +799,7 @@ export const EXTRA_TRANSLATIONS:readonly (readonly [string,string,string])[]=[
   "Kleidung und persönliche Gegenstände",
   "Clothes and personal items",
   "Roupa e objetos pessoais"
- ]
+ ],
+ ["Dein Sportvertrag wurde wegen der Haft aufgelöst.","Your sports contract was terminated because you were imprisoned.","O teu contrato desportivo foi rescindido devido à prisão."],
+ ["Du beendest deine aktive Profikarriere mit 46 Jahren.","You retire from professional sport at age 46.","Terminas a carreira desportiva profissional aos 46 anos."],
 ];

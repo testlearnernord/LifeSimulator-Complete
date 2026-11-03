@@ -55,3 +55,19 @@ test('director history and old save strings localize in all three languages',()=
  assert.equal(translateText('Premiere von Unbekannter Film (1): Kritik 50 %, Kinokasse 400 €, Rückfluss 200 €.','en'),
   'Premiere of Unbekannter Film (1): rating 50%, box office €400, proceeds €200.');
 });
+
+test('sports career static timeline messages display in English and European Portuguese',()=>{
+ const samples=[
+  ['Die Rehabilitation war erfolgreich. Du bist wieder fit.',"Rehabilitation succeeded. You are fit again.",'A reabilitação foi bem-sucedida. Já estás em forma.'],
+  ['Beim Probetraining konntest du den Verein noch nicht überzeugen.',"You failed to impress the club at the tryout.",'Não conseguiste impressionar o clube no teste.'],
+  ['Deine Sportverletzung ist ausgeheilt.','Your sports injury has healed.','A tua lesão desportiva está curada.'],
+  ['Eine Sportverletzung zwingt dich zur Pause.','A sports injury forces you to rest.','Uma lesão desportiva obriga-te a fazer uma pausa.'],
+  ['Dein Sportvertrag wurde wegen der Haft aufgelöst.','Your sports contract was terminated because you were imprisoned.','O teu contrato desportivo foi rescindido devido à prisão.'],
+  ['Du beendest deine aktive Profikarriere mit 46 Jahren.','You retire from professional sport at age 46.','Terminas a carreira desportiva profissional aos 46 anos.']
+ ];
+ for(const [de,en,pt] of samples){
+  assert.equal(translateText(de,'en'),en,de+' EN');
+  assert.equal(translateText(de,'pt'),pt,de+' PT');
+  assert.equal(translateText(de,'de'),de,de+' original');
+ }
+});
