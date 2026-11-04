@@ -84,7 +84,7 @@ test('dynamic sports career histories localize for English and pt-PT while prese
  ];
  for(const [de,en,pt] of samples){
   assert.equal(translateText(de,'en'),en,de+' EN');
-  assert.equal(translateText(de,'pt').replace(/\\u202f/g,' '),pt,de+' PT');
+  assert.equal(translateText(de,'pt').replace(/[\u00a0\u202f]/g,' '),pt.replace(/[\u00a0\u202f]/g,' '),de+' PT');
   assert.equal(translateText(de,'de'),de,de+' source');
  }
 });
