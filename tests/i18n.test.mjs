@@ -71,3 +71,20 @@ test('sports career static timeline messages display in English and European Por
   assert.equal(translateText(de,'de'),de,de+' original');
  }
 });
+
+test('dynamic sports career histories localize for English and pt-PT while preserving old saves',()=>{
+ const samples=[
+  ['Du trainierst Fußball. Spielstärke: 65 %, Fitness: 72 %.','You train in football. Skill: 65%, fitness: 72%.','Treinas futebol. Habilidade: 65%, condição física: 72%.'],
+  ['Du unterschreibst bei Hafenstadt 04 (Regionalliga). Jahresgehalt brutto: 24.000 €.','You sign with Hafenstadt 04 (Regional league). Gross annual salary: €24,000.','Assinas pelo Hafenstadt 04 (liga regional). Salário anual bruto: 24 000 €.'],
+  ['Der Verein stimmt einer Gehaltserhöhung um 2.880 € pro Jahr zu.','The club agrees to an annual pay rise of €2,880.','O clube aceita um aumento salarial anual de 2 880 €.'],
+  ['Ein fiktiver Ausrüster zahlt dir 10.500 € für eine Kampagne.','A fictional sportswear sponsor pays you €10,500 for a campaign.','Uma marca fictícia de equipamento desportivo paga-te 10 500 € por uma campanha.'],
+  ['Du beendest deine Profisportkarriere nach 12 Spielzeiten.','You retire from professional sport after 12 seasons.','Terminas a carreira desportiva profissional após 12 épocas.'],
+  ['Saison bei Hafenstadt 04: 16 Siege, Leistung 78 %, 28.000 € Nettoverdienst. Meistertitel!','Season at Hafenstadt 04: 16 wins, performance 78%, net earnings €28,000. Champions!','Época no Hafenstadt 04: 16 vitórias, desempenho 78%, rendimento líquido 28 000 €. Campeões!'],
+  ['Dein Vertrag bei Hafenstadt 04 ist ausgelaufen. Du kannst erneut zum Probetraining antreten.','Your contract with Hafenstadt 04 has expired. You can attend another tryout.','O teu contrato com Hafenstadt 04 terminou. Podes voltar a fazer provas de seleção.']
+ ];
+ for(const [de,en,pt] of samples){
+  assert.equal(translateText(de,'en'),en,de+' EN');
+  assert.equal(translateText(de,'pt').replace(/\\u202f/g,' '),pt,de+' PT');
+  assert.equal(translateText(de,'de'),de,de+' source');
+ }
+});
