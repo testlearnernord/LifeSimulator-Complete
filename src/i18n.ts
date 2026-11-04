@@ -6,6 +6,7 @@ import {MORE_TRANSLATIONS,WORK_SCHOOL_TRANSLATIONS} from './i18n-more.js';
 import {translateDynamic} from './i18n-dynamic.js';
 import {SPACE_TRANSLATIONS,translateSpaceDynamic} from './i18n-space.js';
 import {DIRECTOR_TRANSLATIONS,translateDirectorDynamic} from './i18n-director.js';
+import {translateSportDynamic} from './i18n-sport.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
 export const LANGUAGE_STORAGE_KEY='lebenslinien-language-v1';
@@ -80,7 +81,7 @@ export function translateText(source:string,lang:Language):string{
  if(birthday)return source.replace(value,lang==='en'?
   birthday[1]+' '+translateText(birthday[2]!,lang):
   birthday[1]+' de '+translateText(birthday[2]!,lang));
- const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang)??translateDirectorDynamic(value,lang);
+ const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang)??translateDirectorDynamic(value,lang)??translateSportDynamic(value,lang);
  if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
  if(boundary>0&&boundary<7&&/^[^\p{L}\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
