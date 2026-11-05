@@ -7,6 +7,7 @@ import {translateDynamic} from './i18n-dynamic.js';
 import {SPACE_TRANSLATIONS,translateSpaceDynamic} from './i18n-space.js';
 import {DIRECTOR_TRANSLATIONS,translateDirectorDynamic} from './i18n-director.js';
 import {translateSportDynamic} from './i18n-sport.js';
+import {WORK_TRANSLATIONS,translateWorkDynamic} from './i18n-work.js';
 // Offline translation layer. Game simulation and save IDs stay unchanged.
 export type Language='de'|'en'|'pt';
 export const LANGUAGE_STORAGE_KEY='lebenslinien-language-v1';
@@ -59,6 +60,7 @@ rows.push(...[
 ]);
 rows.push(...[["Speicherstand hat ein ungültiges Format.","The saved game has an invalid format.","O jogo guardado tem um formato inválido."],["Spielstand erfolgreich importiert.","Saved game imported successfully.","Jogo guardado importado com sucesso."],["Import fehlgeschlagen.","Import failed.","Falha na importação."],["Datei zu groß.","File too large.","O ficheiro é demasiado grande."],["Kein gültiges JSON.","Not valid JSON.","O ficheiro JSON não é válido."],["Unbekanntes oder beschädigtes Savegame.","Unknown or corrupted saved game.","Jogo guardado desconhecido ou danificado."],["IndexedDB konnte nicht geöffnet werden.","Could not open the browser database.","Não foi possível abrir a base de dados do navegador."]]);
 rows.push(...DIRECTOR_TRANSLATIONS.map(row=>[...row]));
+rows.push(...WORK_TRANSLATIONS.map(row=>[...row]));
 const dictionary={en:new Map<string,string>(),pt:new Map<string,string>()};
 for(const entry of rows){const [de,en,pt]=entry;if(de===undefined||en===undefined||pt===undefined)continue;dictionary.en.set(de,en);dictionary.pt.set(de,pt);}
 export function translateText(source:string,lang:Language):string{
@@ -81,7 +83,7 @@ export function translateText(source:string,lang:Language):string{
  if(birthday)return source.replace(value,lang==='en'?
   birthday[1]+' '+translateText(birthday[2]!,lang):
   birthday[1]+' de '+translateText(birthday[2]!,lang));
- const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang)??translateDirectorDynamic(value,lang)??translateSportDynamic(value,lang);
+ const dynamic=translateDynamic(value,lang)??translateSpaceDynamic(value,lang)??translateDirectorDynamic(value,lang)??translateSportDynamic(value,lang)??translateWorkDynamic(value,lang);
  if(dynamic!==null)return source.replace(value,dynamic);
  const boundary=value.indexOf(' ');
  if(boundary>0&&boundary<7&&/^[^\p{L}\p{N}]+$/u.test(value.slice(0,boundary))){const suffix=dictionary[lang].get(value.slice(boundary+1));if(suffix)return source.replace(value,value.slice(0,boundary+1)+suffix);}
