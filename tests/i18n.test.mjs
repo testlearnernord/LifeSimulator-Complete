@@ -88,3 +88,21 @@ test('dynamic sports career histories localize for English and pt-PT while prese
   assert.equal(translateText(de,'de'),de,de+' source');
  }
 });
+
+test('workplace events and legacy save history display in English and European Portuguese',()=>{
+ const samples=[
+  ['Du hast keinen regulären Arbeitsplatz.','You do not have a regular job.','Não tens um emprego regular.'],
+  ['Während der Haft sind Bewerbungen nicht möglich.','You cannot apply for jobs while in prison.','Não podes candidatar-te a empregos enquanto estás na prisão.'],
+  ['Du lernst deine Führungskraft und zwei Kolleginnen oder Kollegen kennen.','You meet your manager and two colleagues.','Conheces a tua chefia e dois colegas.'],
+  ['Nach mehreren Abmahnungen verlierst du deinen Arbeitsplatz.','You lose your job after several warnings.','Perdes o emprego após várias advertências.'],
+  ['Das Vorstellungsgespräch für Elektroniker lief nicht überzeugend. Du erhältst eine Absage.','Your interview for Elektroniker did not go well. Your application was rejected.','A entrevista para Elektroniker não correu bem. A tua candidatura foi rejeitada.'],
+  ['Du wirst in Karrierestufe 3 befördert und erhältst einen Gehaltsaufschlag.','You are promoted to career level 3 and receive a pay rise.','És promovido ao nível 3 da carreira e recebes um aumento salarial.'],
+  ['Du führst ein gutes Gespräch mit Mira Lenz.','You have a good conversation with Mira Lenz.','Tens uma boa conversa com Mira Lenz.'],
+  ['Ein Missverständnis im Team mit Robin Costa belastet die Zusammenarbeit.','A misunderstanding with Robin Costa strains teamwork.','Um mal-entendido com Robin Costa prejudica o trabalho em equipa.']
+ ];
+ for(const [de,en,pt] of samples){
+  assert.equal(translateText(de,'en'),en,de+' EN');
+  assert.equal(translateText(de,'pt'),pt,de+' pt-PT');
+  assert.equal(translateText(de,'de'),de,de+' DE');
+ }
+});
